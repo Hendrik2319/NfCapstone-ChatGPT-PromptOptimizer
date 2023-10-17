@@ -24,8 +24,6 @@ export default function HelloWorld() {
     }
 
     return (
-        <>
-            <h4>Output: {output}</h4>
-        </>
+        <h4>Output: {output}</h4>
     )
 }
