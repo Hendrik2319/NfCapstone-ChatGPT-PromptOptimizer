@@ -34,8 +34,10 @@
 #### ChatGPT API
 * `OPENAI_API_KEY`
   * used to get access to OpenAI API
+  * you can disable API access if set to `disabled`
 * `OPENAI_API_ORGANIZATION`
   * used to define a target for billing
+  * you can disable API access if set to `disabled`
 #### Mongo DB
 * `MONGO_DB_URI`
   * URL of used MongoDB
