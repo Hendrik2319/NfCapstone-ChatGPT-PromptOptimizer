@@ -31,6 +31,11 @@
 
 ## Configuration
 ### Environment Variables for Run
+#### ChatGPT API
+* `OPENAI_API_KEY`
+  * t.b.d.
+* `OPENAI_API_ORGANIZATION`
+  * t.b.d.
 #### Mongo DB
 * `MONGO_DB_URI`
   * URL of used MongoDB
