@@ -1,12 +1,12 @@
 import './App.css'
-import HelloWorld from "./HelloWorld.tsx";
+import SimpleChatView from "./components/SimpleChatView.tsx";
 
 export default function App() {
 
     return (
         <>
-            <h1>HeadLine</h1>
-            <HelloWorld/>
+            <h1>ChatGPT PromptTester</h1>
+            <SimpleChatView/>
         </>
     )
 }

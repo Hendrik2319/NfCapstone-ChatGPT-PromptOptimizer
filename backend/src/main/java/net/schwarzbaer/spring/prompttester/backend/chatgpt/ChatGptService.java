@@ -3,6 +3,7 @@ package net.schwarzbaer.spring.prompttester.backend.chatgpt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -27,13 +28,13 @@ public class ChatGptService {
                 .build();
     }
 
-    public String askChatGPT(String prompt) {
+    public Answer askChatGPT(@NonNull Prompt prompt) {
         ChatGptRequest request = new ChatGptRequest(
                 "gpt-3.5-turbo",
                 List.of(
                         new ChatGptRequest.Message(
                                 "user",
-                                prompt
+                                prompt.prompt()
                         )
                 )
         );
@@ -57,7 +58,7 @@ public class ChatGptService {
         ChatGptResponse.Message message = firstChoice.message();
         if (message==null) return null;
 
-        return message.content();
+        return new Answer(message.content());
     }
 
     private ChatGptResponse execRequest(ChatGptRequest request) {

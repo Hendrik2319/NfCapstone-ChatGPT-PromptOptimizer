@@ -14,7 +14,7 @@ public class SimpleChatGptController {
 	private final ChatGptService chatGptService;
 
 	@PostMapping
-	public String aksChatGPT(@RequestBody String prompt){
+	public Answer aksChatGPT(@RequestBody Prompt prompt){
 		return chatGptService.askChatGPT(prompt);
 	}
 
