@@ -33,9 +33,9 @@
 ### Environment Variables for Run
 #### ChatGPT API
 * `OPENAI_API_KEY`
-  * t.b.d.
+  * used to get access to OpenAI API
 * `OPENAI_API_ORGANIZATION`
-  * t.b.d.
+  * used to define a target for billing
 #### Mongo DB
 * `MONGO_DB_URI`
   * URL of used MongoDB
