@@ -19,10 +19,11 @@ public class ChatGptService {
 
     public ChatGptService(
             @Value("${app.openai-api-key}") String openaiApiKey,
-            @Value("${app.openai-api-org}") String openaiApiOrganization
+            @Value("${app.openai-api-org}") String openaiApiOrganization,
+            @Value("${app.openai-api-url}") String baseUrl
     ) {
         this.webClient = WebClient.builder()
-                .baseUrl("https://api.openai.com/v1/chat/completions")
+                .baseUrl(baseUrl)
                 .defaultHeader("Authorization", "Bearer " + openaiApiKey)
                 .defaultHeader("OpenAI-Organization", openaiApiOrganization)
                 .build();
@@ -42,10 +43,7 @@ public class ChatGptService {
         request.showContent(DEBUG_OUT, "request");
 
         ChatGptResponse response = execRequest(request);
-        if (response==null) {
-            DEBUG_OUT.println("response: <null>");
-            return null;
-        }
+        if (response==null) { DEBUG_OUT.println("response: <null>"); return null; }
 
         response.showContent(DEBUG_OUT, "response");
 
