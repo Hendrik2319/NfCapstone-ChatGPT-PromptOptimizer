@@ -3,6 +3,7 @@
 
 
 ## State of Code
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-black.svg)](https://sonarcloud.io/summary/new_code?id=ChatGPT-PromptTester-Backend)
 ### Backend
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ChatGPT-PromptTester-Backend&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ChatGPT-PromptTester-Backend)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=ChatGPT-PromptTester-Backend&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=ChatGPT-PromptTester-Backend)  
@@ -31,6 +32,13 @@
 
 ## Configuration
 ### Environment Variables for Run
+#### ChatGPT API
+* `OPENAI_API_KEY`
+  * used to get access to OpenAI API
+  * you can disable API access if set to `disabled`
+* `OPENAI_API_ORGANIZATION`
+  * used to define a target for billing
+  * you can disable API access if set to `disabled`
 #### Mongo DB
 * `MONGO_DB_URI`
   * URL of used MongoDB
