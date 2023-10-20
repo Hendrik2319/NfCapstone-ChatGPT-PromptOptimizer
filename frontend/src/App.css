@@ -1,0 +1,13 @@
+.ApiStateIndicator {
+    display: inline-block;
+    border: 1px solid #404040;
+    padding: 0.5em 1em;
+    margin-bottom: 1em;
+}
+.ApiStateIndicator span {
+    margin-left: 10px;
+}
+.ApiStateIndicator.enabled  { background-color: #e0ffe0; }
+.ApiStateIndicator.disabled { background-color: #ffe0e0; }
+.ApiStateIndicator.enabled  span { color: green; }
+.ApiStateIndicator.disabled span { color: red;   }

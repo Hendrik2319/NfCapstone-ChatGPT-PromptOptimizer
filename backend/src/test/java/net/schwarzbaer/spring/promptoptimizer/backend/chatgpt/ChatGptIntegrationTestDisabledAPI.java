@@ -1,6 +1,5 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
-import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class ChatGptIntegrationTest {
+class ChatGptDisabledApiIntegrationTest {
 
 	private static MockWebServer mockWebServer;
 
@@ -41,32 +40,14 @@ class ChatGptIntegrationTest {
 
 	@DynamicPropertySource
 	static void setUrlDynamically(DynamicPropertyRegistry reg) {
-		reg.add("app.openai-api-key", () -> "dummy_api_key");
-		reg.add("app.openai-api-org", () -> "dummy_api_org");
+		reg.add("app.openai-api-key", () -> "disabled");
+		reg.add("app.openai-api-org", () -> "disabled");
 		reg.add("app.openai-api-url", () -> mockWebServer.url("/").toString());
 	}
 
 	@Test
-	void whenAskChatGPT_getsAPrompt_returnsAnAnswer() throws Exception {
+	void whenAskChatGPT_isCalledWithDisabledAPI_returnsAnGeneratedAnswer() throws Exception {
 		// Given
-		mockWebServer.enqueue(
-				new MockResponse()
-						.setHeader("Content-Type", "application/json")
-						.setBody("""
-								{
-									"choices": [
-										{
-											"message": {
-												"content": "TestAnswer"
-											}
-										}
-									],
-									"usage": {
-										"total_tokens": 35
-									}
-								}
-								""")
-		);
 
 		// When
 		mockMvc
@@ -84,13 +65,13 @@ class ChatGptIntegrationTest {
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
 								{
-									"answer": "TestAnswer"
+									"answer": "Access to OpenAI API is currently disabled.\\nYour prompt was:\\n\\"TestPrompt\\""
 								}
 								"""));
 	}
 
 	@Test
-	void whenGetApiState_isCalledWithEnabledAPI_returnsEnabled() throws Exception {
+	void whenGetApiState_isCalledWithDisabledAPI_returnsDisabled() throws Exception {
 		// Given
 
 		// When
@@ -103,7 +84,7 @@ class ChatGptIntegrationTest {
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
 								{
-									"enabled": true
+									"enabled": false
 								}
 								"""));
 

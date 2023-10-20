@@ -82,4 +82,8 @@ public class ChatGptService {
 
 		return responseEntity.getBody();
 	}
+
+	public @NonNull ApiState getApiState() {
+		return new ApiState(webClient != null);
+	}
 }

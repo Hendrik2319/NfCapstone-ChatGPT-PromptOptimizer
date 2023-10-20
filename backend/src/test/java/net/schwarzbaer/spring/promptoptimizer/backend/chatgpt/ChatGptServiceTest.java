@@ -77,4 +77,38 @@ class ChatGptServiceTest {
 		Answer expected = new Answer("TestAnswer");
 		assertEquals(expected, actual);
 	}
+
+	@Test
+	void whenGetApiState_isCalledWithDisabledAPI_returnsDisabled() {
+		// Given
+		chatGptService = new ChatGptService(
+				"disabled",
+				"disabled",
+				mockWebServer.url("/").toString()
+		);
+
+		// When
+		ApiState actual = chatGptService.getApiState();
+
+		// Then
+		ApiState expected = new ApiState(false);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	void whenGetApiState_isCalledWithEnabledAPI_returnsEnabled() {
+		// Given
+		chatGptService = new ChatGptService(
+				"ApiKey",
+				"OrgKey",
+				mockWebServer.url("/").toString()
+		);
+
+		// When
+		ApiState actual = chatGptService.getApiState();
+
+		// Then
+		ApiState expected = new ApiState(true);
+		assertEquals(expected, actual);
+	}
 }
