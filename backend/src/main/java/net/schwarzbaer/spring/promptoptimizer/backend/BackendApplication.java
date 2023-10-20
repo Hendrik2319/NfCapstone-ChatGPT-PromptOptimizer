@@ -1,4 +1,4 @@
-package net.schwarzbaer.spring.prompttester.backend;
+package net.schwarzbaer.spring.promptoptimizer.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

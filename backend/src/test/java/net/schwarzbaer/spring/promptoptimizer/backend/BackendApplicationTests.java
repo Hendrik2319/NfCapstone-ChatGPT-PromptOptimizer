@@ -1,4 +1,4 @@
-package net.schwarzbaer.spring.prompttester.backend;
+package net.schwarzbaer.spring.promptoptimizer.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

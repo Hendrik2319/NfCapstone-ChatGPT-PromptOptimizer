@@ -1,4 +1,4 @@
-package net.schwarzbaer.spring.prompttester.backend.chatgpt;
+package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
