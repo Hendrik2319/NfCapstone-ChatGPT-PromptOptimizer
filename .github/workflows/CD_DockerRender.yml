@@ -48,7 +48,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: backend-build
-          path: backend/target/chatgpt-prompttester.jar
+          path: backend/target/chatgpt-promptoptimizer.jar
 
   push-to-docker-hub:
     runs-on: ubuntu-latest

@@ -1,4 +1,4 @@
-package net.schwarzbaer.spring.prompttester.backend.chatgpt;
+package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
 import java.io.PrintStream;
 import java.time.Instant;

@@ -5,7 +5,7 @@ export default function App() {
 
     return (
         <>
-            <h1>ChatGPT PromptTester</h1>
+            <h1>ChatGPT PromptOptimizer</h1>
             <SimpleChatView/>
         </>
     )

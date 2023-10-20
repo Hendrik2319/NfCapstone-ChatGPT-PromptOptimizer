@@ -1,4 +1,4 @@
-package net.schwarzbaer.spring.prompttester.backend.chatgpt;
+package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
