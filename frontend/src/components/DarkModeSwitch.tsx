@@ -8,7 +8,7 @@ import {
 } from "./DarkModeSwitch.Functions.tsx";
 
 type Props = {
-    onChange: ( state: DarkModeState ) => void
+    readonly onChange: ( state: DarkModeState ) => void
 }
 
 export default function DarkModeSwitch( props: Props ) {
