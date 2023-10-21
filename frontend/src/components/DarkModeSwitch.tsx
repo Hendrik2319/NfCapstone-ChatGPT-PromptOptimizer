@@ -60,13 +60,10 @@ export default function DarkModeSwitch( props: Props ) {
     }
 
     return (
-        <div className={"DarkModeSwitch"}>
-            Theme :&nbsp;
-            <select onChange={onChangeBySwitch} value={switchState}>
-                <option value={"system"}>System</option>
-                <option value={"light"}>Light</option>
-                <option value={"dark"}>Dark</option>
-            </select>
-        </div>
+        <select className={"DarkModeSwitch"} onChange={onChangeBySwitch} value={switchState}>
+            <option value={"system"}>System Theme</option>
+            <option value={"light"}>Light Theme</option>
+            <option value={"dark"}>Dark Theme</option>
+        </select>
     )
 }

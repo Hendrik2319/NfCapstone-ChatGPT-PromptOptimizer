@@ -1,13 +1,74 @@
+
+.dark {
+    --background-color: #202020;
+    --text-color: #ffffff;
+    --border-color: #606060;
+    --button-background-color: #404040;
+    --button-background-color-hover: #303030;
+    --button-text-color: var(--text-color);
+    --button-border-color: var(--border-color);
+}
+.light {
+    --background-color: #ffffff;
+    --text-color: #000000;
+    --border-color: #a0a0a0;
+    --button-background-color: #f0f0f0;
+    --button-background-color-hover: #e0e0e0;
+    --button-text-color: var(--text-color);
+    --button-border-color: var(--border-color);
+}
+body {
+    background-color: var(--background-color, #FFFFFF);
+    color: var(--text-color, #000000);
+}
+
+button, select {
+    color: var(--button-text-color, #000000);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 0.3em;
+    border-color: var(--button-border-color, #707070);
+    background-color: var(--button-background-color, #f0f0f0);
+}
+button:hover, select:hover {
+    background-color: var(--button-background-color-hover, #e0e0e0);
+}
+
+textarea {
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--border-color, #707070);
+    color: var(--text-color, #000000);
+    background-color: var(--background-color, #FFFFFF);
+}
+
+.TopRightBox {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+}
+.TopRightBox > * {
+    margin-left: 0.5em;
+}
+
+.DarkModeSwitch {
+    padding: 0.2em 1em;
+}
+
 .ApiStateIndicator {
     display: inline-block;
     border: 1px solid #404040;
-    padding: 0.5em 1em;
-    margin-bottom: 1em;
+    padding: 0.2em 1em;
+    border-radius: 0.3em;
 }
 .ApiStateIndicator span {
     margin-left: 10px;
 }
-.ApiStateIndicator.enabled  { background-color: #e0ffe0; }
-.ApiStateIndicator.disabled { background-color: #ffe0e0; }
-.ApiStateIndicator.enabled  span { color: green; }
-.ApiStateIndicator.disabled span { color: red;   }
+.dark  .ApiStateIndicator.enabled  { background-color: #003000; }
+.light .ApiStateIndicator.enabled  { background-color: #e0ffe0; }
+.dark  .ApiStateIndicator.disabled { background-color: #400000; }
+.light .ApiStateIndicator.disabled { background-color: #ffe0e0; }
+.dark  .ApiStateIndicator.enabled  span { color: #00a000; }
+.light .ApiStateIndicator.enabled  span { color: #008000; }
+.dark  .ApiStateIndicator.disabled span { color: red;   }
+.light .ApiStateIndicator.disabled span { color: red;   }

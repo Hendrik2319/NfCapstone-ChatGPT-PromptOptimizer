@@ -3,8 +3,6 @@
 }
 
 .SimpleChatForm textarea {
-    display: block;
-    /*border: 1px solid #808080;*/
     width: 100%;
     box-sizing: border-box;
 }
