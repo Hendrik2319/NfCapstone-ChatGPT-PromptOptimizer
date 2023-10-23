@@ -6,13 +6,16 @@ import {useEffect, useState} from "react";
 import {DarkModeState, getCurrentDarkModeState} from "./components/DarkModeSwitch.Functions.tsx";
 import axios from "axios";
 import SidePanel from "./components/SidePanel.tsx";
+import {UserInfos} from "./Types.tsx";
 
 export default function App() {
     const [ darkModeState, setDarkModeState ] = useState<DarkModeState>("light")
+    const [user, setUser] = useState<UserInfos>();
 
     useEffect(() => {
         setAppTheme( getCurrentDarkModeState() );
     }, []);
+    useEffect(determineCurrentUser, []);
 
     function setAppTheme(state: DarkModeState) {
         const bodies = document.getElementsByTagName("body");
@@ -25,13 +28,24 @@ export default function App() {
 
     function login() {
         const host = window.location.host === 'localhost:5173' ? 'http://localhost:8080': window.location.origin;
-        window.open(host + '/oauth2/authorization/github', '_blank');
+        window.open(host + '/oauth2/authorization/github', '_self');
     }
 
-    function me() {
+    function logout() {
+        axios.post("/api/logout")
+            .then(() => {
+                setUser(undefined)
+            })
+            .catch(error => {
+                console.error(error)
+            })
+    }
+
+    function determineCurrentUser() {
         axios.get("/api/users/me")
             .then(response => {
-                console.log(response.data)
+                console.log(response.data);
+                setUser(response.data);
             })
     }
 
@@ -41,8 +55,22 @@ export default function App() {
                 <ApiStateIndicator/>
                 <DarkModeSwitch onChange={setAppTheme}/>
                 <hr/>
-                <button onClick={login}>Login</button>
-                <button onClick={me}>me</button>
+                {!user?.isAuthenticated && <button onClick={login}>Login</button>}
+                { user?.isAuthenticated && <button onClick={logout}>Logout</button>}
+                <button onClick={determineCurrentUser}>me</button>
+                {
+                    user?.isAuthenticated &&
+                    <div className={"CurrentUser"}>
+                        Current user:<br/>
+                        <a href={user.url} target="_blank">
+                            {user.avatar_url && <img alt="user avatar image" src={user.avatar_url}/>}{" "}
+                            {user.login}<br/>
+                            {user.name}<br/>
+                            [{user.id}]
+                        </a>
+
+                    </div>
+                }
             </SidePanel>
             <h1>ChatGPT PromptOptimizer</h1>
             <SimpleChatView/>

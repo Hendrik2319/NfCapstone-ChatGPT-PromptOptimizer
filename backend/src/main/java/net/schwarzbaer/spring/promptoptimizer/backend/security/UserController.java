@@ -33,7 +33,7 @@ public class UserController {
 					Objects.toString( user.getAttribute("login"), null ),
 					Objects.toString( user.getAttribute("name"), null ),
 					Objects.toString( user.getAttribute("location"), null ),
-					Objects.toString( user.getAttribute("url"), null ),
+					Objects.toString( user.getAttribute("html_url"), null ),
 					Objects.toString( user.getAttribute("avatar_url"), null )
 			);
 		}
