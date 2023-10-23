@@ -44,11 +44,14 @@
 * `MONGO_DB_NAME`
   * name of used database on DB server above
   * to separate databases of different run configurations / scenarios
-#### OAuth2
+#### OAuth2 / User Management
 * `OAUTH_GITHUB_CLIENT_ID`
   * client id from OAuth2 app in GitHub
 * `OAUTH_GITHUB_CLIENT_SECRET`
   * client secret from OAuth2 app in GitHub
+* `INITIAL_ADMIN`
+  * user id of first admin: `github{ ID of GitHub Account }`
+  * to have an admin if user database is initially empty
 ### GitHub Secrets 
 * `DOCKERHUB_PASSWORD`
   * used for pushing build docker image to docker in workflow "Deploy to render.com" (`.github/workflows/CD_DockerRender.yml`)
