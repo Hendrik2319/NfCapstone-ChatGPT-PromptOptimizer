@@ -40,4 +40,8 @@ public class UserController {
 
 		return new UserInfos( false, authentication.getName(), null,null, null,null,null);
 	}
+	@GetMapping("restricted")
+	public String getRestricted() {
+		return "You got access to a restricted endpoint";
+	}
 }
