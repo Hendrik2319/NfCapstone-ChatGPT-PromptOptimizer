@@ -5,6 +5,7 @@ import DarkModeSwitch from "./components/DarkModeSwitch.tsx";
 import {useEffect, useState} from "react";
 import {DarkModeState, getCurrentDarkModeState} from "./components/DarkModeSwitch.Functions.tsx";
 import axios from "axios";
+import SidePanel from "./components/SidePanel.tsx";
 
 export default function App() {
     const [ darkModeState, setDarkModeState ] = useState<DarkModeState>("light")
@@ -36,12 +37,13 @@ export default function App() {
 
     return (
         <div className={darkModeState + " App"}>
-            <div className={"TopRightBox"}>
+            <SidePanel>
+                <ApiStateIndicator/>
+                <DarkModeSwitch onChange={setAppTheme}/>
+                <hr/>
                 <button onClick={login}>Login</button>
                 <button onClick={me}>me</button>
-                <DarkModeSwitch onChange={setAppTheme}/>
-                <ApiStateIndicator/>
-            </div>
+            </SidePanel>
             <h1>ChatGPT PromptOptimizer</h1>
             <SimpleChatView/>
         </div>

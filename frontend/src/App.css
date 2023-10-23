@@ -40,10 +40,8 @@ h1 {
 
 button, select {
     color: var(--button-text-color, #000000);
-    border-width: 1px;
-    border-style: solid;
+    border: 1px solid var(--button-border-color, #707070);
     border-radius: 0.3em;
-    border-color: var(--button-border-color, #707070);
     background-color: var(--button-background-color, #f0f0f0);
 }
 button:hover, select:hover {
@@ -51,20 +49,28 @@ button:hover, select:hover {
 }
 
 textarea {
-    border-width: 1px;
-    border-style: solid;
-    border-color: var(--border-color, #707070);
+    border: 1px solid var(--border-color, #707070);
     color: var(--text-color, #000000);
     background-color: var(--textarea-background-color, #FFFFFF);
 }
 
-.TopRightBox {
-    position: absolute;
+.SidePanel {
+    position: fixed;
     top: 2px;
     right: 2px;
+    text-align: right;
+    border: 1px solid var(--border-color, #707070);
+    border-radius: 4px;
+    background-color: var(--background-color, #FFFFFF);
 }
-.TopRightBox > * {
-    margin-left: 0.5em;
+.SidePanel > button {
+    background: var(--background-color, #FFFFFF);
+    border: none;
+}
+.SidePanelContent {
+    display: flex;
+    flex-direction: column;
+    padding: 0.2em;
 }
 
 .DarkModeSwitch {
