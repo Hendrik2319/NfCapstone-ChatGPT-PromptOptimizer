@@ -29,7 +29,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	public static final String TEST_ROLE = "TestRole";
 	public static final PrintStream DEBUG_OUT = System.out;
 	private final String initialAdmin;
 
