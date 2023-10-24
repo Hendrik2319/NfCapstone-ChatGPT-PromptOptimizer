@@ -44,7 +44,7 @@ public class SecurityConfig {
 		http.csrf(AbstractHttpConfigurer::disable)
 
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers("/oauth2/*").permitAll()
+						.requestMatchers("/", "/index.html", "/vite.svg", "/assets/**").permitAll()
 						.requestMatchers(HttpMethod.GET, "/api/users/me", "/api/apistate").permitAll()
 						.requestMatchers("/api/logout").authenticated()
 //						.requestMatchers("/api/users/{id}").hasRole(Role.ADMIN.getShort())
