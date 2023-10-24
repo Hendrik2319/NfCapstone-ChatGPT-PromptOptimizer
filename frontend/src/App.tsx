@@ -72,7 +72,18 @@ export default function App() {
                 }
             </SidePanel>
             <h1>ChatGPT PromptOptimizer</h1>
-            <SimpleChatView/>
+            {
+                !user?.isAuthenticated &&
+                    <><br/>Please <button onClick={login}>Login</button></>
+            }
+            {
+                user?.isAuthenticated && !user.isUser && !user.isAdmin &&
+                    <><br/>You are now logged in, but should wait until an administrator grants you access to the app.</>
+            }
+            {
+                user?.isAuthenticated && (user?.isUser || user?.isAdmin) &&
+                    <SimpleChatView/>
+            }
         </>
     )
 }

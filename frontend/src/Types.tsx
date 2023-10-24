@@ -11,10 +11,12 @@ export type ApiState = {
 
 export type UserInfos = {
     isAuthenticated : boolean
-    id          : string
-    login       : string
-    name        : string
-    location    : string
-    url         : string
-    avatar_url  : string
+    isUser          : boolean
+    isAdmin         : boolean
+    id              : string
+    login           : string
+    name            : string
+    location        : string
+    url             : string
+    avatar_url      : string
 }
