@@ -1,3 +1,4 @@
+import "./SidePanel.css"
 import {ReactNode, useState} from "react";
 
 type Props = {

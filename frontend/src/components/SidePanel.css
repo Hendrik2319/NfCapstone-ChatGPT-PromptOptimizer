@@ -1,0 +1,19 @@
+.SidePanel {
+    position: fixed;
+    top: 2px;
+    right: 2px;
+    text-align: right;
+    border: 1px solid var(--border-color, #707070);
+    border-radius: 4px;
+    background-color: var(--background-color, #FFFFFF);
+}
+.SidePanel > button {
+    background: var(--background-color, #FFFFFF);
+    border: none;
+}
+.SidePanelContent {
+    display: flex;
+    flex-direction: column;
+    padding: 0.2em;
+    text-align: center;
+}

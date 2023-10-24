@@ -50,7 +50,7 @@ export default function App() {
     }
 
     return (
-        <div className={darkModeState + " App"}>
+        <>
             <SidePanel>
                 <ApiStateIndicator/>
                 <DarkModeSwitch onChange={setAppTheme}/>
@@ -74,7 +74,7 @@ export default function App() {
             </SidePanel>
             <h1>ChatGPT PromptOptimizer</h1>
             <SimpleChatView/>
-        </div>
+        </>
     )
 }
 
