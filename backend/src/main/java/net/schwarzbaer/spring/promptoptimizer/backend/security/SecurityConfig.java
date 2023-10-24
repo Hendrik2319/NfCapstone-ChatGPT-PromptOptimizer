@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -46,8 +45,13 @@ public class SecurityConfig {
 		http.csrf(AbstractHttpConfigurer::disable)
 
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers(HttpMethod.GET, "/api/users/restricted").hasRole(Role.ADMIN.name())
-						.anyRequest().permitAll()
+						.requestMatchers("/oauth2/*").permitAll()
+						.requestMatchers(HttpMethod.GET, "/api/users/me", "/api/apistate").permitAll()
+						.requestMatchers("/api/logout").authenticated()
+//						.requestMatchers("/api/users/{id}").hasRole(Role.ADMIN.getShort())
+						.requestMatchers(HttpMethod.GET, "/api/users/restricted").hasRole(Role.ADMIN.getShort())
+						.anyRequest().hasAnyRole(Role.ADMIN.getShort(), Role.USER.getShort())
+//						.anyRequest().permitAll()
 				)
 
 				.sessionManagement(sessions ->
@@ -70,24 +74,10 @@ public class SecurityConfig {
 	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(/*WebClient rest*/) {
 		DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
 		return request -> {
+
 			OAuth2User user = delegate.loadUser(request);
-
-//			DEBUG_OUT.println("1 ########################################################");
-//			DEBUG_OUT.printf("    OAuth2User: [%s]%n", user.getClass());
-//			DEBUG_OUT.printf("    OAuth2User: %s%n", user);
-//			DEBUG_OUT.println("1 ########################################################");
-			ClientRegistration clientRegistration = request.getClientRegistration();
-//			DEBUG_OUT.printf("    ClientRegistration.%s: %s%n", "RegistrationId", clientRegistration.getRegistrationId());
-//			DEBUG_OUT.printf("    ClientRegistration.%s: %s%n", "ClientName"    , clientRegistration.getClientName());
-//			DEBUG_OUT.printf("    ClientRegistration.%s: %s%n", "ClientId"      , clientRegistration.getClientId());
-//			DEBUG_OUT.printf("    ClientRegistration.%s: %s%n", "ClientSecret"  , clientRegistration.getClientSecret());
-//			DEBUG_OUT.printf("    ClientRegistration.%s: %s%n", "RedirectUri"   , clientRegistration.getRedirectUri());
-//			DEBUG_OUT.printf("    ClientRegistration.%s: %s%n", "Scopes"        , clientRegistration.getScopes());
-//			DEBUG_OUT.printf("    ClientRegistration.%s: %s%n", "AuthorizationGrantType"    , clientRegistration.getAuthorizationGrantType());
-//			DEBUG_OUT.printf("    ClientRegistration.%s: %s%n", "ClientAuthenticationMethod", clientRegistration.getClientAuthenticationMethod());
-//			DEBUG_OUT.printf("    ClientRegistration.%s: %s%n", "ProviderDetails"           , clientRegistration.getProviderDetails().);
-
-			String userDbId = clientRegistration.getRegistrationId() + user.getName();
+			String registrationId = request.getClientRegistration().getRegistrationId();
+			String userDbId = registrationId + user.getName();
 			/*
 			query user database for role
 			...
@@ -99,14 +89,9 @@ public class SecurityConfig {
 				DEBUG_OUT.println("########################################################");
 
 				Collection<GrantedAuthority> newAuthorities = new ArrayList<>(user.getAuthorities());
-				newAuthorities.add(new SimpleGrantedAuthority("ROLE_"+Role.ADMIN));
+				newAuthorities.add(new SimpleGrantedAuthority(Role.ADMIN.getLong()));
 				user = new DefaultOAuth2User(newAuthorities, user.getAttributes(), "id");
 			}
-
-//			DEBUG_OUT.println("2 ########################################################");
-//			DEBUG_OUT.printf("    OAuth2User: [%s]%n", user.getClass());
-//			DEBUG_OUT.printf("    OAuth2User: %s%n", user);
-//			DEBUG_OUT.println("2 ########################################################");
 
 			return user;
 		};
