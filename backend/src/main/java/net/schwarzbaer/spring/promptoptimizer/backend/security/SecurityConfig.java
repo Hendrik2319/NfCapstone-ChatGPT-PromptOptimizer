@@ -75,17 +75,16 @@ public class SecurityConfig {
 		return request -> {
 
 			OAuth2User user = delegate.loadUser(request);
-			String registrationId = request.getClientRegistration().getRegistrationId();
-			String userDbId = registrationId + user.getName();
+			String userDbId = request.getClientRegistration().getRegistrationId() + user.getName();
 			/*
 			query user database for role
 			...
 			If not found, do this
 			 */
 			if (initialAdmin.equals(userDbId)) {
-				DEBUG_OUT.println("########################################################");
-				DEBUG_OUT.println("    INITIAL ADMIN");
-				DEBUG_OUT.println("########################################################");
+//				DEBUG_OUT.println("########################################################");
+//				DEBUG_OUT.println("    INITIAL ADMIN");
+//				DEBUG_OUT.println("########################################################");
 
 				Collection<GrantedAuthority> newAuthorities = new ArrayList<>(user.getAuthorities());
 				newAuthorities.add(new SimpleGrantedAuthority(Role.ADMIN.getLong()));
