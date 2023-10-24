@@ -8,7 +8,7 @@
     --button-background-color-hover: #303030;
     --button-text-color: var(--text-color);
     --button-border-color: var(--border-color);
-    --background-image: url("/background.dark.png");
+    --background-image: url("./assets/background.dark.png");
 }
 .light {
     --background-color: #ffffff;
@@ -19,7 +19,7 @@
     --button-background-color-hover: #e0e0e0;
     --button-text-color: var(--text-color);
     --button-border-color: var(--border-color);
-    --background-image: url("/background.light.png");
+    --background-image: url("./assets/background.light.png");
 }
 body {
     background-color: var(--background-color, #FFFFFF);
@@ -28,7 +28,6 @@ body {
 }
 
 h1 {
-    /*background: var(--background-color);*/
     display: inline-block;
     padding: 5px;
     text-shadow:

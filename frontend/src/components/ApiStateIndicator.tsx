@@ -5,6 +5,7 @@ import {ApiState} from "../Types.tsx";
 
 export default function ApiStateIndicator() {
     const [ state, setState ] = useState<ApiState>()
+    console.debug(`Rendering ApiStateIndicator { state:${state} }`);
 
     useEffect( getState, [] )
 

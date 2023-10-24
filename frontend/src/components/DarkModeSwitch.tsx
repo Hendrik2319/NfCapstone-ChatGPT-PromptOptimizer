@@ -14,6 +14,7 @@ type Props = {
 export default function DarkModeSwitch( props: Props ) {
     const [ switchState, setSwitchState ] = useState<DarkModeSwitchState>("system");
     const { onChange: globalOnChangeState } = props;
+    console.debug(`Rendering DarkModeSwitch { switchState:${switchState} }`);
 
     useEffect(() => {
         setSwitchState( getStoredDarkModeSwitchState() );
@@ -32,7 +33,7 @@ export default function DarkModeSwitch( props: Props ) {
                 mediaQueryList.addEventListener('change', listener)
                 return () => mediaQueryList.removeEventListener('change', listener);
             }
-            if (mediaQueryList.addListener) {
+            if (mediaQueryList.addListener) { // as fallback
                 mediaQueryList.addListener(listener)
                 return () => mediaQueryList.removeListener(listener);
             }

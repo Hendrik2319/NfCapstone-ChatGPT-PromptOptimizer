@@ -9,8 +9,8 @@ import SidePanel from "./components/SidePanel.tsx";
 import {UserInfos} from "./Types.tsx";
 
 export default function App() {
-    const [ darkModeState, setDarkModeState ] = useState<DarkModeState>("light")
     const [user, setUser] = useState<UserInfos>();
+    console.debug("Rendering App {}");
 
     useEffect(() => {
         setAppTheme( getCurrentDarkModeState() );
@@ -23,7 +23,6 @@ export default function App() {
             bodies[0].classList.remove( state === "dark" ? "light" : "dark" );
             bodies[0].classList.add(state);
         }
-        setDarkModeState( state );
     }
 
     function login() {

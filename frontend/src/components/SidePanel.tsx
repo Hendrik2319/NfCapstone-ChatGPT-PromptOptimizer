@@ -7,6 +7,7 @@ type Props = {
 
 export default function SidePanel( props:Props ) {
     const [ isOpen, setOpen ] = useState<boolean>(false);
+    console.debug(`Rendering SidePanel { isOpen:${isOpen} }`);
 
     function toggleState() {
         setOpen( !isOpen );
