@@ -76,6 +76,7 @@ public class SecurityConfig {
 
 			OAuth2User user = delegate.loadUser(request);
 			String userDbId = request.getClientRegistration().getRegistrationId() + user.getName();
+			user.getAttributes().put("UserDbId", userDbId);
 			/*
 			query user database for role
 			...

@@ -29,6 +29,7 @@ public class UserService {
 					hasRole(user, Role.USER),
 					hasRole(user, Role.ADMIN),
 					Objects.toString( user.getAttribute("id"), null ),
+					Objects.toString( user.getAttribute("UserDbId"), null ),
 					Objects.toString( user.getAttribute("login"), null ),
 					Objects.toString( user.getAttribute("name"), null ),
 					Objects.toString( user.getAttribute("location"), null ),
@@ -38,7 +39,7 @@ public class UserService {
 		}
 
 		String name = authentication!=null ? authentication.getName() : "anonymousUser";
-		return new UserInfos(false,false,false, name,null,null, null,null,null);
+		return new UserInfos(false,false,false, name,null,null, null,null,null,null);
 	}
 
 	private boolean hasRole(OAuth2AuthenticatedPrincipal user, Role role) {
