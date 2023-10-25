@@ -44,13 +44,21 @@ public class SecurityConfig {
 		http.csrf(AbstractHttpConfigurer::disable)
 
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers("/", "/index.html", "/vite.svg", "/assets/**").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/users/me", "/api/apistate").permitAll()
-						.requestMatchers("/api/logout").authenticated()
-//						.requestMatchers("/api/users/{id}").hasRole(Role.ADMIN.getShort())
-						.requestMatchers(HttpMethod.GET, "/api/users/restricted").hasRole(Role.ADMIN.getShort())
+						.requestMatchers( HttpMethod.GET,
+								"/", "/index.html", "/vite.svg", "/assets/**",
+								"/api/users/me", "/api/apistate"
+						).permitAll()
+
+						.requestMatchers(
+								"/api/logout"
+						).authenticated()
+
+						.requestMatchers(HttpMethod.GET,
+								"/api/scenario/all",
+								"/api/users/restricted"
+						).hasRole(Role.ADMIN.getShort())
+
 						.anyRequest().hasAnyRole(Role.ADMIN.getShort(), Role.USER.getShort())
-//						.anyRequest().permitAll()
 				)
 
 				.sessionManagement(sessions ->
