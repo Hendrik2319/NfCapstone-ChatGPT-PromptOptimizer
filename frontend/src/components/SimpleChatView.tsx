@@ -6,6 +6,7 @@ import {Answer, Prompt} from "../Types.tsx";
 export default function SimpleChatView() {
     const [ prompt, setPrompt ] = useState<Prompt>({ prompt:"" });
     const [ answer, setAnswer ] = useState<Answer>({ answer:"" });
+    console.debug(`Rendering SimpleChatView {}`);
 
     function onInputChange( event: ChangeEvent<HTMLTextAreaElement> ) {
         setPrompt({

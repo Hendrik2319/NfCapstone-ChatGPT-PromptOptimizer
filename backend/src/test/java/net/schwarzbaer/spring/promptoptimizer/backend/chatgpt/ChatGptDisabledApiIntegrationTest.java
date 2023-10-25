@@ -1,13 +1,19 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
+import net.schwarzbaer.spring.promptoptimizer.backend.security.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class ChatGptDisabledApiIntegrationTest {
+
+	@MockBean
+	private ClientRegistrationRepository clientRegistrationRepository;
 
 	private static MockWebServer mockWebServer;
 
@@ -46,28 +55,47 @@ class ChatGptDisabledApiIntegrationTest {
 	}
 
 	@Test
-	void whenAskChatGPT_isCalledWithDisabledAPI_returnsAnGeneratedAnswer() throws Exception {
+	void whenAskChatGPT_withDisabledAPI_withNoUser_returnsStatus401() throws Exception {
 		// Given
 
 		// When
 		mockMvc
-				.perform(MockMvcRequestBuilders
-						.post("/api/ask")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content("""
-								{
-									"prompt": "TestPrompt"
-								}
-								""")
-				)
+				.perform(ChatGptTestTools.buildAskRequest("TestPrompt"))
+
+				// Then
+				.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
+				.andExpect(content().string(""));
+	}
+
+	@Test
+	void whenAskChatGPT_withDisabledAPI_withUnknownAccount_returnsStatus403() throws Exception {
+		// Given
+
+		// When
+		mockMvc
+				.perform(ChatGptTestTools.buildAskRequest("TestPrompt", Role.UNKNOWN_ACCOUNT))
+
+				// Then
+				.andExpect(status().is(HttpStatus.FORBIDDEN.value()))
+				.andExpect(content().string(""));
+	}
+
+	@ParameterizedTest
+	@ArgumentsSource(SecurityTestTools.AllowedUserRoles.class)
+	void whenAskChatGPT_withDisabledAPI_withAllowedUser_returnsAnGeneratedAnswer(Role role) throws Exception {
+		// Given
+
+		// When
+		mockMvc
+				.perform(ChatGptTestTools.buildAskRequest("TestPrompt", role))
 
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
-								{
-									"answer": "Access to OpenAI API is currently disabled.\\nYour prompt was:\\n\\"TestPrompt\\""
-								}
-								"""));
+						{
+							"answer": "Access to OpenAI API is currently disabled.\\nYour prompt was:\\n\\"%s\\""
+						}
+						""".formatted("TestPrompt")));
 	}
 
 	@Test

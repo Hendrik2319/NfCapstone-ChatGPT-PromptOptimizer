@@ -1,9 +1,11 @@
+import "./ApiStateIndicator.css"
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {ApiState} from "../Types.tsx";
 
 export default function ApiStateIndicator() {
     const [ state, setState ] = useState<ApiState>()
+    console.debug(`Rendering ApiStateIndicator { state:${state} }`);
 
     useEffect( getState, [] )
 
