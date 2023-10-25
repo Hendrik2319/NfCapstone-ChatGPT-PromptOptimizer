@@ -1,15 +1,15 @@
 import './App.css'
 import SimpleChatView from "./components/SimpleChatView.tsx";
-import ApiStateIndicator from "./components/ApiStateIndicator.tsx";
-import DarkModeSwitch from "./components/DarkModeSwitch.tsx";
+import ApiStateIndicator from "./components/mainpage/ApiStateIndicator.tsx";
+import DarkModeSwitch from "./components/mainpage/DarkModeSwitch.tsx";
 import {useEffect, useState} from "react";
-import {DarkModeState, getCurrentDarkModeState} from "./components/DarkModeSwitch.Functions.tsx";
+import {DarkModeState, getCurrentDarkModeState} from "./components/mainpage/DarkModeSwitch.Functions.tsx";
 import axios from "axios";
-import SidePanel from "./components/SidePanel.tsx";
+import SidePanel from "./components/mainpage/SidePanel.tsx";
 import {UserInfos} from "./Types.tsx";
 import {Link, Route, Routes} from "react-router-dom";
-import MainPage from "./components/MainPage.tsx";
-import ProtectedRoutes from "./components/ProtectedRoutes.tsx";
+import MainPage from "./components/mainpage/MainPage.tsx";
+import ProtectedRoutes from "./components/mainpage/ProtectedRoutes.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();

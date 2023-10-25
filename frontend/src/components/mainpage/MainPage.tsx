@@ -1,5 +1,5 @@
-import {UserInfos} from "../Types.tsx";
-import ScenarioList from "./ScenarioList.tsx";
+import {UserInfos} from "../../Types.tsx";
+import ScenarioList from "../scenario/ScenarioList.tsx";
 
 type Props = {
     user?: UserInfos
