@@ -7,6 +7,9 @@ import {DarkModeState, getCurrentDarkModeState} from "./components/DarkModeSwitc
 import axios from "axios";
 import SidePanel from "./components/SidePanel.tsx";
 import {UserInfos} from "./Types.tsx";
+import {Link, Route, Routes} from "react-router-dom";
+import MainPage from "./components/MainPage.tsx";
+import ProtectedRoutes from "./components/ProtectedRoutes.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
@@ -73,17 +76,18 @@ export default function App() {
             </SidePanel>
             <h1>ChatGPT PromptOptimizer</h1>
             {
-                !user?.isAuthenticated &&
-                    <><br/>Please <button onClick={login}>Login</button></>
+                user?.isAuthenticated && (user.isUser || user.isAdmin) &&
+                <nav>
+                    <Link to={"/"    }>Home</Link>
+                    <Link to={"/chat"}>Simple Chat View</Link>
+                </nav>
             }
-            {
-                user?.isAuthenticated && !user.isUser && !user.isAdmin &&
-                    <><br/>You are now logged in, but should wait until an administrator grants you access to the app.</>
-            }
-            {
-                user?.isAuthenticated && (user?.isUser || user?.isAdmin) &&
-                    <SimpleChatView/>
-            }
+            <Routes>
+                <Route path={"/"} element={<MainPage user={user} login={login}/>}/>
+                <Route element={<ProtectedRoutes isAuthenticated={user?.isAuthenticated && (user.isUser || user.isAdmin)}/>}>
+                    <Route path={"/chat"} element={<SimpleChatView/>}/>
+                </Route>
+            </Routes>
         </>
     )
 }

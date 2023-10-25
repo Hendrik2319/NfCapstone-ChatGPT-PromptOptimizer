@@ -37,13 +37,23 @@ h1 {
             -2px -2px 10px var(--background-color);
 }
 
-button, select, .CurrentUser a {
+nav {
+    margin-bottom: 1em;
+}
+
+nav a {
+    display: inline-block;
+    padding: 0.2em 0.5em;
+    margin-right: 1em;
+}
+
+button, select, .CurrentUser a, nav a {
     color: var(--button-text-color, #000000);
     border: 1px solid var(--button-border-color, #707070);
     border-radius: 0.3em;
     background-color: var(--button-background-color, #f0f0f0);
 }
-button:hover, select:hover, .CurrentUser a:hover {
+button:hover, select:hover, .CurrentUser a:hover, nav a:hover {
     background-color: var(--button-background-color-hover, #e0e0e0);
 }
 
