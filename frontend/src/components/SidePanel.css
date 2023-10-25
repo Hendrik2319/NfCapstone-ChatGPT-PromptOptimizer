@@ -12,8 +12,12 @@
     border: none;
 }
 .SidePanelContent {
-    display: flex;
+    display: none;
     flex-direction: column;
     padding: 0.2em;
     text-align: center;
+    overflow: clip;
+}
+.SidePanelContent.open {
+    display: flex;
 }
