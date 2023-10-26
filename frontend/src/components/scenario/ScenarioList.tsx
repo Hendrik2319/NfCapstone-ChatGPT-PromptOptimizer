@@ -1,10 +1,11 @@
 import "./ScenarioList.css";
-import {NewScenario, Scenario, UserInfos} from "../../Types.tsx";
+import {DEBUG, NewScenario, Scenario, UserInfos} from "../../Types.tsx";
 import axios from "axios";
 import {ChangeEvent, useEffect, useState} from "react";
 import ScenarioCard from "./ScenarioCard.tsx";
 import {createDialog} from "../FloatingDialogs.tsx";
 import AddScenario from "./AddScenario.tsx";
+import EditScenario, {EditScenarioOptions} from "./EditScenario.tsx";
 
 type Props = {
     user: UserInfos
@@ -14,7 +15,7 @@ export default function ScenarioList( props:Readonly<Props> ) {
     const [ scenarios, setScenarios ] = useState<Scenario[]>([]);
     const [ showAll, setShowAll ] = useState<boolean>(false);
     const { user } = props;
-    console.debug(`Rendering ScenarioList { scenarios: [${scenarios.length}] }`);
+    if (DEBUG) console.debug(`Rendering ScenarioList { scenarios: [${scenarios.length}] }`);
 
     useEffect(loadScenarios, [ showAll ]);
 
@@ -44,11 +45,37 @@ export default function ScenarioList( props:Readonly<Props> ) {
             })
     }
 
+    function editScenario( scenario: Scenario ) {
+        axios.put(`/api/scenario/${scenario.id}`, scenario )
+            .then((response) => {
+                if (response.status!==200)
+                    throw new Error("Get wrong response status, when adding a scenario: "+response.status);
+                loadScenarios();
+            })
+            .catch((error)=>{
+                console.error("Error in ScenarioList.editScenario():", error);
+            })
+    }
+
     const addDialog =
         createDialog<undefined>(
-            'addScenarioDialog',
+            'AddScenarioDialog',
             dialogControl =>
-                <AddScenario addScenario={addScenario} closeDialog={dialogControl.closeDialog}/>
+                <AddScenario
+                    addScenario={addScenario}
+                    closeDialog={dialogControl.closeDialog}
+                />
+        )
+
+    const editDialog =
+        createDialog<EditScenarioOptions>(
+            'EditScenarioDialog',
+            dialogControl =>
+                <EditScenario
+                    saveChanges={editScenario}
+                    setInitFunction={dialogControl.setInitFunction}
+                    closeDialog={dialogControl.closeDialog}
+                />
         )
 
     function onShowAllChange( event: ChangeEvent<HTMLInputElement> ) {
@@ -65,10 +92,18 @@ export default function ScenarioList( props:Readonly<Props> ) {
             <div className={"ScenarioList"}>
                 <button className={"ScenarioCard"} onClick={()=>addDialog.showDialog()}>Add</button>
                 {
-                    scenarios.map(scn => <ScenarioCard key={scn.id} scenario={scn}/>)
+                    scenarios.map(
+                        scn =>
+                            <ScenarioCard
+                                key={scn.id}
+                                scenario={scn}
+                                showEditDialog={editDialog.showDialog}
+                            />
+                    )
                 }
             </div>
             {addDialog.writeHTML()}
+            {editDialog.writeHTML()}
         </>
     )
 }
