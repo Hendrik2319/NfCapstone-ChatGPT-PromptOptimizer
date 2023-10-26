@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewScenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.ScenarioService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,8 +27,8 @@ public class ScenarioController {
 	}
 
 	@PostMapping
-	public Scenario addScenarios(@RequestBody NewScenario newScenario) {
-		return scenarioService.addScenarios(newScenario);
+	public ResponseEntity<Scenario> addScenarios(@RequestBody NewScenario newScenario) {
+		return  ResponseEntity.of(scenarioService.addScenarios(newScenario));
 	}
 
 }

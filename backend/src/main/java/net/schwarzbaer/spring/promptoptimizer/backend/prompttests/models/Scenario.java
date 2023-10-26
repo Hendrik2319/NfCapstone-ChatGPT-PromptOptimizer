@@ -1,14 +1,16 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models;
 
+import org.springframework.lang.NonNull;
+
 public record Scenario(
 		String id,
 		String authorID,
 		String label
 ) {
-	public Scenario(NewScenario newScenario) {
+	public Scenario(@NonNull String authorID, @NonNull NewScenario newScenario) {
 		this(
 				null,
-				newScenario.authorID(),
+				authorID,
 				newScenario.label()
 		);
 	}
