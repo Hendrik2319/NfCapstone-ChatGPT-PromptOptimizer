@@ -24,12 +24,7 @@ export default function ApiStateIndicator() {
     const isEnabled = state?.enabled;
     return (
         <div className={ "ApiStateIndicator " + (isEnabled ? "enabled" : "disabled") }>
-
-            API:
-            <span>
-                { isEnabled ? "Enabled" : "Disabled" }
-            </span>
-
+            API: <span>{ isEnabled ? "Enabled" : "Disabled" }</span>
         </div>
     )
 }
