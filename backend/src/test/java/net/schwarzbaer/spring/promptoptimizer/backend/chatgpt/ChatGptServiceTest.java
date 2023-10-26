@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ChatGptServiceTest {
 
@@ -76,6 +77,36 @@ class ChatGptServiceTest {
 		// Then
 		Answer expected = new Answer("TestAnswer");
 		assertEquals(expected, actual);
+	}
+
+	@Test
+	void whenAskChatGPT_getsAPrompt_andGivesAWrongResponse() {
+		// Given
+		chatGptService = new ChatGptService(
+				"ApiKey",
+				"OrgKey",
+				mockWebServer.url("/").toString()
+		);
+		mockWebServer.enqueue(
+				new MockResponse()
+						.setHeader("Content-Type", "application/json")
+						.setBody("""
+								{
+								    "choices": [
+								        null
+								    ],
+								    "usage": {
+								        "total_tokens": 35
+								    }
+								}
+								""")
+		);
+
+		// When
+		Answer actual = chatGptService.askChatGPT(new Prompt("TestPrompt"));
+
+		// Then
+		assertNull(actual);
 	}
 
 	@Test
