@@ -1,21 +1,26 @@
 import "./ScenarioList.css";
-import {NewScenario, Scenario} from "../../Types.tsx";
+import {NewScenario, Scenario, UserInfos} from "../../Types.tsx";
 import axios from "axios";
-import {useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import ScenarioCard from "./ScenarioCard.tsx";
 import {createDialog} from "../FloatingDialogs.tsx";
 import AddScenario from "./AddScenario.tsx";
 
-export default function ScenarioList() {
+type Props = {
+    user: UserInfos
+}
+
+export default function ScenarioList( props:Readonly<Props> ) {
     const [ scenarios, setScenarios ] = useState<Scenario[]>([]);
+    const [ showAll, setShowAll ] = useState<boolean>(false);
+    const { user } = props;
     console.debug(`Rendering ScenarioList { scenarios: [${scenarios.length}] }`);
 
-    useEffect(() => {
-        loadScenarios()
-    }, []);
+    useEffect(loadScenarios, [ showAll ]);
 
     function loadScenarios(){
-        axios.get("/api/scenario")
+        const url = showAll ? "/api/scenario/all" : "/api/scenario";
+        axios.get(url)
             .then((response) => {
                 if (response.status!==200)
                     throw new Error("Get wrong response status, when loading all scenario: "+response.status);
@@ -46,9 +51,17 @@ export default function ScenarioList() {
                 <AddScenario addScenario={addScenario} closeDialog={dialogControl.closeDialog}/>
         )
 
+    function onShowAllChange( event: ChangeEvent<HTMLInputElement> ) {
+        setShowAll( event.target.checked );
+    }
+
     return (
         <>
-            Scenarios
+            <h3>Scenarios</h3>
+            {
+                user.isAdmin &&
+                <label><input type={"checkbox"} checked={showAll} onChange={onShowAllChange}/> of all users</label>
+            }
             <div className={"ScenarioList"}>
                 <button className={"ScenarioCard"} onClick={()=>addDialog.showDialog()}>Add</button>
                 {

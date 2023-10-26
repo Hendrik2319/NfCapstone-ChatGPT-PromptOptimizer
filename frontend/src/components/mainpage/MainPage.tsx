@@ -14,5 +14,5 @@ export default function MainPage( props: Readonly<Props> ) {
     if (!props.user.isUser && !props.user.isAdmin)
         return <><br/>You are now logged in, but should wait until an administrator grants you access to the app.</>
 
-    return <ScenarioList/>
+    return <ScenarioList user={props.user}/>
 }
