@@ -9,6 +9,8 @@
     --button-text-color: var(--text-color);
     --button-border-color: var(--border-color);
     --background-image: url("./assets/background.dark.png");
+    --box-shadow-color: #606060;
+    --dialog-page-cover-color: #FFFFFF20;
 }
 .light {
     --background-color: #ffffff;
@@ -20,6 +22,8 @@
     --button-text-color: var(--text-color);
     --button-border-color: var(--border-color);
     --background-image: url("./assets/background.light.png");
+    --box-shadow-color: #a0a0a0;
+    --dialog-page-cover-color: #00000040;
 }
 body {
     background-color: var(--background-color, #FFFFFF);
