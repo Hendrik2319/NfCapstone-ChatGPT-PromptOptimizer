@@ -104,7 +104,7 @@ class ScenarioIntegrationTest {
 
 	@Test
 	@DirtiesContext
-	void whenGetAllScenarios_isCalledUnauthorized_returnsStatus401Unauthorized() throws Exception {
+	void whenGetAllScenarios_isCalledByUnauthorized_returnsStatus401Unauthorized() throws Exception {
 		// Given
 		fillScenarioRepository();
 
