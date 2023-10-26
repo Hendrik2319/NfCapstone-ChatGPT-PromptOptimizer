@@ -139,7 +139,7 @@ class ScenarioServiceTest {
 	}
 
 	@Test
-	void whenUpdateScenario_normal() throws ScenarioService.UserIsNotAllowedException {
+	void whenUpdateScenario_isCalledByUser_returnsUpdatedValue() throws ScenarioService.UserIsNotAllowedException {
 		// Given
 		when(userService.getCurrentUser()).thenReturn(new UserInfos(
 				true, true, false,
@@ -179,7 +179,9 @@ class ScenarioServiceTest {
 		whenUpdateScenario_getsWrongArguments_throwsException("id1", "id1", null);
 	}
 
-	private void whenUpdateScenario_getsWrongArguments_throwsException(String pathId, String scenId, String scenAuthor) {
+	private void whenUpdateScenario_getsWrongArguments_throwsException(
+			String pathId, String scenId, String scenAuthor
+	) {
 		// Given
 		// When
 		Executable call = () -> scenarioService.updateScenario(
@@ -206,7 +208,7 @@ class ScenarioServiceTest {
 	}
 
 	@Test
-	void whenUpdateScenario_isCalledByAdmin_returnsStoredValue() throws ScenarioService.UserIsNotAllowedException {
+	void whenUpdateScenario_isCalledByAdmin_returnsUpdatedValue() throws ScenarioService.UserIsNotAllowedException {
 		// Given
 		when(userService.getCurrentUser()).thenReturn(new UserInfos(
 				true, false, true,
@@ -246,7 +248,9 @@ class ScenarioServiceTest {
 		whenUpdateScenario_isCalledByNonAdmin_withWrongIds_throwsException("author1", "author2", "author1");
 	}
 
-	private void whenUpdateScenario_isCalledByNonAdmin_withWrongIds_throwsException(String userDbId, String authorOfStored, String authorOfGiven) {
+	private void whenUpdateScenario_isCalledByNonAdmin_withWrongIds_throwsException(
+			String userDbId, String authorOfStored, String authorOfGiven
+	) {
 		// Given
 		when(userService.getCurrentUser()).thenReturn(new UserInfos(
 				true, true, false,
