@@ -156,7 +156,7 @@ class ScenarioServiceTest {
 
 		// When
 		Optional<Scenario> actual = scenarioService.updateScenario(
-				new Scenario("id1", "author1", "labelNew")
+				"id1", new Scenario("id1", "author1", "labelNew")
 		);
 
 		// Then
@@ -169,23 +169,21 @@ class ScenarioServiceTest {
 		assertEquals(expected, actual.get());
 	}
 
-	@Test
-	void whenUpdateScenario_getsScenarioWithNoId_throwsException() {
-		// Given
-		// When
-		Executable call = () -> scenarioService.updateScenario(
-				new Scenario(null, "author1", "labelNew")
-		);
-		// Then
-		assertThrows(IllegalArgumentException.class, call);
+	@Test void whenUpdateScenario_getsIdDifferentToScenarioID_throwsException() {
+		whenUpdateScenario_getsWrongArguments_throwsException("id2", "id1", "author1");
+	}
+	@Test void whenUpdateScenario_getsScenarioWithNoId_throwsException() {
+		whenUpdateScenario_getsWrongArguments_throwsException("id1", null, "author1");
+	}
+	@Test void whenUpdateScenario_getsScenarioWithNoAuthorId_throwsException() {
+		whenUpdateScenario_getsWrongArguments_throwsException("id1", "id1", null);
 	}
 
-	@Test
-	void whenUpdateScenario_getsScenarioWithNoAuthorId_throwsException() {
+	private void whenUpdateScenario_getsWrongArguments_throwsException(String pathId, String scenId, String scenAuthor) {
 		// Given
 		// When
 		Executable call = () -> scenarioService.updateScenario(
-				new Scenario("id1", null, "labelNew")
+				pathId, new Scenario(scenId, scenAuthor, "labelNew")
 		);
 		// Then
 		assertThrows(IllegalArgumentException.class, call);
@@ -198,7 +196,7 @@ class ScenarioServiceTest {
 
 		// When
 		Optional<Scenario> actual = scenarioService.updateScenario(
-				new Scenario("id1", "author1", "labelNew")
+				"id1", new Scenario("id1", "author1", "labelNew")
 		);
 
 		// Then
@@ -225,7 +223,7 @@ class ScenarioServiceTest {
 
 		// When
 		Optional<Scenario> actual = scenarioService.updateScenario(
-				new Scenario("id1", "author1", "labelNew")
+				"id1", new Scenario("id1", "author1", "labelNew")
 		);
 
 		// Then
@@ -260,7 +258,7 @@ class ScenarioServiceTest {
 
 		// When
 		Executable call = () -> scenarioService.updateScenario(
-				new Scenario("id1", authorOfGiven, "labelNew")
+				"id1", new Scenario("id1", authorOfGiven, "labelNew")
 		);
 
 		// Then

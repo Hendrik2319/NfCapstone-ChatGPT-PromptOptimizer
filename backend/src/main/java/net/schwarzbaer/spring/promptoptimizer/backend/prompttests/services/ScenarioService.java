@@ -35,11 +35,12 @@ public class ScenarioService {
 		return Optional.of(scenarioRepository.save(new Scenario( currentUser.userDbId(), newScenario )));
 	}
 
-	public Optional<Scenario> updateScenario(@NonNull Scenario scenario) throws UserIsNotAllowedException {
-		if (scenario.id()      ==null) throw new IllegalArgumentException("Scenario have no [id]");
-		if (scenario.authorID()==null) throw new IllegalArgumentException("Scenario have no [authorID]");
+	public Optional<Scenario> updateScenario(@NonNull String id, @NonNull Scenario scenario) throws UserIsNotAllowedException {
+		if ( scenario.id()      ==null) throw new IllegalArgumentException("Scenario have no [id]");
+		if ( scenario.authorID()==null) throw new IllegalArgumentException("Scenario have no [authorID]");
+		if (!scenario.id().equals(id) ) throw new IllegalArgumentException("Scenario have an [id] different to path variable");
 
-		Optional<Scenario> storedScenarioOpt = scenarioRepository.findById(scenario.id());
+		Optional<Scenario> storedScenarioOpt = scenarioRepository.findById(id);
 		if (storedScenarioOpt.isEmpty()) return Optional.empty();
 		Scenario storedScenario = storedScenarioOpt.get();
 
