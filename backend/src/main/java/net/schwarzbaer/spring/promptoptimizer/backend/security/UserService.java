@@ -1,5 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,18 +12,19 @@ import java.util.Objects;
 
 @Service
 public class UserService {
+	@SuppressWarnings("java:S106")
 	private static final PrintStream DEBUG_OUT = System.out;
 
-	public UserInfos getCurrentUser() {
+	public @NonNull UserInfos getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Object principal = authentication!=null ? authentication.getPrincipal() : null;
 		if (principal!=null) DEBUG_OUT.println("Principal: "+principal.getClass()+" -> "+principal);
 
 		if (principal instanceof OAuth2AuthenticatedPrincipal user) {
-			DEBUG_OUT.println("User Attributes:");
-			user.getAttributes().forEach((key, value) ->
-					DEBUG_OUT.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
-			);
+//			DEBUG_OUT.println("User Attributes:");
+//			user.getAttributes().forEach((key, value) ->
+//					DEBUG_OUT.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
+//			);
 
 			return new UserInfos(
 					true,

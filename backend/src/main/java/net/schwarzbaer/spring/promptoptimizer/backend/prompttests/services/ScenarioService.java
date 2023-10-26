@@ -35,4 +35,29 @@ public class ScenarioService {
 		return Optional.of(scenarioRepository.save(new Scenario( currentUser.userDbId(), newScenario )));
 	}
 
+	public Optional<Scenario> updateScenario(@NonNull Scenario scenario) throws UserIsNotAllowedException {
+		if (scenario.id()      ==null) throw new IllegalArgumentException("Scenario have no [id]");
+		if (scenario.authorID()==null) throw new IllegalArgumentException("Scenario have no [authorID]");
+
+		Optional<Scenario> storedScenarioOpt = scenarioRepository.findById(scenario.id());
+		if (storedScenarioOpt.isEmpty()) return Optional.empty();
+		Scenario storedScenario = storedScenarioOpt.get();
+
+		UserInfos currentUser = userService.getCurrentUser();
+		if (!currentUser.isAdmin()) {
+			if (currentUser.userDbId()==null)
+				throw new UserIsNotAllowedException("Current user has no [userDbId]");
+			if (!currentUser.userDbId().equals(storedScenario.authorID()) ||
+				!currentUser.userDbId().equals(scenario.authorID()))
+				throw new UserIsNotAllowedException("Current user is not allowed to update a Scenario of another user.");
+		}
+
+		return Optional.of(scenarioRepository.save(scenario));
+	}
+
+	public static class UserIsNotAllowedException extends Exception {
+		public UserIsNotAllowedException(String message) {
+			super(message);
+		}
+	}
 }
