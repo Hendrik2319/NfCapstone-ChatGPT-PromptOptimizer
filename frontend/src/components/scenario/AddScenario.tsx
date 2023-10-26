@@ -1,4 +1,5 @@
 import {ChangeEvent, FormEvent, useState} from "react";
+import {DEBUG} from "../../Types.tsx";
 
 type Props = {
     addScenario: ( label: string ) => void
@@ -7,6 +8,7 @@ type Props = {
 
 export default function AddScenario( props:Readonly<Props> ) {
     const [ label, setLabel ] = useState<string>("");
+    if (DEBUG) console.debug(`Rendering AddScenario {}`)
 
     function onChange( event: ChangeEvent<HTMLInputElement> ) {
         setLabel(event.target.value);

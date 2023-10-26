@@ -1,12 +1,12 @@
 import './SimpleChatView.css';
 import {ChangeEvent, FormEvent, useState} from "react";
 import axios from "axios";
-import {Answer, Prompt} from "../Types.tsx";
+import {Answer, DEBUG, Prompt} from "../Types.tsx";
 
 export default function SimpleChatView() {
     const [ prompt, setPrompt ] = useState<Prompt>({ prompt:"" });
     const [ answer, setAnswer ] = useState<Answer>({ answer:"" });
-    console.debug(`Rendering SimpleChatView {}`);
+    if (DEBUG) console.debug(`Rendering SimpleChatView {}`);
 
     function onInputChange( event: ChangeEvent<HTMLTextAreaElement> ) {
         setPrompt({
@@ -16,11 +16,11 @@ export default function SimpleChatView() {
 
     function onSubmitForm( event:FormEvent<HTMLFormElement> ) {
         event.preventDefault();
-        console.debug(`SimpleChatView: prompt ->`, prompt);
+        if (DEBUG) console.debug(`SimpleChatView: prompt ->`, prompt);
         axios
             .post("/api/ask", prompt)
             .then(response => {
-                console.debug(`SimpleChatView: answer ->`, response.data);
+                if (DEBUG) console.debug(`SimpleChatView: answer ->`, response.data);
                 setAnswer( response.data );
             })
             .catch(reason => {

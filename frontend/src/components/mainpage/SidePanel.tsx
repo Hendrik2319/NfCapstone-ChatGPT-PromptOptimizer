@@ -1,5 +1,6 @@
 import "./SidePanel.css"
 import {ReactNode} from "react";
+import {DEBUG} from "../../Types.tsx";
 
 type Props = {
     children: ReactNode[]
@@ -7,7 +8,7 @@ type Props = {
 
 export default function SidePanel( props: Readonly<Props> ) {
     let isOpen: boolean = false;
-    console.debug(`Rendering SidePanel { isOpen:${isOpen} }`);
+    if (DEBUG) console.debug(`Rendering SidePanel { isOpen:${isOpen} }`);
 
     function toggleState() {
         isOpen = !isOpen;

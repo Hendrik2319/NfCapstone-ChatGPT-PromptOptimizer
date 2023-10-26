@@ -1,11 +1,11 @@
 import "./ApiStateIndicator.css"
 import axios from "axios";
 import {useEffect, useState} from "react";
-import {ApiState} from "../../Types.tsx";
+import {ApiState, DEBUG} from "../../Types.tsx";
 
 export default function ApiStateIndicator() {
     const [ state, setState ] = useState<ApiState>()
-    console.debug(`Rendering ApiStateIndicator { state:${state} }`);
+    if (DEBUG) console.debug(`Rendering ApiStateIndicator { state:${state} }`);
 
     useEffect( getState, [] )
 
@@ -13,7 +13,7 @@ export default function ApiStateIndicator() {
         axios
             .get("/api/apistate")
             .then(response => {
-                console.debug(`ApiState: getState() ->`, response.data);
+                if (DEBUG) console.debug(`ApiState: getState() ->`, response.data);
                 setState(response.data)
             })
             .catch(reason => {
