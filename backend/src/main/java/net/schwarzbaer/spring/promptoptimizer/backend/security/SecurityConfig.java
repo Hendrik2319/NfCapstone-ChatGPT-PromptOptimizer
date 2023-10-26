@@ -19,9 +19,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -29,7 +30,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SecurityConfig {
 
-	public static final PrintStream DEBUG_OUT = System.out;
 	private final String initialAdmin;
 
 	SecurityConfig(
@@ -44,13 +44,21 @@ public class SecurityConfig {
 		http.csrf(AbstractHttpConfigurer::disable)
 
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers("/", "/index.html", "/vite.svg", "/assets/**").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/users/me", "/api/apistate").permitAll()
-						.requestMatchers("/api/logout").authenticated()
-//						.requestMatchers("/api/users/{id}").hasRole(Role.ADMIN.getShort())
-						.requestMatchers(HttpMethod.GET, "/api/users/restricted").hasRole(Role.ADMIN.getShort())
+						.requestMatchers( HttpMethod.GET,
+								"/", "/index.html", "/vite.svg", "/assets/**",
+								"/api/users/me", "/api/apistate"
+						).permitAll()
+
+						.requestMatchers(
+								"/api/logout"
+						).authenticated()
+
+						.requestMatchers(HttpMethod.GET,
+								"/api/scenario/all",
+								"/api/users/restricted"
+						).hasRole(Role.ADMIN.getShort())
+
 						.anyRequest().hasAnyRole(Role.ADMIN.getShort(), Role.USER.getShort())
-//						.anyRequest().permitAll()
 				)
 
 				.sessionManagement(sessions ->
@@ -70,28 +78,26 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(/*WebClient rest*/) {
+	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
 		DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
 		return request -> {
 
 			OAuth2User user = delegate.loadUser(request);
+			Collection<GrantedAuthority> newAuthorities = new ArrayList<>(user.getAuthorities());
+			Map<String, Object> newAttributes = new HashMap<>(user.getAttributes());
+
 			String userDbId = request.getClientRegistration().getRegistrationId() + user.getName();
+			newAttributes.put("UserDbId", userDbId);
+
 			/*
 			query user database for role
 			...
 			If not found, do this
 			 */
-			if (initialAdmin.equals(userDbId)) {
-//				DEBUG_OUT.println("########################################################");
-//				DEBUG_OUT.println("    INITIAL ADMIN");
-//				DEBUG_OUT.println("########################################################");
-
-				Collection<GrantedAuthority> newAuthorities = new ArrayList<>(user.getAuthorities());
+			if (initialAdmin.equals(userDbId))
 				newAuthorities.add(new SimpleGrantedAuthority(Role.ADMIN.getLong()));
-				user = new DefaultOAuth2User(newAuthorities, user.getAttributes(), "id");
-			}
 
-			return user;
+			return new DefaultOAuth2User(newAuthorities, newAttributes, "id");
 		};
 	}
 

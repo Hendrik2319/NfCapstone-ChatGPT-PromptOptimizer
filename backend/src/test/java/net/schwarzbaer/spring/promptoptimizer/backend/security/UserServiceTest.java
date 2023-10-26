@@ -64,7 +64,7 @@ class UserServiceTest {
 		// Then
 		UserInfos expected = new UserInfos(
 				false, false, false,
-				"anonymousUser", null, null, null, null, null
+				"anonymousUser", null, null, null, null, null, null
 		);
 		assertEquals(expected, actual);
 	}
@@ -80,7 +80,7 @@ class UserServiceTest {
 		// Then
 		UserInfos expected = new UserInfos(
 				true, false, false,
-				"TestID2", "TestLogin", null, null, null, null
+				"TestID2", null, "TestLogin", null, null, null, null
 		);
 		assertEquals(expected, actual);
 	}
@@ -96,7 +96,7 @@ class UserServiceTest {
 		// Then
 		UserInfos expected = new UserInfos(
 				true, false, false,
-				"TestID3", "TestUnknownAccount", null, null, null, null
+				"TestID3", null, "TestUnknownAccount", null, null, null, null
 		);
 		assertEquals(expected, actual);
 	}
@@ -112,7 +112,7 @@ class UserServiceTest {
 		// Then
 		UserInfos expected = new UserInfos(
 				true, true, false,
-				"TestID4", "TestUser", null, null, null, null
+				"TestID4", null, "TestUser", null, null, null, null
 		);
 		assertEquals(expected, actual);
 	}
@@ -128,7 +128,7 @@ class UserServiceTest {
 		// Then
 		UserInfos expected = new UserInfos(
 				true, false, true,
-				"TestID5", "TestAdmin", null, null, null, null
+				"TestID5", null, "TestAdmin", null, null, null, null
 		);
 		assertEquals(expected, actual);
 	}

@@ -1,3 +1,5 @@
+export const DEBUG: boolean = true;
+
 export type Prompt = {
     prompt: string
 }
@@ -19,4 +21,14 @@ export type UserInfos = {
     location        : string
     url             : string
     avatar_url      : string
+}
+
+export type Scenario = {
+    id       : string
+    authorID : string
+    label    : string
+}
+
+export type NewScenario = {
+    label    : string
 }

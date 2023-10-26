@@ -1,7 +1,7 @@
 import "./ApiStateIndicator.css"
 import axios from "axios";
 import {useEffect, useState} from "react";
-import {ApiState} from "../Types.tsx";
+import {ApiState} from "../../Types.tsx";
 
 export default function ApiStateIndicator() {
     const [ state, setState ] = useState<ApiState>()
@@ -24,12 +24,7 @@ export default function ApiStateIndicator() {
     const isEnabled = state?.enabled;
     return (
         <div className={ "ApiStateIndicator " + (isEnabled ? "enabled" : "disabled") }>
-
-            API:
-            <span>
-                { isEnabled ? "Enabled" : "Disabled" }
-            </span>
-
+            API: <span>{ isEnabled ? "Enabled" : "Disabled" }</span>
         </div>
     )
 }

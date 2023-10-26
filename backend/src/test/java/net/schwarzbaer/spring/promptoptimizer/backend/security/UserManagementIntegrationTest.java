@@ -44,6 +44,7 @@ class UserManagementIntegrationTest {
 						"isUser"         : %s,
 						"isAdmin"        : %s,
 						"id"        : "%s",
+						"userDbId"  : null,
 						"login"     : %s,
 						"name"      : null,
 						"location"  : null,

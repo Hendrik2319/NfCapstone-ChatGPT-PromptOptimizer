@@ -5,6 +5,7 @@ public record UserInfos(
 		boolean isUser,
 		boolean isAdmin,
 		String id,
+		String userDbId,
 		String login,
 		String name,
 		String location,
