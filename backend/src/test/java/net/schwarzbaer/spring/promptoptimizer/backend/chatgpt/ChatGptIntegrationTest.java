@@ -81,7 +81,7 @@ class ChatGptIntegrationTest {
 	}
 
 	@ParameterizedTest
-	@ArgumentsSource(SecurityTestTools.AllowedUserRoles.class)
+	@ArgumentsSource(SecurityTestTools.UserAndAdminRoles.class)
 	void whenAskChatGPT_withAllowedUser_returnsAnswer(Role role) throws Exception {
 		// Given
 		mockWebServer.enqueue(

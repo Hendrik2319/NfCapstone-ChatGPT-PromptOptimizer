@@ -18,17 +18,23 @@ public class SecurityTestTools {
 
 	@NonNull
 	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(@Nullable Role role) {
-		return buildUser(role, "TestID", "TestLogin");
+		return buildUser(role, "TestID", null, "TestLogin");
 	}
 
 	@NonNull
 	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(@Nullable Role role, @NonNull String id, @NonNull String login) {
+		return buildUser(role, id, null, login);
+	}
+
+	@NonNull
+	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(@Nullable Role role, @NonNull String id, @Nullable String userDbId, @NonNull String login) {
 		return oidcLogin()
 				.authorities(new SimpleGrantedAuthority(role == null ? "DummyAuthority" : role.getLong()))
-				.userInfoToken(token -> token
-						.claim("id", id)
-						.claim("login", login)
-				);
+				.userInfoToken(token -> {
+					token.claim("id", id);
+					token.claim("login", login);
+					if (userDbId!=null) token.claim("UserDbId", userDbId);
+				});
 	}
 
 	@NonNull
@@ -44,10 +50,17 @@ public class SecurityTestTools {
 				.get("/api/users/me");
 	}
 
-	public static class AllowedUserRoles implements ArgumentsProvider {
+	public static class UserAndAdminRoles implements ArgumentsProvider {
 		@Override
 		public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
 			return Stream.of(Role.USER, Role.ADMIN).map(Arguments::of);
+		}
+	}
+
+	public static class NotAdminRoles implements ArgumentsProvider {
+		@Override
+		public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
+			return Stream.of(Role.USER, Role.UNKNOWN_ACCOUNT).map(Arguments::of);
 		}
 	}
 }

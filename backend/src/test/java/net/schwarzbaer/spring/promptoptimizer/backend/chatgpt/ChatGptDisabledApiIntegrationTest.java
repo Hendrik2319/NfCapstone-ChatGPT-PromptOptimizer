@@ -81,7 +81,7 @@ class ChatGptDisabledApiIntegrationTest {
 	}
 
 	@ParameterizedTest
-	@ArgumentsSource(SecurityTestTools.AllowedUserRoles.class)
+	@ArgumentsSource(SecurityTestTools.UserAndAdminRoles.class)
 	void whenAskChatGPT_withDisabledAPI_withAllowedUser_returnsAnGeneratedAnswer(Role role) throws Exception {
 		// Given
 
