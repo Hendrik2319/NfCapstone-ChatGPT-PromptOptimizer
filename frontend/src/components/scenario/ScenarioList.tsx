@@ -5,7 +5,9 @@ import {ChangeEvent, useEffect, useState} from "react";
 import ScenarioCard from "./ScenarioCard.tsx";
 import {createDialog} from "../FloatingDialogs.tsx";
 import AddScenario from "./AddScenario.tsx";
-import EditScenario, {EditScenarioOptions} from "./EditScenario.tsx";
+import EditScenario from "./EditScenario.tsx";
+import DeleteScenario from "./DeleteScenario.tsx";
+import {ScenarioDialogOptions} from "./Types.tsx";
 
 type Props = {
     user: UserInfos
@@ -49,11 +51,23 @@ export default function ScenarioList( props:Readonly<Props> ) {
         axios.put(`/api/scenario/${scenario.id}`, scenario )
             .then((response) => {
                 if (response.status!==200)
-                    throw new Error("Get wrong response status, when adding a scenario: "+response.status);
+                    throw new Error("Get wrong response status, when updating a scenario: "+response.status);
                 loadScenarios();
             })
             .catch((error)=>{
                 console.error("Error in ScenarioList.editScenario():", error);
+            })
+    }
+
+    function deleteScenario( id: string ) {
+        axios.delete(`/api/scenario/${id}` )
+            .then((response) => {
+                if (response.status!==200)
+                    throw new Error("Get wrong response status, when deleting a scenario: "+response.status);
+                loadScenarios();
+            })
+            .catch((error)=>{
+                console.error("Error in ScenarioList.deleteScenario():", error);
             })
     }
 
@@ -68,11 +82,22 @@ export default function ScenarioList( props:Readonly<Props> ) {
         )
 
     const editDialog =
-        createDialog<EditScenarioOptions>(
+        createDialog<ScenarioDialogOptions>(
             'EditScenarioDialog',
             dialogControl =>
                 <EditScenario
                     saveChanges={editScenario}
+                    setInitFunction={dialogControl.setInitFunction}
+                    closeDialog={dialogControl.closeDialog}
+                />
+        )
+
+    const deleteDialog =
+        createDialog<ScenarioDialogOptions>(
+            'DeleteScenarioDialog',
+            dialogControl =>
+                <DeleteScenario
+                    deleteScenario={deleteScenario}
                     setInitFunction={dialogControl.setInitFunction}
                     closeDialog={dialogControl.closeDialog}
                 />
@@ -98,12 +123,14 @@ export default function ScenarioList( props:Readonly<Props> ) {
                                 key={scn.id}
                                 scenario={scn}
                                 showEditDialog={editDialog.showDialog}
+                                showDeleteDialog={deleteDialog.showDialog}
                             />
                     )
                 }
             </div>
             {addDialog.writeHTML()}
             {editDialog.writeHTML()}
+            {deleteDialog.writeHTML()}
         </>
     )
 }

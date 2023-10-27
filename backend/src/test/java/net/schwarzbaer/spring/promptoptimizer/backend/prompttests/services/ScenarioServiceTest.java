@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -267,5 +268,102 @@ class ScenarioServiceTest {
 
 		// Then
 		assertThrows(ScenarioService.UserIsNotAllowedException.class, call);
+	}
+
+	@Test void whenDeleteScenario_isCalledByAdmin() throws ScenarioService.UserIsNotAllowedException {
+		whenDeleteScenario_isCalledByAllowedUser(
+				"author1", false, true, "authorAdmin"
+		);
+	}
+	@Test void whenDeleteScenario_isCalledByUser() throws ScenarioService.UserIsNotAllowedException {
+		whenDeleteScenario_isCalledByAllowedUser(
+				"authorA", true, false, "authorA"
+		);
+	}
+
+	private void whenDeleteScenario_isCalledByAllowedUser(
+			String storedAuthorID, boolean isUser, boolean isAdmin, String userDbId
+	) throws ScenarioService.UserIsNotAllowedException {
+		// Given
+		when(scenarioRepository.findById("id1")).thenReturn(Optional.of(
+				new Scenario("id1", storedAuthorID, "label1")
+		));
+		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+				true, isUser, isAdmin,
+				"userId1", userDbId, null, null, null, null, null
+		));
+
+		// When
+		scenarioService.deleteScenario("id1");
+
+		// Then
+		verify(userService).getCurrentUser();
+		verify(scenarioRepository).findById("id1");
+		verify(scenarioRepository).deleteById("id1");
+		assertTrue(true); // no exception was thrown
+	}
+
+	@Test
+	void whenDeleteScenario_isCalledWithUnknownId_throwException() {
+		// Given
+		when(scenarioRepository.findById("id1")).thenReturn( Optional.empty() );
+
+		// When
+		Executable call = () -> scenarioService.deleteScenario("id1");
+
+		// Then
+		assertThrows(NoSuchElementException.class, call);
+		verify(scenarioRepository).findById("id1");
+	}
+
+	@Test
+	void whenDeleteScenario_isCalledByUnauthorized_andExceptionIsThrown() {
+		whenDeleteScenario_isCalled_andExceptionIsThrown(
+				"Author1", "Author1", "anonymousUser",
+				false, false
+		);
+	}
+	@Test
+	void whenDeleteScenario_isCalledByUnknownAccount_andExceptionIsThrown() {
+		whenDeleteScenario_isCalled_andExceptionIsThrown(
+				"Author1", "Author1", "User1",
+				true, false
+		);
+	}
+	@Test
+	void whenDeleteScenario_isCalledByUserWithNoUserDbId_andExceptionIsThrown() {
+		whenDeleteScenario_isCalled_andExceptionIsThrown(
+				"Author1", null, "User1",
+				true, true
+		);
+	}
+	@Test
+	void whenDeleteScenario_isCalledByUserWithOtherUserDbId_andExceptionIsThrown() {
+		whenDeleteScenario_isCalled_andExceptionIsThrown(
+				"Author2", "Author1", "User1",
+				true, true
+		);
+	}
+
+	private void whenDeleteScenario_isCalled_andExceptionIsThrown(
+			String storedAuthorID, String userDbId, String userId,
+			boolean isAuthenticated, boolean isUser
+	) {
+		// Given
+		when(scenarioRepository.findById("id1")).thenReturn( Optional.of(
+				new Scenario("id1", storedAuthorID, "label1")
+		));
+		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+				isAuthenticated, isUser, false,
+				userId, userDbId, null, null, null, null, null
+		));
+
+		// When
+		Executable call = () -> scenarioService.deleteScenario("id1");
+
+		// Then
+		assertThrows(ScenarioService.UserIsNotAllowedException.class, call);
+		verify(scenarioRepository).findById("id1");
+		verify(userService).getCurrentUser();
 	}
 }
