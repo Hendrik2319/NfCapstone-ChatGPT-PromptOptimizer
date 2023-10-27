@@ -15,6 +15,7 @@ import java.util.List;
 public class ChatGptService {
 
 	private final WebClient webClient;
+	@SuppressWarnings("java:S106")
 	private static final PrintStream DEBUG_OUT = System.out;
 
 	public ChatGptService(

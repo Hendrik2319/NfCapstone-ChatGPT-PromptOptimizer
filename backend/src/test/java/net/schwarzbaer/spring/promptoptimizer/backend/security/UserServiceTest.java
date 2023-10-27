@@ -51,6 +51,23 @@ class UserServiceTest {
 	}
 
 	@Test
+	void whenGetCurrentUser_isCalledAndAuthenticationIsNull() {
+		// Given
+		when(securityContext.getAuthentication()).thenReturn(null);
+		SecurityContextHolder.setContext(securityContext);
+
+		// When
+		UserInfos actual = userService.getCurrentUser();
+
+		// Then
+		UserInfos expected = new UserInfos(
+				false, false, false,
+				"anonymousUser", null, null, null, null, null, null
+		);
+		assertEquals(expected, actual);
+	}
+
+	@Test
 	void whenGetCurrentUser_isCalledByAnonymous() {
 		// Given
 		when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -69,67 +86,55 @@ class UserServiceTest {
 		assertEquals(expected, actual);
 	}
 
-	@Test
-	void whenGetCurrentUser_isCalledByAuthenticatedUser() {
+	private void whenGetCurrentUser_isCalled(
+			Role loggedUserRole,
+			String loggedUserID,
+			String loggedUserLogin,
+			boolean isUser, boolean isAdmin
+	) {
 		// Given
-		initSecurityContext(null, "TestID2", "TestLogin");
+		initSecurityContext(loggedUserRole, loggedUserID, loggedUserLogin);
 
 		// When
 		UserInfos actual = userService.getCurrentUser();
 
 		// Then
 		UserInfos expected = new UserInfos(
-				true, false, false,
-				"TestID2", null, "TestLogin", null, null, null, null
+				true, isUser, isAdmin,
+				loggedUserID, null, loggedUserLogin, null, null, null, null
 		);
 		assertEquals(expected, actual);
+	}
+
+	@Test
+	void whenGetCurrentUser_isCalledByAuthenticatedUser() {
+		whenGetCurrentUser_isCalled(
+				null, "TestID2", "TestLogin",
+				false, false
+		);
 	}
 
 	@Test
 	void whenGetCurrentUser_isCalledByUnknownAccount() {
-		// Given
-		initSecurityContext(Role.UNKNOWN_ACCOUNT, "TestID3", "TestUnknownAccount");
-
-		// When
-		UserInfos actual = userService.getCurrentUser();
-
-		// Then
-		UserInfos expected = new UserInfos(
-				true, false, false,
-				"TestID3", null, "TestUnknownAccount", null, null, null, null
+		whenGetCurrentUser_isCalled(
+				Role.UNKNOWN_ACCOUNT, "TestID3", "TestUnknownAccount",
+				false, false
 		);
-		assertEquals(expected, actual);
 	}
 
 	@Test
 	void whenGetCurrentUser_isCalledByUser() {
-		// Given
-		initSecurityContext(Role.USER, "TestID4", "TestUser");
-
-		// When
-		UserInfos actual = userService.getCurrentUser();
-
-		// Then
-		UserInfos expected = new UserInfos(
-				true, true, false,
-				"TestID4", null, "TestUser", null, null, null, null
+		whenGetCurrentUser_isCalled(
+				Role.USER, "TestID4", "TestUser",
+				true, false
 		);
-		assertEquals(expected, actual);
 	}
 
 	@Test
 	void whenGetCurrentUser_isCalledByAdmin() {
-		// Given
-		initSecurityContext(Role.ADMIN, "TestID5", "TestAdmin");
-
-		// When
-		UserInfos actual = userService.getCurrentUser();
-
-		// Then
-		UserInfos expected = new UserInfos(
-				true, false, true,
-				"TestID5", null, "TestAdmin", null, null, null, null
+		whenGetCurrentUser_isCalled(
+				Role.ADMIN, "TestID5", "TestAdmin",
+				false, true
 		);
-		assertEquals(expected, actual);
 	}
 }
