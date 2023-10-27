@@ -5,6 +5,8 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
 
@@ -44,8 +46,21 @@ class ChatGptServiceTest {
 		assertEquals(expected, actual);
 	}
 
-	@Test
-	void whenAskChatGPT_getsAPrompt_returnsAnAnswer() {
+	@ParameterizedTest
+	@ValueSource( strings = {
+		"""
+			{
+			    "choices": [ { "message": { "content": "%s" } } ],
+			    "usage": { "total_tokens": 35 }
+			}
+		""",
+		"""
+			{
+			    "choices": [ { "message": { "content": "%s" } } ]
+			}
+		""",
+	} )
+	void whenAskChatGPT_getsAPrompt_returnsAnAnswer(String body) {
 		// Given
 		chatGptService = new ChatGptService(
 				"ApiKey",
@@ -55,20 +70,7 @@ class ChatGptServiceTest {
 		mockWebServer.enqueue(
 				new MockResponse()
 						.setHeader("Content-Type", "application/json")
-						.setBody("""
-								{
-								    "choices": [
-								        {
-								            "message": {
-								                "content": "TestAnswer"
-								            }
-								        }
-								    ],
-								    "usage": {
-								        "total_tokens": 35
-								    }
-								}
-								""")
+						.setBody(body.formatted("TestAnswer"))
 		);
 
 		// When
@@ -79,8 +81,32 @@ class ChatGptServiceTest {
 		assertEquals(expected, actual);
 	}
 
-	@Test
-	void whenAskChatGPT_getsAPrompt_andGivesAWrongResponse() {
+	@ParameterizedTest
+	@ValueSource( strings = {
+		"{ \"choices\": [ { \"message\": {} } ], \"usage\": { \"total_tokens\": 35 } }",
+		"{ \"choices\": [ {} ], \"usage\": { \"total_tokens\": 35 } }",
+		"{ \"choices\": [ null ], \"usage\": { \"total_tokens\": 35 } }",
+		"{ \"choices\": [], \"usage\": { \"total_tokens\": 35 } }",
+		"{ \"usage\": { \"total_tokens\": 35 } }",
+	} )
+	void whenAskChatGPT_getsAPrompt_andApiGivesAWrongResponse_returnsNull(String wrongBody) {
+		whenAskChatGPT_andSomethingWentWrong_returnsNull(
+				new MockResponse()
+						.setHeader("Content-Type", "application/json")
+						.setBody(wrongBody)
+		);
+	}
+
+	@ParameterizedTest
+	@ValueSource( ints = { 400, 401, 403, 500, 501, 502 ,503 } )
+	void whenAskChatGPT_getsAPrompt_andApiGivesStatusXXX_returnsNull(int responseCode) {
+		whenAskChatGPT_andSomethingWentWrong_returnsNull(
+				new MockResponse()
+						.setResponseCode(responseCode)
+		);
+	}
+
+	private void whenAskChatGPT_andSomethingWentWrong_returnsNull(MockResponse mockResponse) {
 		// Given
 		chatGptService = new ChatGptService(
 				"ApiKey",
@@ -88,18 +114,7 @@ class ChatGptServiceTest {
 				mockWebServer.url("/").toString()
 		);
 		mockWebServer.enqueue(
-				new MockResponse()
-						.setHeader("Content-Type", "application/json")
-						.setBody("""
-								{
-								    "choices": [
-								        null
-								    ],
-								    "usage": {
-								        "total_tokens": 35
-								    }
-								}
-								""")
+				mockResponse
 		);
 
 		// When
@@ -109,29 +124,24 @@ class ChatGptServiceTest {
 		assertNull(actual);
 	}
 
-	@Test
-	void whenGetApiState_isCalledWithDisabledAPI_returnsDisabled() {
-		// Given
-		chatGptService = new ChatGptService(
-				"disabled",
-				"disabled",
-				mockWebServer.url("/").toString()
-		);
-
-		// When
-		ApiState actual = chatGptService.getApiState();
-
-		// Then
-		ApiState expected = new ApiState(false);
-		assertEquals(expected, actual);
+	@Test void whenGetApiState_isCalledWithDisabledAPI1_returnsDisabled() {
+		whenGetApiState_isCalled("disabled", "disabled", false);
+	}
+	@Test void whenGetApiState_isCalledWithDisabledAPI2_returnsDisabled() {
+		whenGetApiState_isCalled("disabled_", "disabled", false);
+	}
+	@Test void whenGetApiState_isCalledWithDisabledAPI3_returnsDisabled() {
+		whenGetApiState_isCalled("disabled", "disabled_", false);
+	}
+	@Test void whenGetApiState_isCalledWithEnabledAPI_returnsEnabled() {
+		whenGetApiState_isCalled("ApiKey", "OrgKey", true);
 	}
 
-	@Test
-	void whenGetApiState_isCalledWithEnabledAPI_returnsEnabled() {
+	private void whenGetApiState_isCalled(String openaiApiKey, String openaiApiOrganization, boolean isApiEnabled) {
 		// Given
 		chatGptService = new ChatGptService(
-				"ApiKey",
-				"OrgKey",
+				openaiApiKey,
+				openaiApiOrganization,
 				mockWebServer.url("/").toString()
 		);
 
@@ -139,7 +149,7 @@ class ChatGptServiceTest {
 		ApiState actual = chatGptService.getApiState();
 
 		// Then
-		ApiState expected = new ApiState(true);
+		ApiState expected = new ApiState(isApiEnabled);
 		assertEquals(expected, actual);
 	}
 }
