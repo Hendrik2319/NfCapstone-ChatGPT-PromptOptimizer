@@ -439,6 +439,10 @@ class ScenarioIntegrationTest {
 
 				// Then
 				.andExpect(status().isOk());
+
+		Optional<Scenario> actual = scenarioRepository.findById("id1");
+		assertNotNull(actual);
+		assertTrue(actual.isEmpty());
 	}
 
 	@Test @DirtiesContext
