@@ -21,11 +21,8 @@ export default function App() {
     useEffect(determineCurrentUser, []);
 
     function setAppTheme(state: DarkModeState) {
-        const bodies = document.getElementsByTagName("body");
-        if (bodies.length>0) {
-            bodies[0].classList.remove( state === "dark" ? "light" : "dark" );
-            bodies[0].classList.add(state);
-        }
+        document.body.classList.remove( state === "dark" ? "light" : "dark" );
+        document.body.classList.add(state);
     }
 
     function login() {
