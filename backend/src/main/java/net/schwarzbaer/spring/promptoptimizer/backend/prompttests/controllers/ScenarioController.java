@@ -1,9 +1,12 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.controllers;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.schwarzbaer.spring.promptoptimizer.backend.ErrorMessage;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewScenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.ScenarioService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/scenario")
 @RequiredArgsConstructor
+@Slf4j
 public class ScenarioController {
 
 	private final ScenarioService scenarioService;
@@ -28,7 +32,32 @@ public class ScenarioController {
 
 	@PostMapping
 	public ResponseEntity<Scenario> addScenarios(@RequestBody NewScenario newScenario) {
-		return  ResponseEntity.of(scenarioService.addScenarios(newScenario));
+		return ResponseEntity.of(scenarioService.addScenarios(newScenario));
+	}
+
+	@PutMapping("{id}")
+	public ResponseEntity<Scenario> updateScenario(
+			@PathVariable String id,
+			@RequestBody Scenario scenario
+	) throws ScenarioService.UserIsNotAllowedException
+	{
+		return ResponseEntity.of(scenarioService.updateScenario(id, scenario));
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorMessage handleException(IllegalArgumentException ex) {
+		String message = "IllegalArgumentException: %s".formatted(ex.getMessage());
+		log.error(message);
+		return new ErrorMessage(message);
+	}
+
+	@ExceptionHandler(ScenarioService.UserIsNotAllowedException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public ErrorMessage handleException(ScenarioService.UserIsNotAllowedException ex) {
+		String message = "IllegalArgumentException: %s".formatted(ex.getMessage());
+		log.error(message);
+		return new ErrorMessage(message);
 	}
 
 }

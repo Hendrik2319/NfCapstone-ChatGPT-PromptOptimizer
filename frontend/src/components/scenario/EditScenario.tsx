@@ -1,14 +1,25 @@
+import {DEBUG, Scenario} from "../../Types.tsx";
 import {ChangeEvent, FormEvent, useState} from "react";
-import {DEBUG} from "../../Types.tsx";
 
-type Props = {
-    addScenario: ( label: string ) => void
-    closeDialog: () => void
+export type EditScenarioOptions = {
+    scenario: Scenario
 }
 
-export default function AddScenario( props:Readonly<Props> ) {
+type Props = {
+    saveChanges: (scenario: Scenario) => void
+    closeDialog: ()=>void
+    setInitFunction: ( initFunction: (options:EditScenarioOptions)=> void ) => void
+}
+
+export default function EditScenario( props: Readonly<Props> ) {
     const [ label, setLabel ] = useState<string>("");
-    if (DEBUG) console.debug(`Rendering AddScenario {}`)
+    const [ scenario, setScenario ] = useState<Scenario>();
+    if (DEBUG) console.debug(`Rendering EditScenario {}`);
+
+    props.setInitFunction((options: EditScenarioOptions) => {
+        setScenario(options.scenario);
+        setLabel(options.scenario.label);
+    });
 
     function onChange( event: ChangeEvent<HTMLInputElement> ) {
         setLabel(event.target.value);
@@ -16,8 +27,9 @@ export default function AddScenario( props:Readonly<Props> ) {
 
     function onSubmit( event: FormEvent<HTMLFormElement> ) {
         event.preventDefault();
-        if (label.length !== 0) {
-            props.addScenario(label);
+        if (scenario && label.length !== 0) {
+            const changedScenario: Scenario = { ...scenario, label };
+            props.saveChanges(changedScenario);
             closeDialog();
         } else {
             alert("Please enter a label before adding.");
@@ -26,7 +38,6 @@ export default function AddScenario( props:Readonly<Props> ) {
 
     function closeDialog() {
         props.closeDialog();
-        setLabel("");
     }
 
     return (
@@ -36,7 +47,7 @@ export default function AddScenario( props:Readonly<Props> ) {
                 <input value={label} onChange={onChange}/>
             </label>
             <br/>
-            <button>Add</button>
+            <button>Set</button>
             <button type="button" onClick={closeDialog}>Cancel</button>
         </form>
     )

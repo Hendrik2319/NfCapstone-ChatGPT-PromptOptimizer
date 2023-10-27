@@ -232,4 +232,150 @@ class ScenarioIntegrationTest {
 						{ "authorID": "userXY", "label": "labelXY" }
 				"""));
 	}
+
+	@Test @DirtiesContext
+	void whenUpdateScenario_getsPathIdDifferentToScenarioID_returnsStatus400BadRequest() throws Exception {
+		whenUpdateScenario_getsWrongArguments_returnsStatus400BadRequest(
+				"id2","{ \"id\": \"id1\", \"authorID\": \"author1\", \"label\": \"labelNew\" }"
+		);
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateScenario_getsScenarioWithNoId_returnsStatus400BadRequest() throws Exception {
+		whenUpdateScenario_getsWrongArguments_returnsStatus400BadRequest(
+				"id1","{ \"authorID\": \"author1\", \"label\": \"labelNew\" }"
+		);
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateScenario_getsScenarioWithNoAuthorId_returnsStatus400BadRequest() throws Exception {
+		whenUpdateScenario_getsWrongArguments_returnsStatus400BadRequest(
+				"id1","{ \"id\": \"id1\", \"label\": \"labelNew\" }"
+		);
+	}
+
+	private void whenUpdateScenario_getsWrongArguments_returnsStatus400BadRequest(
+			String pathId, String requestBody
+	) throws Exception {
+		// Given
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/scenario/%s".formatted(pathId))
+						.with(SecurityTestTools.buildUser(Role.USER, "userId1", "author1", "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(requestBody)
+				)
+
+				// Then
+				.andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+	}
+
+	@Test
+	@DirtiesContext
+	void whenUpdateScenario_getsScenarioWithUnknownId_returnsStatus404NotFound() throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("id2", "author1", "label1"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/scenario/%s".formatted("id1"))
+						.with(SecurityTestTools.buildUser(Role.USER, "userId1", "author1", "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("{ \"id\": \"id1\", \"authorID\": \"author1\", \"label\": \"labelNew\" }")
+				)
+
+				// Then
+				.andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateScenario_isCalledByNonAdmin_withNoDbId_returnsStatus403Forbidden() throws Exception {
+		whenUpdateScenario_isCalledByNonAdmin_withWrongIds_returnsStatus403Forbidden(
+				null, "author1", "author1"
+		);
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateScenario_isCalledByNonAdmin_withDbIdDifferentToGivenScenario_returnsStatus403Forbidden() throws Exception {
+		whenUpdateScenario_isCalledByNonAdmin_withWrongIds_returnsStatus403Forbidden(
+				"author1", "author1", "author2"
+		);
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateScenario_isCalledByNonAdmin_withDbIdDifferentToStoredScenario_returnsStatus403Forbidden() throws Exception {
+		whenUpdateScenario_isCalledByNonAdmin_withWrongIds_returnsStatus403Forbidden(
+				"author1", "author2", "author1"
+		);
+	}
+
+	private void whenUpdateScenario_isCalledByNonAdmin_withWrongIds_returnsStatus403Forbidden(
+			String userDbId, String authorOfStored, String authorOfGiven
+	) throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("id1", authorOfStored, "labelOld"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/scenario/%s".formatted("id1"))
+						.with(SecurityTestTools.buildUser(Role.USER, "userId1", userDbId, "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{ "id": "id1", "authorID": "%s", "label": "labelNew" }
+						""".formatted(authorOfGiven))
+				)
+
+				// Then
+				.andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateScenario_isCalledByAdmin_returnsUpdatedValue() throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("id1", "author2", "labelOld"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/scenario/%s".formatted("id1"))
+						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "authorAdmin", "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{ "id": "id1", "authorID": "author1", "label": "labelNew" }
+						""")
+				)
+
+				// Then
+				.andExpect(status().isOk())
+				.andExpect(content().json("""
+						{ "id": "id1", "authorID": "author1", "label": "labelNew" }
+				"""));
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateScenario_isCalledByUser_returnsUpdatedValue() throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("id1", "author1", "labelOld"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/scenario/%s".formatted("id1"))
+						.with(SecurityTestTools.buildUser(Role.USER, "userId1", "author1", "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{ "id": "id1", "authorID": "author1", "label": "labelNew" }
+						""")
+				)
+
+				// Then
+				.andExpect(status().isOk())
+				.andExpect(content().json("""
+						{ "id": "id1", "authorID": "author1", "label": "labelNew" }
+				"""));
+	}
 }
