@@ -1,14 +1,11 @@
 import {DEBUG, Scenario} from "../../Types.tsx";
 import {ChangeEvent, FormEvent, useState} from "react";
-
-export type EditScenarioOptions = {
-    scenario: Scenario
-}
+import {ScenarioDialogOptions} from "./Types.tsx";
 
 type Props = {
     saveChanges: (scenario: Scenario) => void
     closeDialog: ()=>void
-    setInitFunction: ( initFunction: (options:EditScenarioOptions)=> void ) => void
+    setInitFunction: ( initFunction: (options: ScenarioDialogOptions)=> void ) => void
 }
 
 export default function EditScenario( props: Readonly<Props> ) {
@@ -16,7 +13,7 @@ export default function EditScenario( props: Readonly<Props> ) {
     const [ scenario, setScenario ] = useState<Scenario>();
     if (DEBUG) console.debug(`Rendering EditScenario {}`);
 
-    props.setInitFunction((options: EditScenarioOptions) => {
+    props.setInitFunction((options: ScenarioDialogOptions) => {
         setScenario(options.scenario);
         setLabel(options.scenario.label);
     });
