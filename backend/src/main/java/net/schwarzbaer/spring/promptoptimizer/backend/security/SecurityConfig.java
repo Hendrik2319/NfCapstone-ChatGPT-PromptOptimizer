@@ -80,25 +80,28 @@ public class SecurityConfig {
 	@Bean
 	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
 		DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-		return request -> {
+		return request -> configureUserData(delegate, request);
+	}
 
-			OAuth2User user = delegate.loadUser(request);
-			Collection<GrantedAuthority> newAuthorities = new ArrayList<>(user.getAuthorities());
-			Map<String, Object> newAttributes = new HashMap<>(user.getAttributes());
+	DefaultOAuth2User configureUserData(DefaultOAuth2UserService delegate, OAuth2UserRequest request) {
+		OAuth2User user = delegate.loadUser(request);
+		Collection<GrantedAuthority> newAuthorities = new ArrayList<>(user.getAuthorities());
+		Map<String, Object> newAttributes = new HashMap<>(user.getAttributes());
 
-			String userDbId = request.getClientRegistration().getRegistrationId() + user.getName();
-			newAttributes.put("UserDbId", userDbId);
+		String userDbId = request.getClientRegistration().getRegistrationId() + user.getName();
+		newAttributes.put("UserDbId", userDbId);
 
-			/*
-			query user database for role
-			...
-			If not found, do this
-			 */
-			if (initialAdmin.equals(userDbId))
-				newAuthorities.add(new SimpleGrantedAuthority(Role.ADMIN.getLong()));
+		/*
+		query user database for role
+		...
+		If not found, do this
+		 */
+		if (initialAdmin.equals(userDbId))
+			newAuthorities.add(new SimpleGrantedAuthority(Role.ADMIN.getLong()));
+		else
+			newAuthorities.add(new SimpleGrantedAuthority(Role.UNKNOWN_ACCOUNT.getLong()));
 
-			return new DefaultOAuth2User(newAuthorities, newAttributes, "id");
-		};
+		return new DefaultOAuth2User(newAuthorities, newAttributes, "id");
 	}
 
 }
