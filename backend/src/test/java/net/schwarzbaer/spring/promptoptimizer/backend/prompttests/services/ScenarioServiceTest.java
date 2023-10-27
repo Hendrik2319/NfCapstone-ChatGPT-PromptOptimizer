@@ -304,7 +304,7 @@ class ScenarioServiceTest {
 	}
 
 	@Test
-	void whenDeleteScenario_withUnknownId_throwException() {
+	void whenDeleteScenario_isCalledWithUnknownId_throwException() {
 		// Given
 		when(scenarioRepository.findById("id1")).thenReturn( Optional.empty() );
 

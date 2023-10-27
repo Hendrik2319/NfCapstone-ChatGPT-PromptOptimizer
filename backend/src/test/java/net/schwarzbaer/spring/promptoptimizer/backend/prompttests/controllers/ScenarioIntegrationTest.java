@@ -20,6 +20,9 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -292,28 +295,51 @@ class ScenarioIntegrationTest {
 	}
 
 	@Test @DirtiesContext
-	void whenUpdateScenario_isCalledByNonAdmin_withNoDbId_returnsStatus403Forbidden() throws Exception {
-		whenUpdateScenario_isCalledByNonAdmin_withWrongIds_returnsStatus403Forbidden(
-				null, "author1", "author1"
-		);
+	void whenUpdateScenario_isCalledByUnauthorized_returnsStatus401Unauthorized() throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("id1", "author1", "labelOld"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/scenario/%s".formatted("id1"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{ "id": "id1", "authorID": "%s", "label": "labelNew" }
+						""".formatted("author1"))
+				)
+
+				// Then
+				.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
 	}
 
+	@Test @DirtiesContext
+	void whenUpdateScenario_isCalledByUnknownAccount_returnsStatus403Forbidden() throws Exception {
+		whenUpdateScenario_isCalled_returnsStatus403Forbidden(
+				Role.UNKNOWN_ACCOUNT, "author1", "author1", "author1"
+		);
+	}
+	@Test @DirtiesContext
+	void whenUpdateScenario_isCalledByNonAdmin_withNoDbId_returnsStatus403Forbidden() throws Exception {
+		whenUpdateScenario_isCalled_returnsStatus403Forbidden(
+				Role.USER, null, "author1", "author1"
+		);
+	}
 	@Test @DirtiesContext
 	void whenUpdateScenario_isCalledByNonAdmin_withDbIdDifferentToGivenScenario_returnsStatus403Forbidden() throws Exception {
-		whenUpdateScenario_isCalledByNonAdmin_withWrongIds_returnsStatus403Forbidden(
-				"author1", "author1", "author2"
+		whenUpdateScenario_isCalled_returnsStatus403Forbidden(
+				Role.USER, "author1", "author1", "author2"
 		);
 	}
-
 	@Test @DirtiesContext
 	void whenUpdateScenario_isCalledByNonAdmin_withDbIdDifferentToStoredScenario_returnsStatus403Forbidden() throws Exception {
-		whenUpdateScenario_isCalledByNonAdmin_withWrongIds_returnsStatus403Forbidden(
-				"author1", "author2", "author1"
+		whenUpdateScenario_isCalled_returnsStatus403Forbidden(
+				Role.USER,"author1", "author2", "author1"
 		);
 	}
 
-	private void whenUpdateScenario_isCalledByNonAdmin_withWrongIds_returnsStatus403Forbidden(
-			String userDbId, String authorOfStored, String authorOfGiven
+	private void whenUpdateScenario_isCalled_returnsStatus403Forbidden(
+			Role role, String userDbId, String authorOfStored, String authorOfGiven
 	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("id1", authorOfStored, "labelOld"));
@@ -322,7 +348,7 @@ class ScenarioIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.put("/api/scenario/%s".formatted("id1"))
-						.with(SecurityTestTools.buildUser(Role.USER, "userId1", userDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{ "id": "id1", "authorID": "%s", "label": "labelNew" }
@@ -354,6 +380,12 @@ class ScenarioIntegrationTest {
 				.andExpect(content().json("""
 						{ "id": "id1", "authorID": "author1", "label": "labelNew" }
 				"""));
+
+		Optional<Scenario> actual = scenarioRepository.findById("id1");
+		assertNotNull(actual);
+		assertTrue(actual.isPresent());
+		Scenario expected = new Scenario("id1", "author1", "labelNew");
+		assertEquals(expected, actual.get());
 	}
 
 	@Test @DirtiesContext
@@ -377,5 +409,93 @@ class ScenarioIntegrationTest {
 				.andExpect(content().json("""
 						{ "id": "id1", "authorID": "author1", "label": "labelNew" }
 				"""));
+
+		Optional<Scenario> actual = scenarioRepository.findById("id1");
+		assertNotNull(actual);
+		assertTrue(actual.isPresent());
+		Scenario expected = new Scenario("id1", "author1", "labelNew");
+		assertEquals(expected, actual.get());
+	}
+
+	@Test @DirtiesContext void whenDeleteScenario_isCalledByAdmin() throws Exception {
+		whenDeleteScenario_isCalledByAllowedUser(Role.ADMIN, "authorAdmin", "author2");
+	}
+	@Test @DirtiesContext void whenDeleteScenario_isCalledByUser() throws Exception {
+		whenDeleteScenario_isCalledByAllowedUser(Role.USER, "author1", "author1");
+	}
+
+	private void whenDeleteScenario_isCalledByAllowedUser(
+			Role role, String userDbId, String storedAuthorID
+	) throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.delete("/api/scenario/id1")
+						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
+				)
+
+				// Then
+				.andExpect(status().isOk());
+	}
+
+	@Test @DirtiesContext
+	void whenDeleteScenario_isCalledWithUnknownId_throwException() throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("id2", "author1", "label1"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.delete("/api/scenario/id1")
+						.with(SecurityTestTools.buildUser(Role.USER, "userId1", "author1", "login"))
+				)
+
+				// Then
+				.andExpect(status().isNotFound());
+	}
+
+	@Test @DirtiesContext
+	void whenDeleteScenario_isCalledUnauthorized_returnErrorStatus() throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("id1", "author1", "label1"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.delete("/api/scenario/id1")
+				)
+
+				// Then
+				.andExpect(status().isUnauthorized());
+	}
+
+	@Test @DirtiesContext void whenDeleteScenario_isCalledByUnknownAccount_returnErrorStatus() throws Exception {
+		whenDeleteScenario_isCalled_returnErrorStatus(Role.UNKNOWN_ACCOUNT, "author1", "author1");
+	}
+	@Test @DirtiesContext void whenDeleteScenario_isCalledByUserWithNoDbIDs_returnErrorStatus() throws Exception {
+		whenDeleteScenario_isCalled_returnErrorStatus(Role.USER, null, "author2");
+	}
+	@Test @DirtiesContext void whenDeleteScenario_isCalledWithDifferentAuthorIDs_returnErrorStatus() throws Exception {
+		whenDeleteScenario_isCalled_returnErrorStatus(Role.USER, "author2", "author1");
+	}
+
+	private void whenDeleteScenario_isCalled_returnErrorStatus(
+			Role role, String userDbId, String storedAuthorID
+	) throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.delete("/api/scenario/id1")
+						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
+				)
+
+				// Then
+				.andExpect(status().isForbidden());
 	}
 }
