@@ -63,7 +63,10 @@ public class ChatGptService {
 		ChatGptResponse.Message message = firstChoice.message();
 		if (message == null) return null;
 
-		return new Answer(message.content());
+		String content = message.content();
+		if (content == null) return null;
+
+		return new Answer(content);
 	}
 
 	private ChatGptResponse execRequest(ChatGptRequest request) {
