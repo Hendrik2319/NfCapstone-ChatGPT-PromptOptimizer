@@ -42,12 +42,14 @@ public class ScenarioService {
 		Scenario storedScenario = storedScenarioOpt.get();
 
 		UserInfos currentUser = userService.getCurrentUser();
-		if (!currentUser.isAdmin()) {
+		if (currentUser.isUser()) {
 			if (currentUser.userDbId()==null)
 				throw new UserIsNotAllowedException("Current user has no [userDbId]");
 			if (!currentUser.userDbId().equals(storedScenario.authorID()))
 				throw new UserIsNotAllowedException("Current user is not allowed to delete a Scenario of another user.");
-		}
+		} else
+			if (!currentUser.isAdmin())
+				throw new UserIsNotAllowedException("Current user is not allowed to delete a Scenario: Only Users and Admins are allowed.");
 
 		scenarioRepository.deleteById(id);
 	}
@@ -62,13 +64,15 @@ public class ScenarioService {
 		Scenario storedScenario = storedScenarioOpt.get();
 
 		UserInfos currentUser = userService.getCurrentUser();
-		if (!currentUser.isAdmin()) {
+		if (currentUser.isUser()) {
 			if (currentUser.userDbId()==null)
 				throw new UserIsNotAllowedException("Current user has no [userDbId]");
 			if (!currentUser.userDbId().equals(storedScenario.authorID()) ||
 				!currentUser.userDbId().equals(scenario.authorID()))
 				throw new UserIsNotAllowedException("Current user is not allowed to update a Scenario of another user.");
-		}
+		} else
+			if (!currentUser.isAdmin())
+				throw new UserIsNotAllowedException("Current user is not allowed to update a Scenario: Only Users and Admins are allowed.");
 
 		return Optional.of(scenarioRepository.save(scenario));
 	}

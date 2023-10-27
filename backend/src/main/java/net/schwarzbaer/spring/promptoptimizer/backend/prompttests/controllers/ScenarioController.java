@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/scenario")
@@ -47,15 +48,23 @@ public class ScenarioController {
 	@ExceptionHandler(IllegalArgumentException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorMessage handleException(IllegalArgumentException ex) {
-		String message = "IllegalArgumentException: %s".formatted(ex.getMessage());
-		log.error(message);
-		return new ErrorMessage(message);
+		return getErrorMessageAndDoLog("IllegalArgumentException", ex);
 	}
 
 	@ExceptionHandler(ScenarioService.UserIsNotAllowedException.class)
 	@ResponseStatus(HttpStatus.FORBIDDEN)
 	public ErrorMessage handleException(ScenarioService.UserIsNotAllowedException ex) {
-		String message = "IllegalArgumentException: %s".formatted(ex.getMessage());
+		return getErrorMessageAndDoLog("IllegalArgumentException", ex);
+	}
+
+	@ExceptionHandler(NoSuchElementException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ErrorMessage handleException(NoSuchElementException ex) {
+		return getErrorMessageAndDoLog("NoSuchElementException", ex);
+	}
+
+	private static ErrorMessage getErrorMessageAndDoLog(String exception, Exception ex) {
+		String message = "%s: %s".formatted(exception, ex.getMessage());
 		log.error(message);
 		return new ErrorMessage(message);
 	}
