@@ -50,6 +50,10 @@ public class SecurityConfig {
 						).permitAll()
 
 						.requestMatchers(
+								"/api/testrunexample"
+						).permitAll()
+
+						.requestMatchers(
 								"/api/logout"
 						).authenticated()
 
