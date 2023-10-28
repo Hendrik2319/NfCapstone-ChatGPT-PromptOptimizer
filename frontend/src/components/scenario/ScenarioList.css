@@ -10,3 +10,7 @@
     background-color: var(--background-color);
     box-shadow: 5px 5px 5px var(--box-shadow-color);
 }
+.ScenarioCard .ContentButton {
+    text-align: left;
+    width: 100%;
+}

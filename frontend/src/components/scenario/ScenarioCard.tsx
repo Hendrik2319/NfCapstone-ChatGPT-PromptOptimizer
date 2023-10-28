@@ -22,9 +22,12 @@ export default function ScenarioCard( props:Readonly<Props> ) {
 
     return (
         <div className={"ScenarioCard"}>
-            <div>id       : {props.scenario.id      }</div>
-            <div>authorID : {props.scenario.authorID}</div>
-            <div>label    : {props.scenario.label   }</div>
+            <button className="ContentButton">
+                <div className="ID">id: {props.scenario.id}</div>
+                <div>label    : {props.scenario.label   }</div>
+                <div>authorID : {props.scenario.authorID}</div>
+            </button>
+            <br/>
             <button onClick={editScenario}>Change Name</button>
             <button onClick={deleteScenario}>Delete</button>
         </div>
