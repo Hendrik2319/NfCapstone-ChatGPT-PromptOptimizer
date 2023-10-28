@@ -1,5 +1,5 @@
-import {DEBUG, Scenario} from "../../Types.tsx";
-import {ScenarioDialogOptions} from "./Types.tsx";
+import {DEBUG} from "../../Types.tsx";
+import {Scenario, ScenarioDialogOptions} from "./Types.tsx";
 import {useState} from "react";
 
 type Props = {

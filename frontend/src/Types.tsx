@@ -22,13 +22,3 @@ export type UserInfos = {
     url             : string
     avatar_url      : string
 }
-
-export type Scenario = {
-    id       : string
-    authorID : string
-    label    : string
-}
-
-export type NewScenario = {
-    label    : string
-}

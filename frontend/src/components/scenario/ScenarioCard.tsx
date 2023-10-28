@@ -1,5 +1,4 @@
-import {Scenario} from "../../Types.tsx";
-import {ScenarioDialogOptions} from "./Types.tsx";
+import {Scenario, ScenarioDialogOptions} from "./Types.tsx";
 
 type Props = {
     scenario: Scenario
