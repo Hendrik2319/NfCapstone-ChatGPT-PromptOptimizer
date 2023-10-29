@@ -41,12 +41,12 @@ export default function TestRunsView( props:Readonly<Props> ) {
 
     useEffect(()=>{
         if (scenarioId) {
-            // loadScenario(scenarioId, scenario=> {
+            loadScenario(scenarioId, scenario=> {
                 loadTestRuns(scenarioId, testruns => {
-                    // setScenario(scenario);
+                    setScenario(scenario);
                     setTestRuns(testruns);
                 });
-            // });
+            });
         }
     }, [ scenarioId ]);
 
@@ -60,12 +60,15 @@ export default function TestRunsView( props:Readonly<Props> ) {
 
     return (
         <>
-            <h3>TestRuns of Scenario "{scenario?.label}"</h3>
-            <div className="FlexRowNoWrap">
+            <h3>Scenario "{scenario?.label}"</h3>
+            <div>
+                <button>Previous TestRuns</button>
                 {
                     props.user && scenario && props.user.userDbId === scenario.authorID &&
-                    <button>Add</button>
+                    <button>New TestRun</button>
                 }
+            </div>
+            <div className="FlexRowNoWrap">
                 {
                     testruns.sort(compareTestRuns).map(
                         testRun => <TestRunCard key={testRun.id} testRun={testRun}/>

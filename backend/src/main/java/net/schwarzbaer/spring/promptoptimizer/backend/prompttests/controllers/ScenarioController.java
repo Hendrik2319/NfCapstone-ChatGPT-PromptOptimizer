@@ -28,6 +28,13 @@ public class ScenarioController {
 		return scenarioService.getAllScenarios();
 	}
 
+	@GetMapping("{id}")
+	public ResponseEntity<Scenario> getScenarioById(@PathVariable String id)
+			throws ScenarioService.UserIsNotAllowedException
+	{
+		return ResponseEntity.of(scenarioService.getScenarioById(id));
+	}
+
 	@PostMapping
 	public ResponseEntity<Scenario> addScenarios(@RequestBody NewScenario newScenario)
 	{
@@ -35,7 +42,7 @@ public class ScenarioController {
 	}
 
 	@PutMapping("{id}")
-	public ResponseEntity<Scenario> updateScenario(@PathVariable String id,@RequestBody Scenario scenario)
+	public ResponseEntity<Scenario> updateScenario(@PathVariable String id, @RequestBody Scenario scenario)
 			throws ScenarioService.UserIsNotAllowedException
 	{
 		return ResponseEntity.of(scenarioService.updateScenario(id, scenario));
