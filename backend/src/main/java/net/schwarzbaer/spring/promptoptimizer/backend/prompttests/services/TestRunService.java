@@ -41,6 +41,7 @@ public class TestRunService {
 		Optional<Scenario> storedScenarioOpt = scenarioService.getScenarioById(scenarioId);
 		if (storedScenarioOpt.isEmpty())
 			throw new NoSuchElementException("Can't add TestRun, no Scenario with ID \"%s\" found.".formatted(scenarioId));
+		// if it's not empty user is allowed to have scenario access
 
 		return testRunRepository.save(testRun);
 	}
