@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {TestRun} from "./Types.tsx";
+import {convertTestRunsFromDTOs, TestRun} from "./Types.tsx";
 import {Scenario} from "../scenario/Types.tsx";
 import {UserInfos} from "../../Types.tsx";
 import TestRunCard from "./TestRunCard.tsx";
@@ -24,7 +24,7 @@ function loadTestRuns( scenarioId: string, callback: (testruns: TestRun[])=>void
         .then((response) => {
             if (response.status!==200)
                 throw new Error(`Get wrong response status, when loading test runs: ${response.status}`);
-            callback(response.data)
+            callback(convertTestRunsFromDTOs(response.data))
         })
         .catch((error)=>{
             console.error("ERROR[TestRunsView.loadTestRuns]", error);
