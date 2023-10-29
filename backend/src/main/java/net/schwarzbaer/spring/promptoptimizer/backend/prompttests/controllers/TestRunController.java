@@ -23,9 +23,4 @@ public class TestRunController {
 		return testRunService.addTestRun(scenarioId, testRun);
 	}
 
-	@PostMapping("/api/testrunexample")
-	public TestRun addExampleTestRun(@RequestBody String prompt) {
-		return testRunService.addExampleTestRun(prompt);
-	}
-
 }
