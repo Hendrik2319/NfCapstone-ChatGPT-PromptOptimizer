@@ -17,7 +17,7 @@ public class TestRunService {
 	private final TestRunRepository testRunRepository;
 //	private final UserService userService;
 
-	public List<TestRun> getAllTestRunOfScenarios(@NonNull String scenarioId) {
+	public List<TestRun> getTestRunsOfScenario(@NonNull String scenarioId) {
 		return testRunRepository.findAllByScenarioId(scenarioId);
 	}
 

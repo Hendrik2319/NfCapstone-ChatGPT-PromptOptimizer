@@ -14,8 +14,8 @@ public class TestRunController {
 	private final TestRunService testRunService;
 
 	@GetMapping("/api/scenario/{scenarioId}/testrun")
-	public List<TestRun> getAllTestRunOfScenarios(@PathVariable String scenarioId) {
-		return testRunService.getAllTestRunOfScenarios(scenarioId);
+	public List<TestRun> getTestRunsOfScenario(@PathVariable String scenarioId) {
+		return testRunService.getTestRunsOfScenario(scenarioId);
 	}
 
 	@PostMapping("/api/scenario/{scenarioId}/testrun")
