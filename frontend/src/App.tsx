@@ -10,6 +10,7 @@ import {DEBUG, UserInfos} from "./Types.tsx";
 import {Link, Route, Routes} from "react-router-dom";
 import MainPage from "./components/mainpage/MainPage.tsx";
 import RouteProtection from "./components/mainpage/RouteProtection.tsx";
+import TestRunsView from "./components/testrun/TestRunsView.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
@@ -36,7 +37,7 @@ export default function App() {
                 setUser(undefined)
             })
             .catch(error => {
-                console.error(error)
+                console.error("ERROR[TestRunsView.loadTestRuns]", error)
             })
     }
 
@@ -83,6 +84,7 @@ export default function App() {
                 <Route path={"/"} element={<MainPage user={user} login={login}/>}/>
                 <Route element={<RouteProtection backPath="/" condition={user?.isAuthenticated && (user.isUser || user.isAdmin)}/>}>
                     <Route path={"/chat"} element={<SimpleChatView/>}/>
+                    <Route path={"/scenario/:id"} element={<TestRunsView user={user}/>}/>
                 </Route>
             </Routes>
         </>

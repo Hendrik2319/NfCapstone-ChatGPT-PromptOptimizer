@@ -16,6 +16,7 @@ export type UserInfos = {
     isUser          : boolean
     isAdmin         : boolean
     id              : string
+    userDbId        : string
     login           : string
     name            : string
     location        : string
