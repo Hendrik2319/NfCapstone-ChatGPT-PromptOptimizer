@@ -1,49 +1,74 @@
 import {TestAnswer, TestCase, TestRun} from "./Types.tsx";
+import styled from "styled-components";
+import {ID, Label} from "../StandardStyledComponents.tsx";
 
 type Props = {
     testRun: TestRun
 }
 
+const SimpleCard = styled.div`
+    display: block;
+    border: 1px solid var(--border-color, #707070);
+    border-radius: 4px;
+    padding: 0.2em;
+`;
+
+const BaseCard = styled.div`
+  padding: 1em;
+  margin: 0.5em;
+  border: 1px solid var(--border-color);
+  background-color: var(--background-color);
+  box-shadow: 5px 5px 5px var(--box-shadow-color);
+`;
+
 export default function TestRunCard( props:Readonly<Props> ) {
 
-    function showVarValues(values: string[], varName: string) {
+    function convertVarValues(values: string[], varName: string) {
         return (
-            <div>
-                {varName}: {values.map( str=>"\""+str+"\"" ).join(", ")}
-            </div>
+            <SimpleCard key={varName}>
+                <Label>{varName}: </Label>
+                {values.map( str=>"\""+str+"\"" ).join(", ")}
+            </SimpleCard>
         )
     }
-    function showTestCase(testcase: TestCase) {
-        const elements: JSX.Element[] = [];
-        if (testcase.forEach) // TODO: choose another type for TestCase
-            testcase.forEach( (values: string[], varName: string) =>
-                elements.push( showVarValues(values, varName) )
-            )
-        else
-            console.error("No testcase.forEach",testcase)
+    function convertTestCase(testcase: TestCase, index: number) {
         return (
-            <div>{elements}</div>
+            <SimpleCard key={index}>
+                <ID>[{index}]</ID>
+                <div className="FlexColumn">{
+                    Array.from(testcase.keys()).sort().map( (varName: string) => {
+                            const values = testcase.get(varName);
+                            if (values) return convertVarValues(values, varName);
+                    })
+                }</div>
+            </SimpleCard>
         )
     }
 
-    function showAnswer(answer: TestAnswer) {
+    function convertAnswer(answer: TestAnswer) {
         return (
-            <div>
+            <SimpleCard key={answer.indexOfTestCase+answer.label}>
                 <div>[{answer.indexOfTestCase}] {answer.label}</div>
-                <div>{answer.answer}</div>
-            </div>
+                <div><Label>answer : </Label>{answer.answer}</div>
+            </SimpleCard>
         )
     }
 
     return (
-        <div className="TestRunCard">
-            <div>id        : {props.testRun.id        }</div>
-            <div>scenarioId: {props.testRun.scenarioId}</div>
-            <div>timestamp : {props.testRun.timestamp }</div>
-            <div>prompt    : {props.testRun.prompt    }</div>
-            <div>variables : {props.testRun.variables }</div>
-            <div>testcases : {props.testRun.testcases.map(showTestCase)}</div>
-            <div>answers   : {props.testRun.answers  .map(showAnswer  )}</div>
-        </div>
+        <BaseCard>
+            <ID>id         : {props.testRun.id        }</ID>
+            <ID>scenarioId : {props.testRun.scenarioId}</ID>
+            <div><Label>timestamp : </Label><SimpleCard>{props.testRun.timestamp }</SimpleCard></div>
+            <div><Label>prompt    : </Label><SimpleCard>{props.testRun.prompt    }</SimpleCard></div>
+            <div><Label>variables : </Label><div className="FlexRow">{
+                props.testRun.variables.map(varName=> <SimpleCard key={varName}>{varName}</SimpleCard>)
+            }</div></div>
+            <div><Label>testcases : </Label><div className="FlexRow">{
+                props.testRun.testcases.map(convertTestCase)
+            }</div></div>
+            <div><Label>answers   : </Label><div className="FlexRow">{
+                props.testRun.answers  .map(convertAnswer)
+            }</div></div>
+        </BaseCard>
     )
 }

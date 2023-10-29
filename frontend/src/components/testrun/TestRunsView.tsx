@@ -5,7 +5,6 @@ import {convertTestRunsFromDTOs, TestRun} from "./Types.tsx";
 import {Scenario} from "../scenario/Types.tsx";
 import {UserInfos} from "../../Types.tsx";
 import TestRunCard from "./TestRunCard.tsx";
-import "./TestRunsView.css";
 
 function loadScenario( scenarioId: string, callback: (scenario: Scenario)=>void ){
     axios.get(`/api/scenario/${scenarioId}`)
@@ -51,16 +50,26 @@ export default function TestRunsView( props:Readonly<Props> ) {
         }
     }, [ scenarioId ]);
 
+    function compareTestRuns( t1: TestRun, t2: TestRun ): number {
+        if (t1.timestamp < t2.timestamp) return -1;
+        if (t1.timestamp > t2.timestamp) return +1;
+        if (t1.prompt < t2.prompt) return -1;
+        if (t1.prompt > t2.prompt) return +1;
+        return 0;
+    }
+
     return (
         <>
             <h3>TestRuns of Scenario "{scenario?.label}"</h3>
-            <div className="TestRunsList">
+            <div className="FlexRowNoWrap">
                 {
                     props.user && scenario && props.user.userDbId === scenario.authorID &&
-                    <button className="TestRunCard">Add</button>
+                    <button>Add</button>
                 }
                 {
-                    testruns.map(testRun => <TestRunCard key={testRun.id} testRun={testRun}/>)
+                    testruns.sort(compareTestRuns).map(
+                        testRun => <TestRunCard key={testRun.id} testRun={testRun}/>
+                    )
                 }
             </div>
         </>

@@ -4,6 +4,7 @@
     --textarea-background-color: #000;
     --text-color: #ffffff;
     --text-color-less: #b0b0b0;
+    --text-color-label: #80b0FF;
     --border-color: #606060;
     --button-background-color: #404040;
     --button-background-color-hover: #303030;
@@ -18,6 +19,7 @@
     --textarea-background-color: #fff;
     --text-color: #000000;
     --text-color-less: #505050;
+    --text-color-label: #5080FF;
     --border-color: #a0a0a0;
     --button-background-color: #f0f0f0;
     --button-background-color-hover: #e0e0e0;
@@ -98,4 +100,33 @@ textarea {
 .ID {
     color: var(--text-color-less);
     font-size: 0.5em;
+}
+
+.Label {
+    color: var(--text-color-label);
+    font-size: 0.8em;
+}
+
+.FlexRow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.FlexRowNoWrap {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+}
+
+.FlexColumn {
+    display: flex;
+    flex-direction: column;
+}
+
+.BorderedBlock {
+    display: block;
+    border: 1px solid var(--border-color, #707070);
+    border-radius: 4px;
 }
