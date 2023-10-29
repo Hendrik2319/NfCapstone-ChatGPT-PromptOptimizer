@@ -94,17 +94,20 @@ public class SecurityConfig {
 
 		String userDbId = request.getClientRegistration().getRegistrationId() + user.getName();
 		newAttributes.put("UserDbId", userDbId);
+		Role role = null;
 
 		/*
 		query user database for role
 		...
 		If not found, do this
 		 */
-		if (initialAdmin.equals(userDbId))
-			newAuthorities.add(new SimpleGrantedAuthority(Role.ADMIN.getLong()));
-		else
-			newAuthorities.add(new SimpleGrantedAuthority(Role.UNKNOWN_ACCOUNT.getLong()));
+		if (role==null && initialAdmin.equals(userDbId))
+			role = Role.ADMIN;
 
+		if (role==null)
+			role = Role.UNKNOWN_ACCOUNT;
+
+		newAuthorities.add(new SimpleGrantedAuthority(role.getLong()));
 		return new DefaultOAuth2User(newAuthorities, newAttributes, "id");
 	}
 
