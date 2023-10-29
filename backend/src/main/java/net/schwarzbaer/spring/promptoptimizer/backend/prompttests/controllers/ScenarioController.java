@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewScenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.ScenarioService;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,7 @@ public class ScenarioController {
 
 	@GetMapping("{id}")
 	public ResponseEntity<Scenario> getScenarioById(@PathVariable String id)
-			throws ScenarioService.UserIsNotAllowedException
+			throws UserIsNotAllowedException
 	{
 		return ResponseEntity.of(scenarioService.getScenarioById(id));
 	}
@@ -43,14 +44,14 @@ public class ScenarioController {
 
 	@PutMapping("{id}")
 	public ResponseEntity<Scenario> updateScenario(@PathVariable String id, @RequestBody Scenario scenario)
-			throws ScenarioService.UserIsNotAllowedException
+			throws UserIsNotAllowedException
 	{
 		return ResponseEntity.of(scenarioService.updateScenario(id, scenario));
 	}
 
 	@DeleteMapping("{id}")
 	public void deleteScenario(@PathVariable String id)
-			throws ScenarioService.UserIsNotAllowedException
+			throws UserIsNotAllowedException
 	{
 		scenarioService.deleteScenario(id);
 	}

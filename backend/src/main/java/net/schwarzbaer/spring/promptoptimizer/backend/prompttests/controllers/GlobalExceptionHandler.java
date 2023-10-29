@@ -2,7 +2,7 @@ package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import net.schwarzbaer.spring.promptoptimizer.backend.ErrorMessage;
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.ScenarioService;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -21,9 +21,9 @@ public class GlobalExceptionHandler {
 		return getErrorMessageAndDoLog("IllegalArgumentException", ex);
 	}
 
-	@ExceptionHandler(ScenarioService.UserIsNotAllowedException.class)
+	@ExceptionHandler(UserIsNotAllowedException.class)
 	@ResponseStatus(HttpStatus.FORBIDDEN)
-	public ErrorMessage handleException(ScenarioService.UserIsNotAllowedException ex)
+	public ErrorMessage handleException(UserIsNotAllowedException ex)
 	{
 		return getErrorMessageAndDoLog("UserIsNotAllowedException", ex);
 	}

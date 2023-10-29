@@ -4,6 +4,7 @@ import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewScen
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.UserInfos;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedException;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -156,7 +157,7 @@ class ScenarioServiceTest {
 // ####################################################################################
 
 	@Test
-	void whenUpdateScenario_isCalledByUser_returnsUpdatedValue() throws ScenarioService.UserIsNotAllowedException {
+	void whenUpdateScenario_isCalledByUser_returnsUpdatedValue() throws UserIsNotAllowedException {
 		// Given
 		when(userService.getCurrentUser()).thenReturn(new UserInfos(
 				true, true, false,
@@ -209,7 +210,7 @@ class ScenarioServiceTest {
 	}
 
 	@Test
-	void whenUpdateScenario_getsScenarioWithUnknownId_returnsEmptyOptional() throws ScenarioService.UserIsNotAllowedException {
+	void whenUpdateScenario_getsScenarioWithUnknownId_returnsEmptyOptional() throws UserIsNotAllowedException {
 		// Given
 		when(scenarioRepository.findById("id1")).thenReturn(Optional.empty());
 
@@ -225,7 +226,7 @@ class ScenarioServiceTest {
 	}
 
 	@Test
-	void whenUpdateScenario_isCalledByAdmin_returnsUpdatedValue() throws ScenarioService.UserIsNotAllowedException {
+	void whenUpdateScenario_isCalledByAdmin_returnsUpdatedValue() throws UserIsNotAllowedException {
 		// Given
 		when(userService.getCurrentUser()).thenReturn(new UserInfos(
 				true, false, true,
@@ -283,19 +284,19 @@ class ScenarioServiceTest {
 		);
 
 		// Then
-		assertThrows(ScenarioService.UserIsNotAllowedException.class, call);
+		assertThrows(UserIsNotAllowedException.class, call);
 	}
 
 // ####################################################################################
 //               deleteScenario
 // ####################################################################################
 
-	@Test void whenDeleteScenario_isCalledByAdmin() throws ScenarioService.UserIsNotAllowedException {
+	@Test void whenDeleteScenario_isCalledByAdmin() throws UserIsNotAllowedException {
 		whenDeleteScenario_isCalledByAllowedUser(
 				"author1", false, true, "authorAdmin"
 		);
 	}
-	@Test void whenDeleteScenario_isCalledByUser() throws ScenarioService.UserIsNotAllowedException {
+	@Test void whenDeleteScenario_isCalledByUser() throws UserIsNotAllowedException {
 		whenDeleteScenario_isCalledByAllowedUser(
 				"authorA", true, false, "authorA"
 		);
@@ -303,7 +304,7 @@ class ScenarioServiceTest {
 
 	private void whenDeleteScenario_isCalledByAllowedUser(
 			String storedAuthorID, boolean isUser, boolean isAdmin, String userDbId
-	) throws ScenarioService.UserIsNotAllowedException {
+	) throws UserIsNotAllowedException {
 		// Given
 		when(scenarioRepository.findById("id1")).thenReturn(Optional.of(
 				new Scenario("id1", storedAuthorID, "label1")
@@ -382,7 +383,7 @@ class ScenarioServiceTest {
 		Executable call = () -> scenarioService.deleteScenario("id1");
 
 		// Then
-		assertThrows(ScenarioService.UserIsNotAllowedException.class, call);
+		assertThrows(UserIsNotAllowedException.class, call);
 		verify(scenarioRepository).findById("id1");
 		verify(userService).getCurrentUser();
 	}
@@ -392,12 +393,12 @@ class ScenarioServiceTest {
 // ####################################################################################
 
 
-	@Test void whenGetScenarioById_isCalledByAdmin() throws ScenarioService.UserIsNotAllowedException {
+	@Test void whenGetScenarioById_isCalledByAdmin() throws UserIsNotAllowedException {
 		whenGetScenarioById_isCalledByAllowedUser(
 				"author1", false, true, "authorAdmin"
 		);
 	}
-	@Test void whenGetScenarioById_isCalledByUser() throws ScenarioService.UserIsNotAllowedException {
+	@Test void whenGetScenarioById_isCalledByUser() throws UserIsNotAllowedException {
 		whenGetScenarioById_isCalledByAllowedUser(
 				"authorA", true, false, "authorA"
 		);
@@ -405,7 +406,7 @@ class ScenarioServiceTest {
 
 	private void whenGetScenarioById_isCalledByAllowedUser(
 			String storedAuthorID, boolean isUser, boolean isAdmin, String userDbId
-	) throws ScenarioService.UserIsNotAllowedException {
+	) throws UserIsNotAllowedException {
 		// Given
 		when(scenarioRepository.findById("id1")).thenReturn(Optional.of(
 				new Scenario("id1", storedAuthorID, "label1")
@@ -428,7 +429,7 @@ class ScenarioServiceTest {
 	}
 
 	@Test
-	void whenGetScenarioById_isCalledWithUnknownId_returnsEmptyOptional() throws ScenarioService.UserIsNotAllowedException {
+	void whenGetScenarioById_isCalledWithUnknownId_returnsEmptyOptional() throws UserIsNotAllowedException {
 		// Given
 		when(scenarioRepository.findById("id1")).thenReturn( Optional.empty() );
 
@@ -487,7 +488,7 @@ class ScenarioServiceTest {
 		Executable call = () -> scenarioService.getScenarioById("id1");
 
 		// Then
-		assertThrows(ScenarioService.UserIsNotAllowedException.class, call);
+		assertThrows(UserIsNotAllowedException.class, call);
 		verify(scenarioRepository).findById("id1");
 		verify(userService).getCurrentUser();
 	}

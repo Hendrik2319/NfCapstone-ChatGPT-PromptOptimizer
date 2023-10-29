@@ -5,6 +5,7 @@ import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewScen
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.UserInfos;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedException;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.UserService;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -86,9 +87,4 @@ public class ScenarioService {
 			throw new UserIsNotAllowedException("Current user is not allowed to "+ action +" a Scenario: Only Users and Admins are allowed.");
 	}
 
-	public static class UserIsNotAllowedException extends Exception {
-		public UserIsNotAllowedException(String message) {
-			super(message);
-		}
-	}
 }
