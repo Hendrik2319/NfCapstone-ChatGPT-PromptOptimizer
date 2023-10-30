@@ -46,21 +46,30 @@ class ChatGptServiceTest {
 		assertEquals(expected, actual);
 	}
 
-	@ParameterizedTest
-	@ValueSource( strings = {
-		"""
-			{
-			    "choices": [ { "message": { "content": "%s" } } ],
-			    "usage": { "total_tokens": 35 }
-			}
-		""",
-		"""
-			{
-			    "choices": [ { "message": { "content": "%s" } } ]
-			}
-		""",
-	} )
-	void whenAskChatGPT_getsAPrompt_returnsAnAnswer(String body) {
+	@Test
+	void whenAskChatGPT_getsAPrompt1_returnsAnAnswer() {
+		whenAskChatGPT_getsAPrompt_returnsAnAnswer(
+				"""
+					{
+					    "choices": [ { "message": { "content": "%s" } } ],
+					    "usage": { "prompt_tokens": 12, "completion_tokens": 23, "total_tokens": 35 }
+					}
+				""",
+				12,23,35
+		);
+	}
+	@Test
+	void whenAskChatGPT_getsAPrompt2_returnsAnAnswer() {
+		whenAskChatGPT_getsAPrompt_returnsAnAnswer(
+				"""
+					{
+					    "choices": [ { "message": { "content": "%s" } } ]
+					}
+				""",
+				0,0,0
+		);
+	}
+	private void whenAskChatGPT_getsAPrompt_returnsAnAnswer(String body, int promptTokens, int completionTokens, int totalTokens) {
 		// Given
 		chatGptService = new ChatGptService(
 				"ApiKey",
@@ -77,7 +86,7 @@ class ChatGptServiceTest {
 		Answer actual = chatGptService.askChatGPT(new Prompt("TestPrompt"));
 
 		// Then
-		Answer expected = new Answer("TestAnswer");
+		Answer expected = new Answer("TestAnswer", promptTokens, completionTokens, totalTokens);
 		assertEquals(expected, actual);
 	}
 

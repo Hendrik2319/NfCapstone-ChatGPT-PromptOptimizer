@@ -66,7 +66,16 @@ public class ChatGptService {
 		String content = message.content();
 		if (content == null) return null;
 
-		return new Answer(content);
+		ChatGptResponse.Usage usage = response.usage();
+		if (usage == null)
+			return new Answer(content);
+
+		return new Answer(
+				content,
+				usage.prompt_tokens(),
+				usage.completion_tokens(),
+				usage.total_tokens()
+		);
 	}
 
 	private ChatGptResponse execRequest(ChatGptRequest request) {
