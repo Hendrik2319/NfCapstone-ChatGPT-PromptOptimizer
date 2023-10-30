@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/scenario")
 public class TestRunController {
 
 	private final TestRunService testRunService;
