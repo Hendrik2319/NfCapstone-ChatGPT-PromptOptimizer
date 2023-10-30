@@ -36,7 +36,7 @@ type Props = {
 
 export default function TestRunsView( props:Readonly<Props> ) {
     const [ scenario, setScenario ] = useState<Scenario>();
-    const [ testruns, setTestRuns ] = useState<TestRun[]>([]);
+    const [ testruns, setTestruns ] = useState<TestRun[]>([]);
     const { id: scenarioId } = useParams();
 
     useEffect(()=>{
@@ -44,7 +44,7 @@ export default function TestRunsView( props:Readonly<Props> ) {
             loadScenario(scenarioId, scenario=> {
                 loadTestRuns(scenarioId, testruns => {
                     setScenario(scenario);
-                    setTestRuns(testruns);
+                    setTestruns(testruns);
                 });
             });
         }

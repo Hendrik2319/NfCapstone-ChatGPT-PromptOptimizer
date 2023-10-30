@@ -10,16 +10,17 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/scenario")
 public class TestRunController {
 
 	private final TestRunService testRunService;
 
-	@GetMapping("/api/scenario/{scenarioId}/testrun")
+	@GetMapping("{scenarioId}/testrun")
 	public List<TestRun> getTestRunsOfScenario(@PathVariable String scenarioId) throws UserIsNotAllowedException {
 		return testRunService.getTestRunsOfScenario(scenarioId);
 	}
 
-	@PostMapping("/api/scenario/{scenarioId}/testrun")
+	@PostMapping("{scenarioId}/testrun")
 	public TestRun addTestRun(@PathVariable String scenarioId, @RequestBody TestRun testRun) throws UserIsNotAllowedException {
 		return testRunService.addTestRun(scenarioId, testRun);
 	}
