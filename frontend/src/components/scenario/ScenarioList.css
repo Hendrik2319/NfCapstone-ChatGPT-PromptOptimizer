@@ -1,16 +1,7 @@
-.ScenarioList {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
 .ScenarioCard {
     padding: 1em;
     margin: 0.5em;
     border: 1px solid var(--border-color);
     background-color: var(--background-color);
     box-shadow: 5px 5px 5px var(--box-shadow-color);
-}
-.ScenarioCard .ContentButton {
-    text-align: left;
-    width: 100%;
 }

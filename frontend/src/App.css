@@ -97,16 +97,6 @@ textarea {
     padding: 0.2em 1em;
 }
 
-.ID {
-    color: var(--text-color-less);
-    font-size: 0.5em;
-}
-
-.Label {
-    color: var(--text-color-label);
-    font-size: 0.8em;
-}
-
 .FlexRow {
     display: flex;
     flex-direction: row;

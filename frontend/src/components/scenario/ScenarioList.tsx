@@ -112,10 +112,10 @@ export default function ScenarioList( props:Readonly<Props> ) {
             <h3>Scenarios</h3>
             {
                 user.isAdmin &&
-                <label><input type={"checkbox"} checked={showAll} onChange={onShowAllChange}/> of all users</label>
+                <label><input type="checkbox" checked={showAll} onChange={onShowAllChange}/> of all users</label>
             }
-            <div className={"ScenarioList"}>
-                <button className={"ScenarioCard"} onClick={()=>addDialog.showDialog()}>Add</button>
+            <div className="FlexRow">
+                <button className="ScenarioCard" onClick={()=>addDialog.showDialog()}>Add</button>
                 {
                     scenarios.map(
                         scn =>
