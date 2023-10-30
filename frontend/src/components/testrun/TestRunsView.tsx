@@ -5,6 +5,7 @@ import {convertTestRunsFromDTOs, TestRun} from "./Types.tsx";
 import {Scenario} from "../scenario/Types.tsx";
 import {DEBUG, UserInfos} from "../../Types.tsx";
 import TestRunCard from "./TestRunCard.tsx";
+import NewTestRunPanel from "./NewTestRunPanel.tsx";
 
 function loadScenario( scenarioId: string, callback: (scenario: Scenario)=>void ){
     axios.get(`/api/scenario/${scenarioId}`)
@@ -71,6 +72,8 @@ export default function TestRunsView( props:Readonly<Props> ) {
         return 0;
     });
 
+    const last: TestRun | undefined = testruns.length===0 ? undefined : testruns[testruns.length-1];
+
     return (
         <>
             <h3>Scenario "{scenario?.label}"</h3>
@@ -88,10 +91,8 @@ export default function TestRunsView( props:Readonly<Props> ) {
                 </div>
             }
             {
-                tabState==="NewTestRun" &&
-                <>
-                    NewTestRun
-                </>
+                tabState==="NewTestRun" && scenarioId &&
+                <NewTestRunPanel previous={last} scenarioId={scenarioId} switchBack={()=>{}}/>
             }
             </>
     )

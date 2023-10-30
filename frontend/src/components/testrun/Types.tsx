@@ -1,5 +1,7 @@
 export type TestRun    = TestRunBase<TestCase>
 export type TestRunDTO = TestRunBase<{ [ key: string ]: string[] }>
+export type NewTestRun    = NewTestRunBase<TestCase>
+export type NewTestRunDTO = NewTestRunBase<{ [ key: string ]: string[] }>
 
 type TestRunBase<TestCaseType> = {
     id        : string
@@ -9,6 +11,16 @@ type TestRunBase<TestCaseType> = {
     variables : string[]
     testcases : TestCaseType[]
     answers   : TestAnswer[]
+}
+
+type NewTestRunBase<TestCaseType> = {
+//  id        : string  - defined by database
+    scenarioId: string
+//  timestamp : string  - defined by backend
+    prompt    : string
+    variables : string[]
+    testcases : TestCaseType[]
+//  answers   : TestAnswer[]  - defined by backend as results from external API
 }
 
 export type TestCase = Map<string, string[]>
@@ -59,5 +71,17 @@ export function convertTestRunFromDTO( testRunDTO: TestRunDTO ): TestRun {
         variables : testRunDTO.variables,
         testcases : testRunDTO.testcases.map(convertObjectIntoMap),
         answers   : testRunDTO.answers
+    };
+}
+
+export function convertNewTestRunIntoDTO( newTestRun: NewTestRun ): NewTestRunDTO {
+    return {
+    //  id        : newTestRun.id,
+        scenarioId: newTestRun.scenarioId,
+    //  timestamp : newTestRun.timestamp,
+        prompt    : newTestRun.prompt,
+        variables : newTestRun.variables,
+        testcases : newTestRun.testcases.map(convertMapIntoObject),
+    //  answers   : newTestRun.answers
     };
 }
