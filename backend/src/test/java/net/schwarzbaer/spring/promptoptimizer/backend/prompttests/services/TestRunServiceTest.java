@@ -115,6 +115,36 @@ class TestRunServiceTest {
 // ####################################################################################
 
 	@Test
-	void addTestRun() {
+	void addTestRun1() {
+		// Given
+
+		// When
+		Executable call = () -> testRunService.addTestRun("scenarioId1", new TestRun(
+				"id1", "scenarioId1",
+				ZonedDateTime.of(2023, 10, 29, 14, 30, 0, 0, ZoneId.systemDefault()),
+				"prompt", List.of("var1", "var2"),
+				List.of(Map.of("var1", List.of("value1"), "var2", List.of("value2"))),
+				List.of(new TestRun.TestAnswer(1, "label", "answer"))
+		));
+
+		// Then
+		assertThrows(IllegalArgumentException.class, call);
+	}
+
+	@Test
+	void addTestRun2() {
+		// Given
+
+		// When
+		Executable call = () -> testRunService.addTestRun("scenarioId1", new TestRun(
+				null, "scenarioId2",
+				ZonedDateTime.of(2023, 10, 29, 14, 30, 0, 0, ZoneId.systemDefault()),
+				"prompt", List.of("var1", "var2"),
+				List.of(Map.of("var1", List.of("value1"), "var2", List.of("value2"))),
+				List.of(new TestRun.TestAnswer(1, "label", "answer"))
+		));
+
+		// Then
+		assertThrows(IllegalArgumentException.class, call);
 	}
 }
