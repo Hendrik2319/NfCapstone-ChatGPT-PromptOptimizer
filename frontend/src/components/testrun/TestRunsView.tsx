@@ -64,6 +64,14 @@ export default function TestRunsView( props:Readonly<Props> ) {
             setTabState("PrevTestRuns")
     }, [tabState, userCanStartNewTestRun]);
 
+    function onSuccessfulTestRun() {
+        if (scenarioId)
+            loadTestRuns(scenarioId, testruns => {
+                setTestruns(testruns);
+                setTabState("PrevTestRuns");
+            });
+    }
+
     testruns.sort((t1: TestRun, t2: TestRun): number => {
         if (t1.timestamp < t2.timestamp) return -1;
         if (t1.timestamp > t2.timestamp) return +1;
@@ -92,7 +100,7 @@ export default function TestRunsView( props:Readonly<Props> ) {
             }
             {
                 tabState==="NewTestRun" && scenarioId &&
-                <NewTestRunPanel previous={last} scenarioId={scenarioId} switchBack={()=>{}}/>
+                <NewTestRunPanel previous={last} scenarioId={scenarioId} onSuccessfulTestRun={onSuccessfulTestRun}/>
             }
             </>
     )

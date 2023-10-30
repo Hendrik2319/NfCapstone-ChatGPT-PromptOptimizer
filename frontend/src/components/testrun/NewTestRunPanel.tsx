@@ -1,7 +1,8 @@
-import {NewTestRun, TestRun} from "./Types.tsx";
+import {convertNewTestRunIntoDTO, NewTestRun, TestRun} from "./Types.tsx";
 import {ChangeEvent, FormEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {DEBUG} from "../../Types.tsx";
+import axios from "axios";
 
 const Form = styled.form`
   display: block;
@@ -42,7 +43,7 @@ function copyValues( scenarioId: string, data?: NewTestRun ) {
 type Props = {
     previous?: TestRun
     scenarioId: string
-    switchBack: ()=>void
+    onSuccessfulTestRun: ()=>void
 }
 
 export default function NewTestRunPanel( props:Readonly<Props> ) {
@@ -53,10 +54,22 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         setNewTestRun( copyValues(props.scenarioId, props.previous) );
     }, [props.previous, props.scenarioId]);
 
+    function performTestRun() {
+        if (newTestRun)
+            axios.post(`/api/testrun`, convertNewTestRunIntoDTO(newTestRun))
+                .then((response) => {
+                    if (response.status !== 200)
+                        throw new Error(`Get wrong response status, when performing a test run: ${response.status}`);
+                    props.onSuccessfulTestRun();
+                })
+                .catch((error) => {
+                    console.error("ERROR[NewTestRunPanel.performTestRun]", error);
+                })
+    }
+
     function onSubmitForm( event: FormEvent<HTMLFormElement> ) {
         event.preventDefault();
-        // TODO
-        // props.switchBack();
+        performTestRun();
     }
 
     function onPromptInput( event: ChangeEvent<HTMLTextAreaElement> ) {
