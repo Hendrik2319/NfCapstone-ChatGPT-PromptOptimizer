@@ -1,5 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptService;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
@@ -25,12 +26,14 @@ class TestRunServiceTest {
 	private TestRunRepository testRunRepository;
 	private ScenarioService scenarioService;
 	private TestRunService testRunService;
+	private ChatGptService chatGptService;
 
 	@BeforeEach
 	void setup() {
 		testRunRepository = mock(TestRunRepository.class);
 		scenarioService = mock(ScenarioService.class);
-		testRunService = new TestRunService(testRunRepository, scenarioService);
+		chatGptService = mock(ChatGptService.class);
+		testRunService = new TestRunService(testRunRepository, scenarioService, chatGptService);
 	}
 
 	@NonNull

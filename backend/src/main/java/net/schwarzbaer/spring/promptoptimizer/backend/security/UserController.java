@@ -17,8 +17,4 @@ public class UserController {
 		return userService.getCurrentUser();
 	}
 
-	@GetMapping("restricted")
-	public String getRestricted() {
-		return "You got access to a restricted endpoint";
-	}
 }
