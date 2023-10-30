@@ -1,6 +1,6 @@
 import {TestAnswer, TestCase, TestRun} from "./Types.tsx";
 import styled from "styled-components";
-import {ID, Label} from "../StandardStyledComponents.tsx";
+import {Id, Label} from "../StandardStyledComponents.tsx";
 
 type Props = {
     testRun: TestRun
@@ -44,7 +44,7 @@ export default function TestRunCard( props:Readonly<Props> ) {
 
         return (
             <SimpleCard key={index}>
-                <ID>[{index}]</ID>
+                <Id>[{index}]</Id>
                 <div className="FlexColumn">{
                     Array.from(testcase.keys()).sort(sortVarNames).map( (varName: string) => {
                             const values = testcase.get(varName);
@@ -66,8 +66,8 @@ export default function TestRunCard( props:Readonly<Props> ) {
 
     return (
         <BaseCard>
-            <ID>id         : {props.testRun.id        }</ID>
-            <ID>scenarioId : {props.testRun.scenarioId}</ID>
+            <Id>id         : {props.testRun.id        }</Id>
+            <Id>scenarioId : {props.testRun.scenarioId}</Id>
             <div><Label>timestamp : </Label><SimpleCard>{props.testRun.timestamp }</SimpleCard></div>
             <div><Label>prompt    : </Label><SimpleCard>{props.testRun.prompt    }</SimpleCard></div>
             <div><Label>variables : </Label><div className="FlexRow">{

@@ -50,13 +50,13 @@ export default function TestRunsView( props:Readonly<Props> ) {
         }
     }, [ scenarioId ]);
 
-    function compareTestRuns( t1: TestRun, t2: TestRun ): number {
+    testruns.sort((t1: TestRun, t2: TestRun): number => {
         if (t1.timestamp < t2.timestamp) return -1;
         if (t1.timestamp > t2.timestamp) return +1;
         if (t1.prompt < t2.prompt) return -1;
         if (t1.prompt > t2.prompt) return +1;
         return 0;
-    }
+    });
 
     return (
         <>
@@ -70,9 +70,7 @@ export default function TestRunsView( props:Readonly<Props> ) {
             </div>
             <div className="FlexRowNoWrap">
                 {
-                    testruns.sort(compareTestRuns).map(
-                        testRun => <TestRunCard key={testRun.id} testRun={testRun}/>
-                    )
+                    testruns.map( testRun => <TestRunCard key={testRun.id} testRun={testRun}/> )
                 }
             </div>
         </>
