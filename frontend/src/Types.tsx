@@ -16,19 +16,10 @@ export type UserInfos = {
     isUser          : boolean
     isAdmin         : boolean
     id              : string
+    userDbId        : string
     login           : string
     name            : string
     location        : string
     url             : string
     avatar_url      : string
-}
-
-export type Scenario = {
-    id       : string
-    authorID : string
-    label    : string
-}
-
-export type NewScenario = {
-    label    : string
 }

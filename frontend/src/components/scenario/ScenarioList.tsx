@@ -1,5 +1,5 @@
 import "./ScenarioList.css";
-import {DEBUG, NewScenario, Scenario, UserInfos} from "../../Types.tsx";
+import {DEBUG, UserInfos} from "../../Types.tsx";
 import axios from "axios";
 import {ChangeEvent, useEffect, useState} from "react";
 import ScenarioCard from "./ScenarioCard.tsx";
@@ -7,7 +7,7 @@ import {createDialog} from "../FloatingDialogs.tsx";
 import AddScenario from "./AddScenario.tsx";
 import EditScenario from "./EditScenario.tsx";
 import DeleteScenario from "./DeleteScenario.tsx";
-import {ScenarioDialogOptions} from "./Types.tsx";
+import {NewScenario, Scenario, ScenarioDialogOptions} from "./Types.tsx";
 
 type Props = {
     user: UserInfos

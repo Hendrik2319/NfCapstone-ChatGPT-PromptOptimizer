@@ -1,6 +1,6 @@
-import {DEBUG, Scenario} from "../../Types.tsx";
+import {DEBUG} from "../../Types.tsx";
 import {ChangeEvent, FormEvent, useState} from "react";
-import {ScenarioDialogOptions} from "./Types.tsx";
+import {Scenario, ScenarioDialogOptions} from "./Types.tsx";
 
 type Props = {
     saveChanges: (scenario: Scenario) => void
