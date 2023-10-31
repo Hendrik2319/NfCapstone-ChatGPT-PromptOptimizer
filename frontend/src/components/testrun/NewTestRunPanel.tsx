@@ -1,9 +1,10 @@
 import {convertNewTestRunFromDTO, convertNewTestRunIntoDTO, NewTestRun, TestRun} from "./Types.tsx";
-import {ChangeEvent, FormEvent, useEffect, useState} from "react";
+import {FormEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {DEBUG} from "../../Types.tsx";
 import axios from "axios";
 import StringListInput from "./StringListInput.tsx";
+import PromptEditAndView from "./PromptEditAndView.tsx";
 
 const Form = styled.form`
   display: block;
@@ -31,6 +32,10 @@ const SimpleCard = styled.div`
   border-radius: 4px;
   padding: 0.2em;
   background: var(--background-color);
+`;
+
+const ColoredSpan = styled.span<{ $bgcolor: string }>`
+  background: ${props => props.$bgcolor};
 `;
 
 function deepcopy(oldMap: Map<string, string[]>): Map<string, string[]> {
@@ -133,9 +138,9 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         performTestRun();
     }
 
-    function onPromptInput( event: ChangeEvent<HTMLTextAreaElement> ) {
-        const newPrompt = event.target.value;
-        saveFormValues( newPrompt, variables, testcases );
+    function setChangedPrompt(newPrompt: string) {
+        console.debug("setChangedPrompt( "+newPrompt+" )");
+        saveFormValues(newPrompt, variables, testcases);
         setPrompt(newPrompt);
     }
 
@@ -187,10 +192,49 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         return "magenta";
     }
 
+    function getParsedPromptOutput(prompt: string): JSX.Element {
+        const parts: (string | number)[] = [];
+
+        while (prompt !== "") {
+            let nextVarPos = -1;
+            let nextVarIndex = -1;
+            for (let i = 0; i < variables.length; i++) {
+                const pos = prompt.indexOf("{"+variables[i]+"}");
+                if (pos<0) continue;
+                if (nextVarPos<0 || nextVarPos>pos) {
+                    nextVarPos = pos;
+                    nextVarIndex = i;
+                }
+            }
+            if (nextVarPos<0)
+            { // no var found
+                parts.push(prompt);
+                prompt = "";
+            }
+            else
+            { // nearest var found at {nextVarPos}
+                parts.push(prompt.substring(0,nextVarPos));
+                parts.push(nextVarIndex);
+                prompt = prompt.substring( nextVarPos + ("{"+variables[nextVarIndex]+"}").length );
+            }
+        }
+
+        return (
+            <>
+                {
+                    parts.map( (part, index) => {
+                        if (typeof part === "string") return part;
+                        return <ColoredSpan key={index} $bgcolor={getVarColor(part)}>{"{" + variables[part] + "}"}</ColoredSpan>
+                    } )
+                }
+            </>
+        )
+    }
+
     return (
         <Form onSubmit={onSubmitForm}>
-            <Label htmlFor="prompt">Prompt :</Label>
-            <TextArea id="prompt" value={prompt} onChange={onPromptInput} rows={10}/>
+            <Label>Prompt :</Label>
+            <PromptEditAndView prompt={prompt} setPrompt={setChangedPrompt} getParsedPromptOutput={getParsedPromptOutput}/>
             <Label>Variables :</Label>
             <SimpleCard>
                 <StringListInput
@@ -206,9 +250,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
             <TextArea readOnly={true} rows={3} value={convertTestcasesToString(testcases)}/>
             <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
             <BigButton>Start Test Run</BigButton>
-            <BigButton type={"button"} onClick={()=>saveCurrentNewTestRun(props.scenarioId, getNewTestRun())}>Save</BigButton>
-            <BigButton type={"button"} onClick={()=>console.debug("loadCurrentNewTestRun", loadCurrentNewTestRun(props.scenarioId))}>TestLoad</BigButton>
-            <BigButton type={"button"} onClick={()=>clearCurrentNewTestRun(props.scenarioId)}>Clear</BigButton>
         </Form>
     )
 }

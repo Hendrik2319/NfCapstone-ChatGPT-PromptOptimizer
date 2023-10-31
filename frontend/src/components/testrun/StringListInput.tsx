@@ -1,7 +1,7 @@
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 
-const InputField = styled.input<{ $bgcolor?: string }>`
+const InputField = styled.input<{ $bgcolor: string }>`
   margin-right: 0.5em;
   margin-bottom: 0.2em;
   background: ${props => props.$bgcolor};
