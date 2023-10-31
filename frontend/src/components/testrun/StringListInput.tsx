@@ -7,6 +7,7 @@ const InputField = styled.input<{ $bgcolor: string }>`
   background: ${props => props.$bgcolor};
   border: 1px solid var(--border-color, #707070);
   border-radius: 3px;
+  color: var(--text-color);
 `;
 
 type Props = {

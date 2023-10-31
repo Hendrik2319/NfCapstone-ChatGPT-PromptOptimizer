@@ -184,15 +184,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     }
 
     function getVarColor(index: number): string {
-        switch (index%6) {
-            case 0: return "#ffc0c0";
-            case 1: return "#c0ffc0";
-            case 2: return "#c0c0ff";
-            case 3: return "#c0ffff";
-            case 4: return "#ffc0ff";
-            case 5: return "#ffffc0";
-        }
-        return "magenta";
+        return "var(--text-background-var"+(index%6)+")";
     }
 
     function getParsedPromptOutput(prompt: string): JSX.Element {

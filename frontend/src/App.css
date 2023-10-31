@@ -13,6 +13,12 @@
     --background-image: url("./assets/background.dark.png");
     --box-shadow-color: #606060;
     --dialog-page-cover-color: #FFFFFF20;
+    --text-background-var0: #A04040;
+    --text-background-var1: #40A040;
+    --text-background-var2: #5050E0;
+    --text-background-var3: #40A0A0;
+    --text-background-var4: #A040A0;
+    --text-background-var5: #A0A040;
 }
 .light {
     --background-color: #ffffff;
@@ -28,6 +34,12 @@
     --background-image: url("./assets/background.light.png");
     --box-shadow-color: #a0a0a0;
     --dialog-page-cover-color: #00000040;
+    --text-background-var0: #ffc0c0;
+    --text-background-var1: #c0ffc0;
+    --text-background-var2: #c0c0ff;
+    --text-background-var3: #c0ffff;
+    --text-background-var4: #ffc0ff;
+    --text-background-var5: #ffffc0;
 }
 body {
     background-color: var(--background-color, #FFFFFF);
