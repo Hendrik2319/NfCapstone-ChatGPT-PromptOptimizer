@@ -96,7 +96,7 @@ class TestRunIntegrationTest {
 	}
 
 	private String createNewTestRunJSON(@Nullable String scenarioId) {
-		return createNewTestRunJSON(scenarioId, "TestPrompt");
+		return createNewTestRunJSON(scenarioId, "DefaultPrompt");
 	}
 	private String createNewTestRunJSON(@Nullable String scenarioId, @NonNull String prompt) {
 		return """

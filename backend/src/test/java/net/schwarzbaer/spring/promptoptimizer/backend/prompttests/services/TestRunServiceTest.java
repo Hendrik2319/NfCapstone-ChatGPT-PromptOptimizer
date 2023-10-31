@@ -11,6 +11,9 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedE
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.lang.NonNull;
 
 import java.time.ZoneId;
@@ -22,23 +25,20 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class TestRunServiceTest {
 
-	private TestRunRepository testRunRepository;
-	private ScenarioService scenarioService;
-	private TestRunService testRunService;
-	private ChatGptService chatGptService;
-	private TimeService timeService;
+	@Mock private TestRunRepository testRunRepository;
+	@Mock private ScenarioService scenarioService;
+	@Mock private ChatGptService chatGptService;
+	@Mock private TimeService timeService;
+	@InjectMocks private TestRunService testRunService;
 
 	@BeforeEach
 	void setup() {
-		testRunRepository = mock(TestRunRepository.class);
-		scenarioService = mock(ScenarioService.class);
-		chatGptService = mock(ChatGptService.class);
-		timeService = mock(TimeService.class);
-		testRunService = new TestRunService(testRunRepository, scenarioService, chatGptService, timeService);
+		MockitoAnnotations.openMocks(this);
 	}
 
 	@NonNull
