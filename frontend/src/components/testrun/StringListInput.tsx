@@ -1,9 +1,12 @@
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 
-const InputField = styled.input`
-    margin-right: 0.5em;
-    margin-bottom: 0.2em;
+const InputField = styled.input<{ $bgcolor?: string }>`
+  margin-right: 0.5em;
+  margin-bottom: 0.2em;
+  background: ${props => props.$bgcolor};
+  border: 1px solid var(--border-color, #707070);
+  border-radius: 3px;
 `;
 
 type Props = {
@@ -12,6 +15,7 @@ type Props = {
     onAddValue: (value: string, index: number) => void
     onChangeValue: (value: string, index: number) => void
     allowDeleteValue: (value: string, index: number) => boolean
+    getFieldBgColor?: (index: number) => string
 }
 
 export default function StringListInput( props:Readonly<Props> ) {
@@ -57,6 +61,7 @@ export default function StringListInput( props:Readonly<Props> ) {
                 values.map(
                     (value, index) =>
                        <InputField
+                           $bgcolor={props.getFieldBgColor ? props.getFieldBgColor(index) : 'var(--background-color)' }
                            key={index}
                            size={props.fieldSize}
                            value={value}

@@ -7,7 +7,6 @@ import StringListInput from "./StringListInput.tsx";
 
 const Form = styled.form`
   display: block;
-  margin-top: 0.5em;
 `;
 
 const TextArea = styled.textarea`
@@ -16,6 +15,7 @@ const TextArea = styled.textarea`
 `;
 
 const Label = styled.label`
+  margin-top: 0.5em;
   display: block;
 `;
 
@@ -175,6 +175,18 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         ).join("\r\n");
     }
 
+    function getVarColor(index: number): string {
+        switch (index%6) {
+            case 0: return "#ffc0c0";
+            case 1: return "#c0ffc0";
+            case 2: return "#c0c0ff";
+            case 3: return "#c0ffff";
+            case 4: return "#ffc0ff";
+            case 5: return "#ffffc0";
+        }
+        return "magenta";
+    }
+
     return (
         <Form onSubmit={onSubmitForm}>
             <Label htmlFor="prompt">Prompt :</Label>
@@ -184,6 +196,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 <StringListInput
                     values={variables}
                     fieldSize={10}
+                    getFieldBgColor={getVarColor}
                     onAddValue      ={onAddVariable}
                     onChangeValue   ={onChangeVariable}
                     allowDeleteValue={allowDeleteVariable}
