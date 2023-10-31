@@ -72,3 +72,14 @@ export function convertNewTestRunIntoDTO( newTestRun: NewTestRun ): NewTestRunDT
     //  answers   : newTestRun.answers
     };
 }
+export function convertNewTestRunFromDTO( newTestRun: NewTestRunDTO ): NewTestRun {
+    return {
+    //  id        : newTestRun.id,
+        scenarioId: newTestRun.scenarioId,
+    //  timestamp : newTestRun.timestamp,
+        prompt    : newTestRun.prompt,
+        variables : newTestRun.variables,
+        testcases : newTestRun.testcases.map(convertObjectIntoMap),
+    //  answers   : newTestRun.answers
+    };
+}

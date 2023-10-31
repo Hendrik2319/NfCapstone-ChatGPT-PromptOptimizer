@@ -1,4 +1,4 @@
-import {convertNewTestRunIntoDTO, NewTestRun, TestRun} from "./Types.tsx";
+import {convertNewTestRunFromDTO, convertNewTestRunIntoDTO, NewTestRun, TestRun} from "./Types.tsx";
 import {ChangeEvent, FormEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {DEBUG} from "../../Types.tsx";
@@ -33,13 +33,20 @@ const SimpleCard = styled.div`
   background: var(--background-color);
 `;
 
+function deepcopy(oldMap: Map<string, string[]>): Map<string, string[]> {
+    const newMap = new Map<string, string[]>();
+    oldMap.forEach(
+        (value, key) => newMap.set(key, value.map(t => t)))
+    return newMap;
+}
+
 function copyValues( scenarioId: string, data?: NewTestRun ) {
     if (data)
         return {
             prompt: data.prompt,
             scenarioId: scenarioId,
-            variables: data.variables,
-            testcases: data.testcases
+            variables: data.variables.map(str=>str),
+            testcases: data.testcases.map(deepcopy)
         };
     return {
         prompt: "",
@@ -47,6 +54,19 @@ function copyValues( scenarioId: string, data?: NewTestRun ) {
         variables: [],
         testcases: []
     };
+}
+
+const KEY_CURRENT_NEW_TEST_RUN: string = "NewTestRunPanel.CurrentNewTestRun";
+
+function saveCurrentNewTestRun( scenarioId: string, newTestRun: NewTestRun ) {
+    localStorage.setItem(KEY_CURRENT_NEW_TEST_RUN+"."+scenarioId, JSON.stringify( convertNewTestRunIntoDTO(newTestRun) ));
+}
+function loadCurrentNewTestRun(scenarioId: string): NewTestRun | undefined  {
+    const str = localStorage.getItem(KEY_CURRENT_NEW_TEST_RUN+"."+scenarioId);
+    if (str) return convertNewTestRunFromDTO( JSON.parse(str) );
+}
+function clearCurrentNewTestRun(scenarioId: string) {
+    localStorage.setItem(KEY_CURRENT_NEW_TEST_RUN+"."+scenarioId, "");
 }
 
 type Props = {
@@ -60,8 +80,15 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     if (DEBUG) console.debug(`Rendering NewTestRunPanel { scenarioId: [${props.scenarioId}] }`);
 
     useEffect(() => {
-        setNewTestRun( copyValues(props.scenarioId, props.previous) );
+        const storedNewTestRun = loadCurrentNewTestRun(props.scenarioId);
+        if (storedNewTestRun) setNewTestRun(storedNewTestRun);
+        else setNewTestRun( copyValues(props.scenarioId, props.previous) );
     }, [props.previous, props.scenarioId]);
+
+    function resetForm() {
+        clearCurrentNewTestRun(props.scenarioId);
+        setNewTestRun( copyValues(props.scenarioId, props.previous) );
+    }
 
     function performTestRun() {
         if (newTestRun)
@@ -87,6 +114,25 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         setNewTestRun(changedNewTestRun);
     }
 
+    function onAddVariable(value: string, index: number) {
+        const changedNewTestRun: NewTestRun = copyValues(props.scenarioId, newTestRun);
+        changedNewTestRun.variables.push(value);
+        setNewTestRun(changedNewTestRun);
+    }
+
+    function onChangeVariable(value: string, index: number) {
+        const changedNewTestRun: NewTestRun = copyValues(props.scenarioId, newTestRun);
+        changedNewTestRun.variables[index] = value;
+        setNewTestRun(changedNewTestRun);
+    }
+
+    function allowDeleteVariable(value: string, index: number): boolean {
+        const changedNewTestRun: NewTestRun = copyValues(props.scenarioId, newTestRun);
+        changedNewTestRun.variables.splice(index, 1);
+        setNewTestRun(changedNewTestRun);
+        return true;
+    }
+
     return (
         <Form onSubmit={onSubmitForm}>
             <Label htmlFor="prompt">Prompt :</Label>
@@ -94,19 +140,20 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
             <Label>Variables :</Label>
             <SimpleCard>
                 <StringListInput
-                    values={[]}
+                    values={newTestRun ? newTestRun.variables : []}
                     fieldSize={10}
-                    // onAddValue      ={(value, index) => console.debug("Vars.AddValue   ( value:\"" + value + "\", index:" + index + " )")}
-                    // onChangeValue   ={(value, index) => console.debug("Vars.ChangeValue( value:\"" + value + "\", index:" + index + " )")}
-                    // allowDeleteValue={(value, index) => { console.debug("Vars.DeleteValue( value:\"" + value + "\", index:" + index + " )"); return true; }}
-                    onAddValue      ={()=>{}}
-                    onChangeValue   ={()=>{}}
-                    allowDeleteValue={()=>true}
+                    onAddValue      ={onAddVariable}
+                    onChangeValue   ={onChangeVariable}
+                    allowDeleteValue={allowDeleteVariable}
                 />
             </SimpleCard>
             <Label>Test Cases :</Label>
             <TextArea readOnly={true} rows={3}/>
+            <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
             <BigButton>Start Test Run</BigButton>
+            { newTestRun && <BigButton type={"button"} onClick={()=>saveCurrentNewTestRun(props.scenarioId, newTestRun)}>Save</BigButton>}
+            <BigButton type={"button"} onClick={()=>console.debug("loadCurrentNewTestRun", loadCurrentNewTestRun(props.scenarioId))}>TestLoad</BigButton>
+            <BigButton type={"button"} onClick={()=>clearCurrentNewTestRun(props.scenarioId)}>Clear</BigButton>
         </Form>
     )
 }
