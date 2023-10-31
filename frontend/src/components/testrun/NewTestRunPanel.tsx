@@ -3,6 +3,7 @@ import {ChangeEvent, FormEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {DEBUG} from "../../Types.tsx";
 import axios from "axios";
+import StringListInput from "./StringListInput.tsx";
 
 const Form = styled.form`
   display: block;
@@ -22,6 +23,14 @@ const BigButton = styled.button`
   font-size: 1.2em;
   font-weight: bold;
   padding: 0.5em 2em;
+`;
+
+const SimpleCard = styled.div`
+  display: block;
+  border: 1px solid var(--border-color, #707070);
+  border-radius: 4px;
+  padding: 0.2em;
+  background: var(--background-color);
 `;
 
 function copyValues( scenarioId: string, data?: NewTestRun ) {
@@ -83,7 +92,18 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
             <Label htmlFor="prompt">Prompt :</Label>
             <TextArea id="prompt" value={newTestRun?.prompt} onChange={onPromptInput} rows={10}/>
             <Label>Variables :</Label>
-            <TextArea readOnly={true} rows={3}/>
+            <SimpleCard>
+                <StringListInput
+                    values={[]}
+                    fieldSize={10}
+                    // onAddValue      ={(value, index) => console.debug("Vars.AddValue   ( value:\"" + value + "\", index:" + index + " )")}
+                    // onChangeValue   ={(value, index) => console.debug("Vars.ChangeValue( value:\"" + value + "\", index:" + index + " )")}
+                    // allowDeleteValue={(value, index) => { console.debug("Vars.DeleteValue( value:\"" + value + "\", index:" + index + " )"); return true; }}
+                    onAddValue      ={()=>{}}
+                    onChangeValue   ={()=>{}}
+                    allowDeleteValue={()=>true}
+                />
+            </SimpleCard>
             <Label>Test Cases :</Label>
             <TextArea readOnly={true} rows={3}/>
             <BigButton>Start Test Run</BigButton>
