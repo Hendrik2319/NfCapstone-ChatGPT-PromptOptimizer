@@ -12,7 +12,6 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedE
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -24,6 +23,7 @@ public class TestRunService {
 	private final TestRunRepository testRunRepository;
 	private final ScenarioService scenarioService;
 	private final ChatGptService chatGptService;
+	private final TimeService timeService;
 
 	public List<TestRun> getTestRunsOfScenario(@NonNull String scenarioId)
 			throws UserIsNotAllowedException
@@ -63,7 +63,7 @@ public class TestRunService {
 		Answer answer = chatGptService.askChatGPT(new Prompt(newTestRun.prompt()));
 
 		testRunRepository.save(new TestRun(
-				null, newTestRun.scenarioId(), ZonedDateTime.now(),
+				null, newTestRun.scenarioId(), timeService.getNow(),
 				newTestRun.prompt(),
 				newTestRun.variables(),
 				newTestRun.testcases(),
