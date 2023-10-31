@@ -31,6 +31,7 @@ export type TestAnswer = {
     answer: string
 }
 
+
 function convertObjectIntoMap<V>( obj: { [ key: string ]: V } ): Map<string,V> {
     const map = new Map<string,V>();
     for (const key in obj) map.set(key, obj[key]);
@@ -43,21 +44,6 @@ export function convertMapIntoObject<V>( map: Map<string, V> ): { [ key: string 
     return obj;
 }
 
-
-export function convertTestRunsIntoDTOs( testRuns: TestRun[] ): TestRunDTO[] {
-    return testRuns.map(convertTestRunIntoDTO);
-}
-export function convertTestRunIntoDTO( testRun: TestRun ): TestRunDTO {
-    return {
-        id        : testRun.id,
-        scenarioId: testRun.scenarioId,
-        timestamp : testRun.timestamp,
-        prompt    : testRun.prompt,
-        variables : testRun.variables,
-        testcases : testRun.testcases.map(convertMapIntoObject),
-        answers   : testRun.answers
-    };
-}
 
 export function convertTestRunsFromDTOs( testRunDTOs: TestRunDTO[] ): TestRun[] {
     return testRunDTOs.map(convertTestRunFromDTO);
@@ -73,6 +59,7 @@ export function convertTestRunFromDTO( testRunDTO: TestRunDTO ): TestRun {
         answers   : testRunDTO.answers
     };
 }
+
 
 export function convertNewTestRunIntoDTO( newTestRun: NewTestRun ): NewTestRunDTO {
     return {
