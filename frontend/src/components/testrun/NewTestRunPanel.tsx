@@ -106,11 +106,21 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         setNewTestRun( copyValues(props.scenarioId, props.previous) );
     }
 
+    function saveFormValues(prompt: string, variables: string[], testcases: Map<string, string[]>[]) {
+        saveCurrentNewTestRun(props.scenarioId, {
+            prompt,
+            scenarioId: props.scenarioId,
+            variables,
+            testcases
+        })
+    }
+
     function performTestRun() {
         axios.post(`/api/testrun`, convertNewTestRunIntoDTO( getNewTestRun() ))
             .then((response) => {
                 if (response.status !== 200)
                     throw new Error(`Get wrong response status, when performing a test run: ${response.status}`);
+                clearCurrentNewTestRun(props.scenarioId);
                 props.onSuccessfulTestRun();
             })
             .catch((error) => {
@@ -124,25 +134,28 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     }
 
     function onPromptInput( event: ChangeEvent<HTMLTextAreaElement> ) {
-        setPrompt(event.target.value)
+        const newPrompt = event.target.value;
+        saveFormValues( newPrompt, variables, testcases );
+        setPrompt(newPrompt);
+    }
+
+    function changeVariable( changeAction: (changedVariables: string[]) => void ) {
+        const changedVariables = [...variables];
+        changeAction(changedVariables);
+        saveFormValues( prompt, changedVariables, testcases );
+        setVariables(changedVariables);
     }
 
     function onAddVariable(value: string) {
-        const changedVariables = [...variables];
-        changedVariables.push(value);
-        setVariables(changedVariables);
+        changeVariable( changedVariables => changedVariables.push(value));
     }
 
     function onChangeVariable(value: string, index: number) {
-        const changedVariables = [...variables];
-        changedVariables[index] = value;
-        setVariables(changedVariables);
+        changeVariable( changedVariables => changedVariables[index] = value);
     }
 
     function allowDeleteVariable(value: string, index: number): boolean {
-        const changedVariables = [...variables];
-        changedVariables.splice(index, 1);
-        setVariables(changedVariables);
+        changeVariable( changedVariables => changedVariables.splice(index, 1));
         return true;
     }
 
