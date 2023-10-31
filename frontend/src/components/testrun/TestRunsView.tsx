@@ -3,8 +3,9 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {convertTestRunsFromDTOs, TestRun} from "./Types.tsx";
 import {Scenario} from "../scenario/Types.tsx";
-import {UserInfos} from "../../Types.tsx";
+import {DEBUG, UserInfos} from "../../Types.tsx";
 import TestRunCard from "./TestRunCard.tsx";
+import NewTestRunPanel from "./NewTestRunPanel.tsx";
 
 function loadScenario( scenarioId: string, callback: (scenario: Scenario)=>void ){
     axios.get(`/api/scenario/${scenarioId}`)
@@ -34,10 +35,18 @@ type Props = {
     user?: UserInfos
 }
 
+type TabState = "PrevTestRuns" | "NewTestRun"
+
 export default function TestRunsView( props:Readonly<Props> ) {
     const [ scenario, setScenario ] = useState<Scenario>();
     const [ testruns, setTestruns ] = useState<TestRun[]>([]);
+    const [ tabState, setTabState ] = useState<TabState>("PrevTestRuns");
     const { id: scenarioId } = useParams();
+    if (DEBUG) console.debug(`Rendering TestRunsView { scenarioId: [${scenarioId}] }`);
+
+    const userCanStartNewTestRun =
+        props.user && scenario &&
+        props.user.userDbId === scenario.authorID;
 
     useEffect(()=>{
         if (scenarioId) {
@@ -50,6 +59,19 @@ export default function TestRunsView( props:Readonly<Props> ) {
         }
     }, [ scenarioId ]);
 
+    useEffect(() => {
+        if (!userCanStartNewTestRun && tabState==="NewTestRun")
+            setTabState("PrevTestRuns")
+    }, [tabState, userCanStartNewTestRun]);
+
+    function onSuccessfulTestRun() {
+        if (scenarioId)
+            loadTestRuns(scenarioId, testruns => {
+                setTestruns(testruns);
+                setTabState("PrevTestRuns");
+            });
+    }
+
     testruns.sort((t1: TestRun, t2: TestRun): number => {
         if (t1.timestamp < t2.timestamp) return -1;
         if (t1.timestamp > t2.timestamp) return +1;
@@ -58,21 +80,28 @@ export default function TestRunsView( props:Readonly<Props> ) {
         return 0;
     });
 
+    const last: TestRun | undefined = testruns.length===0 ? undefined : testruns[testruns.length-1];
+
     return (
         <>
             <h3>Scenario "{scenario?.label}"</h3>
             <div>
-                <button>Previous TestRuns</button>
+                <button onClick={()=>setTabState("PrevTestRuns")}>Previous TestRuns</button>
                 {
-                    props.user && scenario && props.user.userDbId === scenario.authorID &&
-                    <button>New TestRun</button>
+                    userCanStartNewTestRun &&
+                    <button onClick={()=>setTabState("NewTestRun")}>New TestRun</button>
                 }
             </div>
-            <div className="FlexRowNoWrap">
-                {
-                    testruns.map( testRun => <TestRunCard key={testRun.id} testRun={testRun}/> )
-                }
-            </div>
-        </>
+            {
+                tabState==="PrevTestRuns" &&
+                <div className="FlexRowNoWrap">
+                    { testruns.map(testRun => <TestRunCard key={testRun.id} testRun={testRun}/>) }
+                </div>
+            }
+            {
+                tabState==="NewTestRun" && scenarioId &&
+                <NewTestRunPanel previous={last} scenarioId={scenarioId} onSuccessfulTestRun={onSuccessfulTestRun}/>
+            }
+            </>
     )
 }

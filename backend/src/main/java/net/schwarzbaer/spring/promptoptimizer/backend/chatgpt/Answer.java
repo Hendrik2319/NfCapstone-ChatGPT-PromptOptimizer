@@ -2,5 +2,13 @@ package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
 import org.springframework.lang.NonNull;
 
-public record Answer(@NonNull String answer) {
+public record Answer(
+		@NonNull String answer,
+		int promptTokens,
+		int completionTokens,
+		int totalTokens
+) {
+	public Answer(@NonNull String answer) {
+		this(answer, 0, 0, 0);
+	}
 }

@@ -1,5 +1,7 @@
 export type TestRun    = TestRunBase<TestCase>
 export type TestRunDTO = TestRunBase<{ [ key: string ]: string[] }>
+export type NewTestRun    = NewTestRunBase<TestCase>
+export type NewTestRunDTO = NewTestRunBase<{ [ key: string ]: string[] }>
 
 type TestRunBase<TestCaseType> = {
     id        : string
@@ -11,6 +13,16 @@ type TestRunBase<TestCaseType> = {
     answers   : TestAnswer[]
 }
 
+type NewTestRunBase<TestCaseType> = {
+//  id        : string  - defined by database
+    scenarioId: string
+//  timestamp : string  - defined by backend
+    prompt    : string
+    variables : string[]
+    testcases : TestCaseType[]
+//  answers   : TestAnswer[]  - defined by backend as results from external API
+}
+
 export type TestCase = Map<string, string[]>
 
 export type TestAnswer = {
@@ -18,6 +30,7 @@ export type TestAnswer = {
     label : string
     answer: string
 }
+
 
 function convertObjectIntoMap<V>( obj: { [ key: string ]: V } ): Map<string,V> {
     const map = new Map<string,V>();
@@ -32,21 +45,6 @@ export function convertMapIntoObject<V>( map: Map<string, V> ): { [ key: string 
 }
 
 
-export function convertTestRunsIntoDTOs( testRuns: TestRun[] ): TestRunDTO[] {
-    return testRuns.map(convertTestRunIntoDTO);
-}
-export function convertTestRunIntoDTO( testRun: TestRun ): TestRunDTO {
-    return {
-        id        : testRun.id,
-        scenarioId: testRun.scenarioId,
-        timestamp : testRun.timestamp,
-        prompt    : testRun.prompt,
-        variables : testRun.variables,
-        testcases : testRun.testcases.map(convertMapIntoObject),
-        answers   : testRun.answers
-    };
-}
-
 export function convertTestRunsFromDTOs( testRunDTOs: TestRunDTO[] ): TestRun[] {
     return testRunDTOs.map(convertTestRunFromDTO);
 }
@@ -59,5 +57,18 @@ export function convertTestRunFromDTO( testRunDTO: TestRunDTO ): TestRun {
         variables : testRunDTO.variables,
         testcases : testRunDTO.testcases.map(convertObjectIntoMap),
         answers   : testRunDTO.answers
+    };
+}
+
+
+export function convertNewTestRunIntoDTO( newTestRun: NewTestRun ): NewTestRunDTO {
+    return {
+    //  id        : newTestRun.id,
+        scenarioId: newTestRun.scenarioId,
+    //  timestamp : newTestRun.timestamp,
+        prompt    : newTestRun.prompt,
+        variables : newTestRun.variables,
+        testcases : newTestRun.testcases.map(convertMapIntoObject),
+    //  answers   : newTestRun.answers
     };
 }

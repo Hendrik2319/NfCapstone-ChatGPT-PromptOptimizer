@@ -1,6 +1,10 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
 import lombok.RequiredArgsConstructor;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Answer;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptService;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Prompt;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewTestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
@@ -18,6 +22,8 @@ public class TestRunService {
 
 	private final TestRunRepository testRunRepository;
 	private final ScenarioService scenarioService;
+	private final ChatGptService chatGptService;
+	private final TimeService timeService;
 
 	public List<TestRun> getTestRunsOfScenario(@NonNull String scenarioId)
 			throws UserIsNotAllowedException
@@ -44,5 +50,26 @@ public class TestRunService {
 		// if it's not empty user is allowed to have scenario access
 
 		return testRunRepository.save(testRun);
+	}
+
+	public void performTestRun(@NonNull NewTestRun newTestRun) throws UserIsNotAllowedException {
+		if (newTestRun.scenarioId()==null)
+			throw new IllegalArgumentException("A NewTestRun must have an scenario ID.");
+
+		Optional<Scenario> storedScenarioOpt = scenarioService.getScenarioById(newTestRun.scenarioId());
+		if (storedScenarioOpt.isEmpty())
+			throw new NoSuchElementException("Can't perform a TestRun, no Scenario with ID \"%s\" found.".formatted(newTestRun.scenarioId()));
+
+		Answer answer = chatGptService.askChatGPT(new Prompt(newTestRun.prompt()));
+
+		testRunRepository.save(new TestRun(
+				null, newTestRun.scenarioId(), timeService.getNow(),
+				newTestRun.prompt(),
+				newTestRun.variables(),
+				newTestRun.testcases(),
+				List.of(
+						new TestRun.TestAnswer(1, "the only answer", answer.answer())
+				)
+		));
 	}
 }

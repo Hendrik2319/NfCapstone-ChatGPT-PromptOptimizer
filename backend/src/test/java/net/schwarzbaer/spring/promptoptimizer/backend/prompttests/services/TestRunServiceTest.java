@@ -1,5 +1,9 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Answer;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptService;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Prompt;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewTestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
@@ -7,6 +11,9 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedE
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.lang.NonNull;
 
 import java.time.ZoneId;
@@ -18,19 +25,20 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class TestRunServiceTest {
 
-	private TestRunRepository testRunRepository;
-	private ScenarioService scenarioService;
-	private TestRunService testRunService;
+	@Mock private TestRunRepository testRunRepository;
+	@Mock private ScenarioService scenarioService;
+	@Mock private ChatGptService chatGptService;
+	@Mock private TimeService timeService;
+	@InjectMocks private TestRunService testRunService;
 
 	@BeforeEach
 	void setup() {
-		testRunRepository = mock(TestRunRepository.class);
-		scenarioService = mock(ScenarioService.class);
-		testRunService = new TestRunService(testRunRepository, scenarioService);
+		MockitoAnnotations.openMocks(this);
 	}
 
 	@NonNull
@@ -196,5 +204,85 @@ class TestRunServiceTest {
 		TestRun expected = createTestRun("id1", "scenarioId1");
 		assertEquals(expected, actual);
 	}
+
+// ####################################################################################
+//               performTestRun
+// ####################################################################################
+
+	@Test
+	void whenPerformTestRun_isCalledWithoutScenarioId_throwsException() {
+		// Given
+
+		// When
+		Executable call = () -> testRunService.performTestRun(new NewTestRun(
+				null, "TestPrompt", List.of(), List.of()
+		));
+
+		// Then
+		assertThrows(IllegalArgumentException.class, call);
+	}
+
+	@Test
+	void whenPerformTestRun_isCalledByNotAllowedUser_throwsException() throws UserIsNotAllowedException {
+		// Given
+		when(scenarioService.getScenarioById("scenarioId1")).thenThrow(UserIsNotAllowedException.class);
+
+		// When
+		Executable call = () -> testRunService.performTestRun(new NewTestRun(
+				"scenarioId1", "TestPrompt", List.of(), List.of()
+		));
+
+		// Then
+		assertThrows(UserIsNotAllowedException.class, call);
+	}
+
+	@Test
+	void whenPerformTestRun_isCalledWithUnknownScenarioID_throwsException() throws UserIsNotAllowedException {
+		// Given
+		when(scenarioService.getScenarioById("scenarioId1")).thenReturn(
+				Optional.empty()
+		);
+
+		// When
+		Executable call = () -> testRunService.performTestRun(new NewTestRun(
+				"scenarioId1", "TestPrompt", List.of(), List.of()
+		));
+
+		// Then
+		assertThrows(NoSuchElementException.class, call);
+	}
+
+	@Test
+	void whenPerformTestRun_isCalledNormal_returnsNothing() throws UserIsNotAllowedException {
+		// Given
+		when(scenarioService.getScenarioById("scenarioId1")).thenReturn(
+				Optional.of(new Scenario("scenarioId1", "author1", "label1"))
+		);
+		when(chatGptService.askChatGPT(new Prompt("TestPrompt"))).thenReturn(
+				new Answer("TestAnswer", 12,23,35)
+		);
+		ZonedDateTime now = ZonedDateTime.now();
+		when(timeService.getNow()).thenReturn(now);
+
+		// When
+		testRunService.performTestRun(new NewTestRun(
+				"scenarioId1", "TestPrompt", List.of(), List.of()
+		));
+
+		// Then
+		verify(testRunRepository).save(new TestRun(
+				null, "scenarioId1", now,
+				"TestPrompt",
+				List.of(), List.of(),
+				List.of(
+						new TestRun.TestAnswer(
+								1, "the only answer",
+								"TestAnswer"
+						)
+				)
+		));
+	}
+
+
 
 }

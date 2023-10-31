@@ -1,11 +1,15 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.controllers;
 
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptTestTools;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,6 +25,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -38,12 +43,25 @@ class TestRunIntegrationTest {
 	@Autowired private ScenarioRepository scenarioRepository;
 	@Autowired private TestRunRepository testRunRepository;
 
+	private static MockWebServer mockWebServer;
+
+	@BeforeAll
+	static void setup() throws IOException {
+		mockWebServer = new MockWebServer();
+		mockWebServer.start();
+	}
+
+	@AfterAll
+	static void teardown() throws IOException {
+		mockWebServer.shutdown();
+	}
+
 
 	@DynamicPropertySource
 	static void setUrlDynamically(DynamicPropertyRegistry reg) {
-		reg.add("app.openai-api-key", ()->"dummy_api_key");
-		reg.add("app.openai-api-org", ()->"dummy_api_org");
-		reg.add("app.openai-api-url", ()->"dummy_url");
+		reg.add("app.openai-api-key", () -> "dummy_api_key");
+		reg.add("app.openai-api-org", () -> "dummy_api_org");
+		reg.add("app.openai-api-url", () -> mockWebServer.url("/").toString());
 	}
 
 	@NonNull
@@ -77,9 +95,26 @@ class TestRunIntegrationTest {
 		);
 	}
 
-	/* ####################################################################################
-				getTestRunsOfScenario
-	#################################################################################### */
+	private String createNewTestRunJSON(@Nullable String scenarioId) {
+		return createNewTestRunJSON(scenarioId, "DefaultPrompt");
+	}
+	private String createNewTestRunJSON(@Nullable String scenarioId, @NonNull String prompt) {
+		return """
+			{
+				%s
+			    "prompt"    : "%s",
+			    "variables" : ["var1","var2"],
+			    "testcases" : [{"var1":["value1"],"var2":["value2"]}]
+			}
+		""".formatted(
+				scenarioId==null ? "" : "\"scenarioId\": \"%s\",".formatted(scenarioId),
+				prompt
+		);
+	}
+
+//	####################################################################################
+//				getTestRunsOfScenario
+//	#################################################################################### 
 
 	@Test
 	@DirtiesContext
@@ -183,10 +218,10 @@ class TestRunIntegrationTest {
 				.andExpect(status().isOk())
 				.andExpect(content().string("[]"));
 	}
-
-	/* ####################################################################################
-				addTestRun
-	#################################################################################### */
+	
+//	####################################################################################
+//				addTestRun
+//	####################################################################################
 
 	@Test @DirtiesContext void whenAddTestRun_isCalledByUser_returnsStoredTestRun() throws Exception {
 		whenAddTestRun_isCalledByAllowedUser_returnsStoredTestRun("authorUser", Role.USER, "authorUser");
@@ -302,4 +337,119 @@ class TestRunIntegrationTest {
 				.andExpect(status().isForbidden());
 	}
 
+//	####################################################################################
+//				addTestRun
+//	####################################################################################
+
+	@Test @DirtiesContext
+	void whenPerformTestRun_isCalledWithNoScenarioId_returnsStatus400BadRequest() throws Exception {
+		// Given
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.post("/api/testrun")
+						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(createNewTestRunJSON(null))
+				)
+
+				// Then
+				.andExpect(status().isBadRequest());
+	}
+
+	@Test @DirtiesContext
+	void whenPerformTestRun_isCalledByUnauthorized_returnsStatus401Unauthorized() throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("scenarioId1", "author1", "label1"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.post("/api/testrun")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(createNewTestRunJSON("scenarioId1"))
+				)
+
+				// Then
+				.andExpect(status().isUnauthorized());
+	}
+
+	@Test @DirtiesContext void whenPerformTestRun_isCalledByUnknownAccount_returnsStatus403Forbidden() throws Exception {
+		whenPerformTestRun_isCalledByNotAllowedUser_returnsStatus403Forbidden(
+				"author1", Role.UNKNOWN_ACCOUNT, "author1"
+		);
+	}
+	@Test @DirtiesContext void whenPerformTestRun_isCalledDifferentAuthorIds_returnsStatus403Forbidden() throws Exception {
+		whenPerformTestRun_isCalledByNotAllowedUser_returnsStatus403Forbidden(
+				"authorA", Role.USER, "authorB"
+		);
+	}
+	@Test @DirtiesContext void whenPerformTestRun_isCalledNoUserDbId_returnsStatus403Forbidden() throws Exception {
+		whenPerformTestRun_isCalledByNotAllowedUser_returnsStatus403Forbidden(
+				"authorA", Role.USER, null
+		);
+	}
+
+	private void whenPerformTestRun_isCalledByNotAllowedUser_returnsStatus403Forbidden(String scenarioAuthorID, Role role, String userDbId) throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("scenarioId1", scenarioAuthorID, "label1"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.post("/api/testrun")
+						.with(SecurityTestTools.buildUser(role, "id", userDbId, "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(createNewTestRunJSON("scenarioId1"))
+				)
+
+				// Then
+				.andExpect(status().isForbidden());
+	}
+
+	@Test @DirtiesContext
+	void whenPerformTestRun_isCalledWithUnknownScenarioID_returnsStatus404NotFound() throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("scenarioId1", "author1", "label1"));
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.post("/api/testrun")
+						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(createNewTestRunJSON("scenarioIdOther"))
+				)
+
+				// Then
+				.andExpect(status().isNotFound());
+	}
+
+	@Test @DirtiesContext void whenPerformTestRun_isCalledByUser() throws Exception {
+		whenPerformTestRun_isCalledByAllowedUser("author1", Role.USER, "author1");
+	}
+	@Test @DirtiesContext void whenPerformTestRun_isCalledByAdmin() throws Exception {
+		whenPerformTestRun_isCalledByAllowedUser("authorOther", Role.ADMIN, "authorAdmin");
+	}
+
+	private void whenPerformTestRun_isCalledByAllowedUser(String scenarioAuthorID, Role role, String userDbId) throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario("scenarioId1", scenarioAuthorID, "label1"));
+		mockWebServer.enqueue(
+				ChatGptTestTools.buildApiResponse("TestAnswer", 12, 23, 35)
+		);
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.post("/api/testrun")
+						.with(SecurityTestTools.buildUser(role, "id", userDbId, "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(createNewTestRunJSON("scenarioId1", "TestPrompt"))
+				)
+
+				// Then
+				.andExpect(status().isOk());
+	}
 }

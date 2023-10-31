@@ -2,6 +2,9 @@ package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
@@ -14,20 +17,17 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class UserServiceTest {
 
-	private SecurityContext securityContext;
-	private Authentication authentication;
-	private UserService userService;
+	@Mock private SecurityContext securityContext;
+	@Mock private Authentication authentication;
+	@InjectMocks private UserService userService;
 
 	@BeforeEach
 	void setUp() {
-		securityContext = mock(SecurityContext.class);
-		authentication = mock(Authentication.class);
-		userService = new UserService();
+		MockitoAnnotations.openMocks(this);
 	}
 
 	@NonNull

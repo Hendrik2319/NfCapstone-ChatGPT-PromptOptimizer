@@ -9,25 +9,27 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class ScenarioServiceTest {
 
-	private ScenarioRepository scenarioRepository;
-	private UserService userService;
-	private ScenarioService scenarioService;
+	@Mock private ScenarioRepository scenarioRepository;
+	@Mock private UserService userService;
+	@InjectMocks private ScenarioService scenarioService;
 
 	@BeforeEach
 	void setup() {
-		scenarioRepository = mock(ScenarioRepository.class);
-		userService = mock(UserService.class);
-		scenarioService = new ScenarioService(scenarioRepository, userService);
+		MockitoAnnotations.openMocks(this);
 	}
 
 // ####################################################################################
