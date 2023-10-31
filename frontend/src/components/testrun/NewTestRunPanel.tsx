@@ -76,7 +76,9 @@ type Props = {
 }
 
 export default function NewTestRunPanel( props:Readonly<Props> ) {
-    const [newTestRun, setNewTestRun] = useState<NewTestRun>();
+    const [prompt, setPrompt] = useState<string>("");
+    const [variables, setVariables] = useState<string[]>([]);
+    const [testcases, setTestcases] = useState<Map<string, string[]>[]>([]);
     if (DEBUG) console.debug(`Rendering NewTestRunPanel { scenarioId: [${props.scenarioId}] }`);
 
     useEffect(() => {
@@ -85,22 +87,35 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         else setNewTestRun( copyValues(props.scenarioId, props.previous) );
     }, [props.previous, props.scenarioId]);
 
+    function setNewTestRun(newTestRun: NewTestRun) {
+        setPrompt   (newTestRun.prompt   );
+        setVariables(newTestRun.variables);
+        setTestcases(newTestRun.testcases);
+    }
+    function getNewTestRun(): NewTestRun {
+        return {
+            prompt,
+            scenarioId: props.scenarioId,
+            variables,
+            testcases
+        }
+    }
+
     function resetForm() {
         clearCurrentNewTestRun(props.scenarioId);
         setNewTestRun( copyValues(props.scenarioId, props.previous) );
     }
 
     function performTestRun() {
-        if (newTestRun)
-            axios.post(`/api/testrun`, convertNewTestRunIntoDTO(newTestRun))
-                .then((response) => {
-                    if (response.status !== 200)
-                        throw new Error(`Get wrong response status, when performing a test run: ${response.status}`);
-                    props.onSuccessfulTestRun();
-                })
-                .catch((error) => {
-                    console.error("ERROR[NewTestRunPanel.performTestRun]", error);
-                })
+        axios.post(`/api/testrun`, convertNewTestRunIntoDTO( getNewTestRun() ))
+            .then((response) => {
+                if (response.status !== 200)
+                    throw new Error(`Get wrong response status, when performing a test run: ${response.status}`);
+                props.onSuccessfulTestRun();
+            })
+            .catch((error) => {
+                console.error("ERROR[NewTestRunPanel.performTestRun]", error);
+            })
     }
 
     function onSubmitForm( event: FormEvent<HTMLFormElement> ) {
@@ -109,38 +124,52 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     }
 
     function onPromptInput( event: ChangeEvent<HTMLTextAreaElement> ) {
-        const changedNewTestRun: NewTestRun = copyValues(props.scenarioId, newTestRun);
-        changedNewTestRun.prompt = event.target.value;
-        setNewTestRun(changedNewTestRun);
+        setPrompt(event.target.value)
     }
 
-    function onAddVariable(value: string, index: number) {
-        const changedNewTestRun: NewTestRun = copyValues(props.scenarioId, newTestRun);
-        changedNewTestRun.variables.push(value);
-        setNewTestRun(changedNewTestRun);
+    function onAddVariable(value: string) {
+        const changedVariables = [...variables];
+        changedVariables.push(value);
+        setVariables(changedVariables);
     }
 
     function onChangeVariable(value: string, index: number) {
-        const changedNewTestRun: NewTestRun = copyValues(props.scenarioId, newTestRun);
-        changedNewTestRun.variables[index] = value;
-        setNewTestRun(changedNewTestRun);
+        const changedVariables = [...variables];
+        changedVariables[index] = value;
+        setVariables(changedVariables);
     }
 
     function allowDeleteVariable(value: string, index: number): boolean {
-        const changedNewTestRun: NewTestRun = copyValues(props.scenarioId, newTestRun);
-        changedNewTestRun.variables.splice(index, 1);
-        setNewTestRun(changedNewTestRun);
+        const changedVariables = [...variables];
+        changedVariables.splice(index, 1);
+        setVariables(changedVariables);
         return true;
+    }
+
+    function convertTestcasesToString(testcases: Map<string, string[]>[]) {
+        return testcases.map(
+            (map, index) => {
+                return "["+ index +"] "+ Array.from(map.keys()).sort().map(
+                    varName => {
+                        const strings = map.get(varName);
+                        if (strings)
+                            return varName +": [ "+ strings.join(",") +" ]";
+                        else
+                            return varName +": --";
+                    }
+                ).join(", ");
+            }
+        ).join("\r\n");
     }
 
     return (
         <Form onSubmit={onSubmitForm}>
             <Label htmlFor="prompt">Prompt :</Label>
-            <TextArea id="prompt" value={newTestRun?.prompt} onChange={onPromptInput} rows={10}/>
+            <TextArea id="prompt" value={prompt} onChange={onPromptInput} rows={10}/>
             <Label>Variables :</Label>
             <SimpleCard>
                 <StringListInput
-                    values={newTestRun ? newTestRun.variables : []}
+                    values={variables}
                     fieldSize={10}
                     onAddValue      ={onAddVariable}
                     onChangeValue   ={onChangeVariable}
@@ -148,10 +177,10 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 />
             </SimpleCard>
             <Label>Test Cases :</Label>
-            <TextArea readOnly={true} rows={3}/>
+            <TextArea readOnly={true} rows={3} value={convertTestcasesToString(testcases)}/>
             <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
             <BigButton>Start Test Run</BigButton>
-            { newTestRun && <BigButton type={"button"} onClick={()=>saveCurrentNewTestRun(props.scenarioId, newTestRun)}>Save</BigButton>}
+            <BigButton type={"button"} onClick={()=>saveCurrentNewTestRun(props.scenarioId, getNewTestRun())}>Save</BigButton>
             <BigButton type={"button"} onClick={()=>console.debug("loadCurrentNewTestRun", loadCurrentNewTestRun(props.scenarioId))}>TestLoad</BigButton>
             <BigButton type={"button"} onClick={()=>clearCurrentNewTestRun(props.scenarioId)}>Clear</BigButton>
         </Form>
