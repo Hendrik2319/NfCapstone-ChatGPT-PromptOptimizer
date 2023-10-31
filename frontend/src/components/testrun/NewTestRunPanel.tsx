@@ -85,6 +85,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     const [variables, setVariables] = useState<string[]>([]);
     const [testcases, setTestcases] = useState<Map<string, string[]>[]>([]);
     if (DEBUG) console.debug(`Rendering NewTestRunPanel { scenarioId: [${props.scenarioId}] }`);
+    let promptEditViewUpdateCallback: null | (()=>void) = null;
 
     useEffect(() => {
         const storedNewTestRun = loadCurrentNewTestRun(props.scenarioId);
@@ -148,6 +149,8 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         const changedVariables = [...variables];
         changeAction(changedVariables);
         saveFormValues( prompt, changedVariables, testcases );
+        if (promptEditViewUpdateCallback)
+            promptEditViewUpdateCallback();
         setVariables(changedVariables);
     }
 
@@ -234,7 +237,12 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     return (
         <Form onSubmit={onSubmitForm}>
             <Label>Prompt :</Label>
-            <PromptEditAndView prompt={prompt} setPrompt={setChangedPrompt} getParsedPromptOutput={getParsedPromptOutput}/>
+            <PromptEditAndView
+                prompt={prompt}
+                setPrompt={setChangedPrompt}
+                getParsedPromptOutput={getParsedPromptOutput}
+                setUpdateCallback={ fcn => promptEditViewUpdateCallback = fcn }
+            />
             <Label>Variables :</Label>
             <SimpleCard>
                 <StringListInput

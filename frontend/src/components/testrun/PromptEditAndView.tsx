@@ -29,6 +29,7 @@ type Props = {
     prompt: string
     setPrompt: (prompt: string) => void
     getParsedPromptOutput: (prompt: string) => JSX.Element
+    setUpdateCallback: ( callback: ()=>void ) =>void
 }
 
 export default function PromptEditAndView( props:Readonly<Props> ) {
@@ -51,6 +52,10 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
     function onFinishView() {
         setMode("edit");
     }
+
+    props.setUpdateCallback( ()=> {
+        setMode("view");
+    } );
 
     switch (mode) {
         case "edit": return <TextArea value={prompt} onChange={onPromptInput} onBlur={onFinishEdit}/>;
