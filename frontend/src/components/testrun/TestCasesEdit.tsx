@@ -1,4 +1,4 @@
-import {Id, Label} from "../StandardStyledComponents.tsx";
+import {Id} from "../StandardStyledComponents.tsx";
 import StringListInput from "./StringListInput.tsx";
 import {ChangeEvent, useState} from "react";
 import styled from "styled-components";
@@ -10,13 +10,20 @@ const SimpleCard = styled.div`
   background: var(--background-color);
 `;
 
+const ColoredVarName = styled.label<{ $bgcolor: string }>`
+  display: inline-block;
+  border: 1px solid var(--border-color, #707070);
+  border-radius: 4px;
+  padding: 0.1em 0.5em;
+  background: ${props => props.$bgcolor};
+`;
+
 type Props = {
     testcases: Map<string, string[]>[]
     // setTestcases: (testcases: Map<string, string[]>[]) => void
     getVariables: () => string[]
     // getUsedVars: () => Set<number>
-    // getVarColor: (index: number) => string
-    // setUpdateCallback: ( callback: ()=>void ) =>void
+    getVarColor: (index: number) => string
 }
 
 export default function TestCasesEdit( props: Readonly<Props> ) {
@@ -41,7 +48,6 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
 
     return (
         <>
-            <button type={"button"}>Edit</button>
             {"Test Case: "}
             <select value={selectedTestCaseIndex} onChange={onTestCaseSelectChange}>
                 {
@@ -58,12 +64,12 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
                 <SimpleCard>
                     <Id>Test Case {selectedTestCaseIndex+1}</Id>
                     <div className="FlexColumn">{
-                        variables.map( (varName: string) => {
+                        variables.map( (varName, index) => {
                             const values = selectedTestcase.get(varName) ?? [];
                             return (
                                 <SimpleCard key={varName}>
-                                    <Label>{varName}: </Label>
                                     <StringListInput
+                                        labelComp={<ColoredVarName $bgcolor={props.getVarColor(index)}>{varName}: </ColoredVarName>}
                                         values={values}
                                         fieldSize={10}
                                         // getFieldBgColor={getVarColor}

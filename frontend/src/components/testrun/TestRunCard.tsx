@@ -1,7 +1,7 @@
-import {TestAnswer, TestCase, TestRun} from "./Types.tsx";
+import {TestAnswer, TestRun} from "./Types.tsx";
 import styled from "styled-components";
 import {Id, Label} from "../StandardStyledComponents.tsx";
-import {compareStringsIgnoringCase} from "../../Tools.tsx";
+import TestCasesView from "./TestCasesView.tsx";
 
 type Props = {
     testRun: TestRun
@@ -24,28 +24,6 @@ const BaseCard = styled.div`
 
 export default function TestRunCard( props:Readonly<Props> ) {
 
-    function convertVarValues(values: string[], varName: string) {
-        return (
-            <SimpleCard key={varName}>
-                <Label>{varName}: </Label>
-                {values.map( str=>"\""+str+"\"" ).join(", ")}
-            </SimpleCard>
-        )
-    }
-    function convertTestCase(testcase: TestCase, index: number) {
-        return (
-            <SimpleCard key={index}>
-                <Id>[{index}]</Id>
-                <div className="FlexColumn">{
-                    Array.from(testcase.keys()).sort(compareStringsIgnoringCase).map( (varName: string) => {
-                            const values = testcase.get(varName);
-                            if (values) return convertVarValues(values, varName);
-                    })
-                }</div>
-            </SimpleCard>
-        )
-    }
-
     function convertAnswer(answer: TestAnswer) {
         return (
             <SimpleCard key={answer.indexOfTestCase+answer.label}>
@@ -64,11 +42,9 @@ export default function TestRunCard( props:Readonly<Props> ) {
             <div><Label>variables : </Label><div className="FlexRow">{
                 props.testRun.variables.map(varName=> <SimpleCard key={varName}>{varName}</SimpleCard>)
             }</div></div>
-            <div><Label>testcases : </Label><div className="FlexRow">{
-                props.testRun.testcases.map(convertTestCase)
-            }</div></div>
+            <div><Label>testcases : </Label><TestCasesView testcases={props.testRun.testcases}/></div>
             <div><Label>answers   : </Label><div className="FlexRow">{
-                props.testRun.answers  .map(convertAnswer)
+                props.testRun.answers.map(convertAnswer)
             }</div></div>
         </BaseCard>
     )

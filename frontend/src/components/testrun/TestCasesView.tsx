@@ -4,11 +4,9 @@ import styled from "styled-components";
 
 type Props = {
     testcases: Map<string, string[]>[]
-    // setTestcases: (testcases: Map<string, string[]>[]) => void
-    // getVariables: () => string[]
+    getVariables?: () => string[]
     // getUsedVars: () => Set<number>
     // getVarColor: (index: number) => string
-    // setUpdateCallback: ( callback: ()=>void ) =>void
 }
 
 const SimpleCard = styled.div`
@@ -19,22 +17,27 @@ const SimpleCard = styled.div`
 `;
 
 export default function TestCasesView( props: Readonly<Props> ) {
+    const variables = props.getVariables ? props.getVariables() : null;
+
+    function getVarNames( testcase: Map<string, string[]> ) {
+        if (variables != null) return variables;
+        return Array
+            .from(testcase.keys())
+            .sort(compareStringsIgnoringCase);
+    }
 
     return (
         <div className="FlexRow">{
             props.testcases.map((testcase, index) => (
                 <SimpleCard key={index}>
-                    <Id>[{index}]</Id>
+                    <Id>Test Case {index+1}</Id>
                     <div className="FlexColumn">{
-                        Array
-                            .from(testcase.keys())
-                            .sort(compareStringsIgnoringCase)
-                            .map(varName =>
-                                <SimpleCard key={varName}>
-                                    <Label>{varName}: </Label>
-                                    {testcase.get(varName)?.map(str => "\"" + str + "\"").join(", ")}
-                                </SimpleCard>
-                            )
+                        getVarNames(testcase).map(varName =>
+                            <SimpleCard key={varName}>
+                                <Label>{varName}: </Label>
+                                {testcase.get(varName)?.map(str => "\"" + str + "\"").join(", ")}
+                            </SimpleCard>
+                        )
                     }</div>
                 </SimpleCard>
             ))

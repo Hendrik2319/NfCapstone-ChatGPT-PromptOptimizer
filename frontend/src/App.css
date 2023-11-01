@@ -135,3 +135,7 @@ textarea {
     border: 1px solid var(--border-color, #707070);
     border-radius: 4px;
 }
+
+.InlineBlock {
+    display: inline-block;
+}

@@ -11,6 +11,7 @@ const InputField = styled.input<{ $bgcolor: string }>`
 `;
 
 type Props = {
+    labelComp?: JSX.Element
     values: string[]
     fieldSize: number
     onAddValue: (value: string, index: number) => void
@@ -57,7 +58,8 @@ export default function StringListInput( props:Readonly<Props> ) {
     }
 
     return (
-        <div className={"FlexRow"}>
+        <div className={"FlexRow InlineBlock"}>
+            {props.labelComp}
             {
                 values.map(
                     (value, index) =>
