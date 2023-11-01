@@ -64,7 +64,7 @@ export default function StringListInput( props:Readonly<Props> ) {
                 values.map(
                     (value, index) =>
                        <InputField
-                           $bgcolor={props.getFieldBgColor ? props.getFieldBgColor(index) : 'var(--background-color)' }
+                           $bgcolor={props.getFieldBgColor && index+1!==values.length ? props.getFieldBgColor(index) : 'var(--background-color)' }
                            key={index}
                            size={props.fieldSize}
                            value={value}
