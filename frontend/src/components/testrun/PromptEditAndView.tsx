@@ -31,15 +31,17 @@ const ColoredSpan = styled.span<{ $bgcolor: string }>`
 type Mode = "edit" | "view";
 type Props = {
     prompt: string
-    setPrompt: (prompt: string) => void
     getVariables: () => string[]
-    updateUsedVars: (usedVars: Set<number>) => void
     getVarColor: (index: number) => string
+    updateUsedVars: (usedVars: Set<number>) => void
+    saveFormValues: (prompt: string) => void
+    setGetter: ( getter: ()=>string ) => void
 }
 
 export default function PromptEditAndView( props:Readonly<Props> ) {
-    const [prompt, setPrompt] = useState<string>("");
+    const [prompt, setPrompt] = useState<string>(props.prompt);
     const [mode, setMode] = useState<Mode>("view");
+    props.setGetter( ()=>prompt );
 
     useEffect(() => {
         setPrompt(props.prompt);
@@ -51,7 +53,7 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
 
     function onFinishEdit() {
         setMode("view");
-        props.setPrompt(prompt);
+        props.saveFormValues(prompt);
     }
     function onFinishView() {
         setMode("edit");
@@ -63,7 +65,8 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
         const usedVars = new Set<number>();
         let promptStr = prompt;
 
-        while (promptStr !== "") {
+        while (promptStr !== "")
+        {
             let nextVarPos = -1;
             let nextVarIndex = -1;
             for (let i = 0; i < variables.length; i++) {
@@ -74,6 +77,7 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
                     nextVarIndex = i;
                 }
             }
+
             if (nextVarPos<0)
             { // no var found
                 parts.push(promptStr);

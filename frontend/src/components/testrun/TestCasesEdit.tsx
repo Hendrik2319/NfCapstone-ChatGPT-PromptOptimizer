@@ -2,6 +2,7 @@ import {Id} from "../StandardStyledComponents.tsx";
 import StringListInput from "./StringListInput.tsx";
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
+import {TestCase} from "./Types.tsx";
 
 const SimpleCard = styled.div`
   border: 1px solid var(--border-color, #707070);
@@ -19,7 +20,7 @@ const ColoredVarName = styled.label<{ $bgcolor: string }>`
 `;
 
 type Props = {
-    testcases: Map<string, string[]>[]
+    testcases: TestCase[]
     // setTestcases: (testcases: Map<string, string[]>[]) => void
     getVariables: () => string[]
     // getUsedVars: () => Set<number>
@@ -56,7 +57,7 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
         setSelectedTestCaseIndex(newIndex);
     }
 
-    const selectedTestcase: Map<string, string[]> | null =
+    const selectedTestcase: TestCase | null =
         selectedTestCaseIndex < props.testcases.length
             ? props.testcases[selectedTestCaseIndex]
             : null;

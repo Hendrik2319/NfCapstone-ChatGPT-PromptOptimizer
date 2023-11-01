@@ -1,9 +1,10 @@
 import {Id, Label} from "../StandardStyledComponents.tsx";
 import {compareStringsIgnoringCase} from "../../Tools.tsx";
 import styled from "styled-components";
+import {TestCase} from "./Types.tsx";
 
 type Props = {
-    testcases: Map<string, string[]>[]
+    testcases: TestCase[]
     getVariables?: () => string[]
     // getUsedVars: () => Set<number>
     // getVarColor: (index: number) => string
@@ -19,7 +20,7 @@ const SimpleCard = styled.div`
 export default function TestCasesView( props: Readonly<Props> ) {
     const variables = props.getVariables ? props.getVariables() : null;
 
-    function getVarNames( testcase: Map<string, string[]> ) {
+    function getVarNames( testcase: TestCase ) {
         if (variables != null) return variables;
         return Array
             .from(testcase.keys())

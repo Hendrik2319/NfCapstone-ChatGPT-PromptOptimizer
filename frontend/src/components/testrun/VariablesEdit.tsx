@@ -1,5 +1,5 @@
 import StringListInput from "./StringListInput.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import styled from "styled-components";
 
 const SimpleCard = styled.div`
@@ -17,7 +17,12 @@ type Props = {
 }
 
 export default function VariablesEdit( props: Readonly<Props> ) {
-    const [variables, setVariables] = useState<string[]>([]);
+    const [variables, setVariables] = useState<string[]>(props.variables);
+    props.setGetter( ()=>variables );
+
+    useEffect(() => {
+        setVariables(props.variables)
+    }, [props.variables]);
 
     function changeVariable( changeAction: (changedVariables: string[]) => void ) {
         const changedVariables = [...variables];
