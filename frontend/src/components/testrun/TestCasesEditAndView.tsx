@@ -20,26 +20,33 @@ type Props = {
     getVariables: () => string[]
     getUsedVars: () => Set<number> // TODO: delete if not needed
     getVarColor: (index: number) => string
-    saveFormValues:  (testcases: TestCase[]) => void // TODO: delete if not needed
+    saveFormValues:  (testcases: TestCase[]) => void
     setGetter: ( getter: ()=>TestCase[] ) => void
 }
 
 export default function TestCasesEditAndView(props:Readonly<Props> ) {
-    const cleanedTestcases = cleanTestcases(props.testcases, props.getVariables());
-
-    const [testcases, setTestcases] = useState<TestCase[]>( cleanedTestcases );
+    const variables = props.getVariables();
+    const [testcases, setTestcases] = useState<TestCase[]>( cleanTestcases(props.testcases, variables) );
     const [mode, setMode] = useState<Mode>("view");
     props.setGetter( ()=>testcases );
 
     useEffect(() => {
-        setTestcases(cleanedTestcases)
-    }, [cleanedTestcases]);
+        setTestcases( cleanTestcases(props.testcases, variables) )
+    }, [props.testcases, variables]);
+
+    function onChangedTestcases( testcases: TestCase[] ) {
+        props.saveFormValues(testcases);
+        setTestcases(testcases);
+    }
 
     if (mode === "view")
         return (
             <>
                 <button type={"button"} onClick={ () => setMode("edit") }>Switch to Edit</button>
-                <TestCasesView testcases={testcases} getVariables={props.getVariables}/>
+                <TestCasesView
+                    testcases={testcases}
+                    getVariables={props.getVariables}
+                />
             </>
         );
 
@@ -47,7 +54,12 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
         return (
             <>
                 <button type={"button"} onClick={ () => setMode("view") }>Switch to View</button>
-                <TestCasesEdit testcases={testcases} getVariables={props.getVariables} getVarColor={props.getVarColor}/>
+                <TestCasesEdit
+                    testcases={testcases}
+                    setTestcases={onChangedTestcases}
+                    getVariables={props.getVariables}
+                    getVarColor={props.getVarColor}
+                />
             </>
         );
 }

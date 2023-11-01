@@ -118,6 +118,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         return "var(--text-background-var"+(index%6)+")";
     }
 
+    // TODO: propagate changes in variables to PromptEditAndView and TestCasesEditAndView
     return (
         <>
             <Label>Prompt :</Label>

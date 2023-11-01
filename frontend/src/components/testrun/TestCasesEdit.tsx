@@ -19,9 +19,16 @@ const ColoredVarName = styled.label<{ $bgcolor: string }>`
   background: ${props => props.$bgcolor};
 `;
 
+function deepcopy(oldMap: TestCase): TestCase {
+    const newMap = new Map<string, string[]>();
+    oldMap.forEach(
+        (value, key) => newMap.set(key, value.map(t => t)))
+    return newMap;
+}
+
 type Props = {
     testcases: TestCase[]
-    // setTestcases: (testcases: Map<string, string[]>[]) => void
+    setTestcases: (testcases: TestCase[]) => void
     getVariables: () => string[]
     // getUsedVars: () => Set<number>
     getVarColor: (index: number) => string
@@ -29,8 +36,6 @@ type Props = {
 
 export default function TestCasesEdit( props: Readonly<Props> ) {
     const [selectedTestCaseIndex, setSelectedTestCaseIndex] = useState<number>(0);
-
-    const variables = props.getVariables();
 
     useEffect(() => {
         if (props.testcases.length <= selectedTestCaseIndex && 0 < props.testcases.length)
@@ -51,6 +56,28 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
         selectedTestCaseIndex < props.testcases.length
             ? props.testcases[selectedTestCaseIndex]
             : null;
+
+    function changeVariable(varName: string, changeAction: (changedVariables: string[]) => void ) {
+        if (!selectedTestcase) return;
+        const values = Array.from(selectedTestcase.get(varName) ?? []);
+        changeAction(values);
+        const copy = props.testcases.map(deepcopy);
+        copy[selectedTestCaseIndex].set(varName, values);
+        props.setTestcases(copy);
+    }
+
+    function onAddValue(varName: string, value: string) {
+        changeVariable(varName, values => values.push(value));
+    }
+
+    function onChangeValue(varName: string, value: string, index: number) {
+        changeVariable(varName, values => values[index] = value);
+    }
+
+    function allowDeleteValue(varName: string, value: string, index: number) {
+        changeVariable(varName, values => values.splice(index, 1));
+        return true;
+    }
 
     const disabled = props.testcases.length === 0;
     return (
@@ -73,7 +100,7 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
                 <SimpleCard>
                     <Id>Test Case {selectedTestCaseIndex+1}</Id>
                     <div className="FlexColumn">{
-                        variables.map( (varName, index) => {
+                        props.getVariables().map( (varName, index) => {
                             const values = selectedTestcase.get(varName) ?? [];
                             return (
                                 <SimpleCard key={varName}>
@@ -82,9 +109,9 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
                                         values={values}
                                         fieldSize={10}
                                         // getFieldBgColor={getVarColor}
-                                        onAddValue      ={()=>{} /*   TODO   */}
-                                        onChangeValue   ={()=>{} /*   TODO   */}
-                                        allowDeleteValue={()=>true /*   TODO   */}
+                                        onAddValue      ={(value: string               ) => onAddValue      (varName, value       )}
+                                        onChangeValue   ={(value: string, index: number) => onChangeValue   (varName, value, index)}
+                                        allowDeleteValue={(value: string, index: number) => allowDeleteValue(varName, value, index)}
                                     />
                                 </SimpleCard>
                             )
