@@ -65,7 +65,8 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
     }
 
     function getParsedPromptOutput(): JSX.Element {
-        const variables = props.getVariables();
+        const variables = props.getVariables(); // TODO: gets an old list
+        console.debug("PromptEditAndView.getParsedPromptOutput", variables);
         const parts: (string | number)[] = [];
         const usedVars = new Set<number>();
         let promptStr = prompt;

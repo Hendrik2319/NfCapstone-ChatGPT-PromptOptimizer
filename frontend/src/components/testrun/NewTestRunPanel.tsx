@@ -124,7 +124,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         const testcases = getTestcases();
         const tc = testcases.find(testcase => {
             const values = testcase.get(varName);
-            return !values || values.length===0;
+            return values && values.length!==0;
         });
         if (tc) {
             alert("Can't delete variable.\r\nThere are at least 1 test case that have values for this variable.")
@@ -134,7 +134,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     }
 
     function onVariablesChange(variables: string[]) {
-        console.debug(onVariablesChange, variables);
+        console.debug("NewTestRunPanel.onVariablesChange", variables);
         saveFormValues(getPrompt(), variables, getTestcases());
         if (promptVarChangeNotifier)
             promptVarChangeNotifier();

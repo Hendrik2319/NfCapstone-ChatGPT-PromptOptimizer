@@ -34,6 +34,7 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
     props.setGetter( ()=>testcases );
     props.setVarChangeNotifier( ()=>setRenderTrigger(!renderTrigger) );
     if (SHOW_RENDERING_HINTS) console.debug(`Rendering TestCasesEditAndView {}`);
+    console.debug("TestCasesEditAndView", variables);
 
     useEffect(() => {
         setTestcases( cleanTestcases(props.testcases, variables) )
