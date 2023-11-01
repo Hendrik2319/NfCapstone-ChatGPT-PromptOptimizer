@@ -34,7 +34,7 @@ type Props = {
     getVariables: () => string[]
     getVarColor: (index: number) => string
     updateUsedVars: (usedVars: Set<number>) => void
-    saveFormValues: (prompt: string) => void
+    onChangedPrompt: (prompt: string) => void
     setGetter: ( getter: ()=>string ) => void
 }
 
@@ -53,7 +53,7 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
 
     function onFinishEdit() {
         setMode("view");
-        props.saveFormValues(prompt);
+        props.onChangedPrompt(prompt);
     }
     function onFinishView() {
         setMode("edit");

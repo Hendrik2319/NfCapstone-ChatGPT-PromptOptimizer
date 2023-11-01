@@ -20,7 +20,7 @@ type Props = {
     getVariables: () => string[]
     getUsedVars: () => Set<number> // delete if not needed
     getVarColor: (index: number) => string
-    saveFormValues:  (testcases: TestCase[]) => void
+    onChangedTestcases:  (testcases: TestCase[]) => void
     setGetter: ( getter: ()=>TestCase[] ) => void
 }
 
@@ -35,7 +35,7 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
     }, [props.testcases, variables]);
 
     function onChangedTestcases( testcases: TestCase[] ) {
-        props.saveFormValues(testcases);
+        props.onChangedTestcases(testcases);
         setTestcases(testcases);
     }
 

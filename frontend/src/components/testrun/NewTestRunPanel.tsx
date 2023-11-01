@@ -140,7 +140,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 getVariables={getVariables}
                 getVarColor={getVarColor}
                 updateUsedVars={usedVars_ => usedVars = usedVars_}
-                saveFormValues={prompt => saveFormValues(prompt, getVariables(), getTestcases())}
+                onChangedPrompt={prompt => saveFormValues(prompt, getVariables(), getTestcases())}
                 setGetter={fcn => promptCompGetter = fcn}
             />
             <Label>Variables :</Label>
@@ -148,7 +148,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 variables={storedNewTestRun.variables}
                 isAllowedToDelete={isAllowedToDeleteVar}
                 getVarColor={getVarColor}
-                saveFormValues={variables => saveFormValues(getPrompt(), variables, getTestcases())}
+                onChangedVariables={variables => saveFormValues(getPrompt(), variables, getTestcases())}
                 setGetter={fcn => variablesCompGetter = fcn}
             />
             <Label>Test Cases :</Label>
@@ -157,7 +157,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 getVariables={getVariables}
                 getUsedVars={() => usedVars}
                 getVarColor={getVarColor}
-                saveFormValues={testcases => saveFormValues(getPrompt(), getVariables(), testcases)}
+                onChangedTestcases={testcases => saveFormValues(getPrompt(), getVariables(), testcases)}
                 setGetter={fcn => testcasesCompGetter = fcn}
             />
             <Form onSubmit={onSubmitForm}>
