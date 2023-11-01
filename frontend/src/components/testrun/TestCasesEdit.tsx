@@ -31,16 +31,6 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
     const [selectedTestCaseIndex, setSelectedTestCaseIndex] = useState<number>(0);
 
     const variables = props.getVariables();
-    /*
-        const testcases = props.testcases.map( testcase => {
-            const cleanedTestcase = new Map<string, string[]>();
-            variables.forEach( varName => {
-                const values = testcase.get(varName);
-                cleanedTestcase.set( varName, !values ? [] : values.map(s=>s) );
-            } );
-            return cleanedTestcase;
-        } );
-    */
 
     useEffect(() => {
         if (props.testcases.length <= selectedTestCaseIndex && 0 < props.testcases.length)
