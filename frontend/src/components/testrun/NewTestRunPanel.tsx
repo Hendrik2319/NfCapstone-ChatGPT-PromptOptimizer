@@ -5,6 +5,8 @@ import {DEBUG} from "../../Types.tsx";
 import axios from "axios";
 import StringListInput from "./StringListInput.tsx";
 import PromptEditAndView from "./PromptEditAndView.tsx";
+import TestCasesEditAndView from "./TestCasesEditAndView.tsx";
+import {compareStringsIgnoringCase} from "../../Tools.tsx";
 
 const Form = styled.form`
   display: block;
@@ -27,7 +29,6 @@ const BigButton = styled.button`
 `;
 
 const SimpleCard = styled.div`
-  display: block;
   border: 1px solid var(--border-color, #707070);
   border-radius: 4px;
   padding: 0.2em;
@@ -82,6 +83,8 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     const [testcases, setTestcases] = useState<Map<string, string[]>[]>([]);
     if (DEBUG) console.debug(`Rendering NewTestRunPanel { scenarioId: [${props.scenarioId}] }`);
     let promptEditViewUpdateCallback: null | (()=>void) = null;
+    let testCasesEditUpdateCallback: null | (()=>void) = null;
+    let usedVars = new Set<number>();
 
     useEffect(() => {
         const storedNewTestRun = loadCurrentNewTestRun(props.scenarioId);
@@ -135,8 +138,11 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         performTestRun();
     }
 
+    function setChangedTestcases(testcases: Map<string, string[]>[]) {
+        // TODO
+    }
+
     function setChangedPrompt(newPrompt: string) {
-        console.debug("setChangedPrompt( "+newPrompt+" )");
         saveFormValues(newPrompt, variables, testcases);
         setPrompt(newPrompt);
     }
@@ -166,7 +172,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     function convertTestcasesToString(testcases: Map<string, string[]>[]) {
         return testcases.map(
             (map, index) => {
-                return "["+ index +"] "+ Array.from(map.keys()).sort().map(
+                return "["+ index +"] "+ Array.from(map.keys()).sort(compareStringsIgnoringCase).map(
                     varName => {
                         const strings = map.get(varName);
                         if (strings)
@@ -191,9 +197,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 setPrompt={setChangedPrompt}
                 getVariables={()=>variables}
                 getVarColor={getVarColor}
-                updateUsedVars={ usedVars => {
-                    // TODO
-                }}
+                updateUsedVars={ usedVars_ => usedVars = usedVars_}
                 setUpdateCallback={ fcn => promptEditViewUpdateCallback = fcn }
             />
             <Label>Variables :</Label>
@@ -209,6 +213,14 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
             </SimpleCard>
             <Label>Test Cases :</Label>
             <TextArea readOnly={true} rows={3} value={convertTestcasesToString(testcases)}/>
+            <TestCasesEditAndView
+                testcases={testcases.map(deepcopy)}
+                setTestcases={setChangedTestcases}
+                getVariables={()=>variables}
+                getUsedVars={()=>usedVars}
+                getVarColor={getVarColor}
+                setUpdateCallback={ fcn => testCasesEditUpdateCallback = fcn}
+            />
             <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
             <BigButton>Start Test Run</BigButton>
         </Form>
