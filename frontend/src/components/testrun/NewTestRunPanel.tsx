@@ -80,19 +80,21 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     let    promptVarChangeNotifier: null | VariablesChangeMethod = null;
     let testcasesVarChangeNotifier: null | VariablesChangeMethod = null;
 
-    const storedNewTestRun = loadCurrentNewTestRun(props.scenarioId) ?? copyValues(props.scenarioId, props.previous);
+    let storedNewTestRun = loadCurrentNewTestRun(props.scenarioId) ?? copyValues(props.scenarioId, props.previous);
 
     function getVariables(): string[]   { return !variablesCompGetter ? storedNewTestRun.variables : variablesCompGetter(); }
     function getPrompt   (): string     { return !   promptCompGetter ? storedNewTestRun.prompt    :    promptCompGetter(); }
     function getTestcases(): TestCase[] { return !testcasesCompGetter ? storedNewTestRun.testcases : testcasesCompGetter(); }
 
     function saveFormValues(prompt: string, variables: string[], testcases: TestCase[]) {
-        saveCurrentNewTestRun(props.scenarioId, {
+        storedNewTestRun = {
             prompt,
             scenarioId: props.scenarioId,
             variables,
             testcases
-        })
+        };
+        console.debug("NewTestRunPanel.saveFormValues", storedNewTestRun);
+        saveCurrentNewTestRun(props.scenarioId, storedNewTestRun)
     }
 
     function performTestRun() {

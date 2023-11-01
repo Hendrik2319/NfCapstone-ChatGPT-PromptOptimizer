@@ -32,9 +32,8 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
     const [mode, setMode] = useState<Mode>("view");
     const [renderTrigger, setRenderTrigger] = useState<boolean>(true);
     props.setGetter( ()=>testcases );
-    props.setVarChangeNotifier( ()=>setRenderTrigger(!renderTrigger) );
     if (SHOW_RENDERING_HINTS) console.debug(`Rendering TestCasesEditAndView {}`);
-    console.debug("TestCasesEditAndView", variables);
+    console.debug("TestCasesEditAndView", variables, testcases);
 
     useEffect(() => {
         setTestcases( cleanTestcases(props.testcases, variables) )
@@ -44,6 +43,27 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
         props.onTestcasesChange(testcases);
         setTestcases(testcases);
     }
+
+    props.setVarChangeNotifier( (index: number, oldVarName: string, newVarName: string) => {
+        if (oldVarName==="" || newVarName==="")
+            setRenderTrigger(!renderTrigger);
+        else {
+            console.debug("TestCasesEditAndView.VarChangeNotifier( index:"+index+", VarName: "+oldVarName+" -> "+newVarName+" )");
+            onChangedTestcases(
+                testcases.map( (testcase, index) => {
+                    const changedTestcase = new Map<string, string[]>();
+                    testcase.forEach((values, varName) => {
+                        if (oldVarName===varName) {
+                            console.debug("TestCasesEditAndView.VarChangeNotifier: TestCase["+index+"] rename Var["+varName+"] "+oldVarName+" -> "+newVarName+" )", values);
+                            varName = newVarName;
+                        }
+                        changedTestcase.set(varName, Array.from(values));
+                    })
+                    return changedTestcase;
+                })
+            );
+        }
+    } );
 
     if (mode === "view")
         return (
