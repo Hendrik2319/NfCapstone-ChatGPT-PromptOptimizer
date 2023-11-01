@@ -82,8 +82,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     const [variables, setVariables] = useState<string[]>([]);
     const [testcases, setTestcases] = useState<Map<string, string[]>[]>([]);
     if (DEBUG) console.debug(`Rendering NewTestRunPanel { scenarioId: [${props.scenarioId}] }`);
-    let promptEditViewUpdateCallback: null | (()=>void) = null;
-    let testCasesEditUpdateCallback: null | (()=>void) = null;
     let usedVars = new Set<number>();
 
     useEffect(() => {
@@ -151,8 +149,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         const changedVariables = [...variables];
         changeAction(changedVariables);
         saveFormValues( prompt, changedVariables, testcases );
-        if (promptEditViewUpdateCallback)
-            promptEditViewUpdateCallback();
         setVariables(changedVariables);
     }
 
@@ -198,7 +194,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 getVariables={()=>variables}
                 getVarColor={getVarColor}
                 updateUsedVars={ usedVars_ => usedVars = usedVars_}
-                setUpdateCallback={ fcn => promptEditViewUpdateCallback = fcn }
             />
             <Label>Variables :</Label>
             <SimpleCard>
@@ -219,7 +214,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 getVariables={()=>variables}
                 getUsedVars={()=>usedVars}
                 getVarColor={getVarColor}
-                setUpdateCallback={ fcn => testCasesEditUpdateCallback = fcn}
             />
             <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
             <BigButton>Start Test Run</BigButton>

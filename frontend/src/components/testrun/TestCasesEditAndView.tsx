@@ -9,7 +9,6 @@ type Props = {
     getVariables: () => string[]
     getUsedVars: () => Set<number>
     getVarColor: (index: number) => string
-    setUpdateCallback: ( callback: ()=>void ) =>void
 }
 
 export default function TestCasesEditAndView(props:Readonly<Props> ) {
@@ -22,8 +21,6 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
     function finishEditMode() {
         setMode("view");
     }
-
-    props.setUpdateCallback(()=> setMode(mode==="edit" ? "edit" : "view"));
 
     if (mode === "view")
         return (

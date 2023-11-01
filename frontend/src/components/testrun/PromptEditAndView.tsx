@@ -35,7 +35,6 @@ type Props = {
     getVariables: () => string[]
     updateUsedVars: (usedVars: Set<number>) => void
     getVarColor: (index: number) => string
-    setUpdateCallback: ( callback: ()=>void ) =>void
 }
 
 export default function PromptEditAndView( props:Readonly<Props> ) {
@@ -45,11 +44,6 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
     useEffect(() => {
         setPrompt(props.prompt);
     }, [props.prompt]);
-
-
-    props.setUpdateCallback( ()=> {
-        setMode("view");
-    } );
 
     function onPromptInput( event: ChangeEvent<HTMLTextAreaElement> ) {
         setPrompt(event.target.value);

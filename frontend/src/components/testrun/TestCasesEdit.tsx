@@ -1,6 +1,6 @@
 import {Id} from "../StandardStyledComponents.tsx";
 import StringListInput from "./StringListInput.tsx";
-import {ChangeEvent, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 
 const SimpleCard = styled.div`
@@ -29,6 +29,11 @@ type Props = {
 export default function TestCasesEdit( props: Readonly<Props> ) {
     const [selectedTestCaseIndex, setSelectedTestCaseIndex] = useState<number>(0);
 
+    useEffect(() => {
+        if (props.testcases.length <= selectedTestCaseIndex && 0 < props.testcases.length)
+            setSelectedTestCaseIndex( props.testcases.length-1 );
+    }, [selectedTestCaseIndex, props.testcases.length]);
+
     function onTestCaseSelectChange( event: ChangeEvent<HTMLSelectElement> ) {
         switchTo(parseInt(event.target.value));
     }
@@ -46,19 +51,22 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
 
     const variables = props.getVariables();
 
+    const disabled = props.testcases.length === 0;
     return (
-        <>
+        <div>
             {"Test Case: "}
-            <select value={selectedTestCaseIndex} onChange={onTestCaseSelectChange}>
+            <select value={selectedTestCaseIndex} onChange={onTestCaseSelectChange} disabled={disabled}>
                 {
                     props.testcases.map( (tc, index) =>
                         <option key={index} value={index}>{index+1}</option>
                     )
                 }
             </select>
-            <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex-1)}>&lt;</button>
-            <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex+1)}>&gt;</button>
+            <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex-1)} disabled={disabled}>&lt;</button>
+            <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex+1)} disabled={disabled}>&gt;</button>
+            {"  "}
             <button type={"button"} onClick={()=>{ /*   TODO   */ }}>Add</button>
+            <button type={"button"} onClick={()=>{ /*   TODO   */ }}>Remove</button>
             {
                 selectedTestcase &&
                 <SimpleCard>
@@ -83,6 +91,6 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
                     }</div>
                 </SimpleCard>
             }
-        </>
+        </div>
     )
 }
