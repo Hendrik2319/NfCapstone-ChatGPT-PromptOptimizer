@@ -20,7 +20,7 @@ type Props = {
     getVariables: () => string[]
     getUsedVars: () => Set<number> // delete if not needed
     getVarColor: (index: number) => string
-    onChangedTestcases:  (testcases: TestCase[]) => void
+    onTestcasesChange:  (testcases: TestCase[]) => void
     setGetter: ( getter: ()=>TestCase[] ) => void
     setVarChangeNotifier: ( notifier: ()=>void )=>void
 }
@@ -37,7 +37,7 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
     }, [props.testcases, variables]);
 
     function onChangedTestcases( testcases: TestCase[] ) {
-        props.onChangedTestcases(testcases);
+        props.onTestcasesChange(testcases);
         setTestcases(testcases);
     }
 

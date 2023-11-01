@@ -13,7 +13,7 @@ type Props = {
     variables: string[]
     isAllowedToDelete: (varName: string) => boolean
     getVarColor: (index: number) => string
-    onChangedVariables: (variables: string[]) => void
+    onVariablesChange: (variables: string[]) => void
     setGetter: ( getter: ()=>string[] ) => void
 }
 
@@ -28,7 +28,7 @@ export default function VariablesEdit( props: Readonly<Props> ) {
     function changeVariable( changeAction: (changedVariables: string[]) => void ) {
         const changedVariables = [...variables];
         changeAction(changedVariables);
-        props.onChangedVariables( changedVariables);
+        props.onVariablesChange( changedVariables);
         setVariables(changedVariables);
     }
 

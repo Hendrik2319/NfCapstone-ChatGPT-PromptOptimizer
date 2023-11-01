@@ -133,7 +133,8 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         return true;
     }
 
-    function onChangedVariables(variables: string[]) {
+    function onVariablesChange(variables: string[]) {
+        console.debug(onVariablesChange, variables);
         saveFormValues(getPrompt(), variables, getTestcases());
         if (promptVarChangeNotifier)
             promptVarChangeNotifier();
@@ -149,7 +150,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 getVariables={getVariables}
                 getVarColor={getVarColor}
                 updateUsedVars={usedVars_ => usedVars = usedVars_}
-                onChangedPrompt={prompt => saveFormValues(prompt, getVariables(), getTestcases())}
+                onPromptChange={prompt => saveFormValues(prompt, getVariables(), getTestcases())}
                 setGetter={fcn => promptCompGetter = fcn}
                 setVarChangeNotifier={fcn => promptVarChangeNotifier = fcn}
             />
@@ -158,7 +159,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 variables={storedNewTestRun.variables}
                 isAllowedToDelete={isAllowedToDeleteVar}
                 getVarColor={getVarColor}
-                onChangedVariables={onChangedVariables}
+                onVariablesChange={onVariablesChange}
                 setGetter={fcn => variablesCompGetter = fcn}
             />
             <Label>Test Cases :</Label>
@@ -167,7 +168,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 getVariables={getVariables}
                 getUsedVars={() => usedVars}
                 getVarColor={getVarColor}
-                onChangedTestcases={testcases => saveFormValues(getPrompt(), getVariables(), testcases)}
+                onTestcasesChange={testcases => saveFormValues(getPrompt(), getVariables(), testcases)}
                 setGetter={fcn => testcasesCompGetter = fcn}
                 setVarChangeNotifier={fcn => testcasesVarChangeNotifier = fcn}
             />

@@ -34,7 +34,7 @@ type Props = {
     getVariables: () => string[]
     getVarColor: (index: number) => string
     updateUsedVars: (usedVars: Set<number>) => void
-    onChangedPrompt: (prompt: string) => void
+    onPromptChange: (prompt: string) => void
     setGetter: ( getter: ()=>string ) => void
     setVarChangeNotifier: ( notifier: ()=>void )=>void
 }
@@ -55,7 +55,7 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
 
     function onFinishEdit() {
         setMode("view");
-        props.onChangedPrompt(prompt);
+        props.onPromptChange(prompt);
     }
     function onFinishView() {
         setMode("edit");
