@@ -1,4 +1,11 @@
-import {convertNewTestRunFromDTO, convertNewTestRunIntoDTO, NewTestRun, TestCase, TestRun} from "./Types.tsx";
+import {
+    convertNewTestRunFromDTO,
+    convertNewTestRunIntoDTO,
+    NewTestRun,
+    TestCase,
+    TestRun,
+    VariablesChangeMethod
+} from "./Types.tsx";
 import {FormEvent} from "react";
 import styled from "styled-components";
 import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
@@ -70,8 +77,8 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     let variablesCompGetter: null | (()=>string[]) = null;
     let    promptCompGetter: null | (()=>string) = null;
     let testcasesCompGetter: null | (()=>TestCase[]) = null;
-    let    promptVarChangeNotifier: null | (()=>void) = null;
-    let testcasesVarChangeNotifier: null | (()=>void) = null;
+    let    promptVarChangeNotifier: null | VariablesChangeMethod = null;
+    let testcasesVarChangeNotifier: null | VariablesChangeMethod = null;
 
     const storedNewTestRun = loadCurrentNewTestRun(props.scenarioId) ?? copyValues(props.scenarioId, props.previous);
 
@@ -133,13 +140,12 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         return true;
     }
 
-    function onVariablesChange(variables: string[]) {
-        console.debug("NewTestRunPanel.onVariablesChange", variables);
-        saveFormValues(getPrompt(), variables, getTestcases());
+    const variablesChanged: VariablesChangeMethod = (index: number, oldVarName: string, newVarName: string): void => {
+        console.debug("NewTestRunPanel.variablesChanged( index:"+index+", VarName: "+oldVarName+" -> "+newVarName+" )");
         if (promptVarChangeNotifier)
-            promptVarChangeNotifier();
+            promptVarChangeNotifier(index, oldVarName, newVarName);
         if (testcasesVarChangeNotifier)
-            testcasesVarChangeNotifier();
+            testcasesVarChangeNotifier(index, oldVarName, newVarName);
     }
 
     return (
@@ -159,7 +165,8 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 variables={storedNewTestRun.variables}
                 isAllowedToDelete={isAllowedToDeleteVar}
                 getVarColor={getVarColor}
-                onVariablesChange={onVariablesChange}
+                notifyOthersAboutChange={variablesChanged}
+                onVariablesChange={variables => saveFormValues(getPrompt(), variables, getTestcases())}
                 setGetter={fcn => variablesCompGetter = fcn}
             />
             <Label>Test Cases :</Label>

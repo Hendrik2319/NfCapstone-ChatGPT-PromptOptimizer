@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import TestCasesEdit from "./TestCasesEdit.tsx";
 import TestCasesView from "./TestCasesView.tsx";
-import {TestCase} from "./Types.tsx";
+import {TestCase, VariablesChangeMethod} from "./Types.tsx";
 import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
 
 function cleanTestcases(rawTestcases: TestCase[], variables: string[]) {
@@ -23,7 +23,7 @@ type Props = {
     getVarColor: (index: number) => string
     onTestcasesChange:  (testcases: TestCase[]) => void
     setGetter: ( getter: ()=>TestCase[] ) => void
-    setVarChangeNotifier: ( notifier: ()=>void )=>void
+    setVarChangeNotifier: ( notifier: VariablesChangeMethod )=>void
 }
 
 export default function TestCasesEditAndView(props:Readonly<Props> ) {

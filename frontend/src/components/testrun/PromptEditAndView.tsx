@@ -1,6 +1,7 @@
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
+import {VariablesChangeMethod} from "./Types.tsx";
 
 const TextArea = styled.textarea`
   height: 6em;
@@ -37,7 +38,7 @@ type Props = {
     updateUsedVars: (usedVars: Set<number>) => void
     onPromptChange: (prompt: string) => void
     setGetter: ( getter: ()=>string ) => void
-    setVarChangeNotifier: ( notifier: ()=>void )=>void
+    setVarChangeNotifier: ( notifier: VariablesChangeMethod )=>void
 }
 
 export default function PromptEditAndView( props:Readonly<Props> ) {

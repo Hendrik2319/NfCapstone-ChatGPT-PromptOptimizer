@@ -83,3 +83,5 @@ export function convertNewTestRunFromDTO( newTestRun: NewTestRunDTO ): NewTestRu
     //  answers   : newTestRun.answers
     };
 }
+
+export type VariablesChangeMethod = (index: number, oldVarName: string, newVarName: string) => void
