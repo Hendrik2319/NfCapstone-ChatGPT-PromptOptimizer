@@ -3,18 +3,12 @@ import {FormEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {DEBUG} from "../../Types.tsx";
 import axios from "axios";
-import StringListInput from "./StringListInput.tsx";
 import PromptEditAndView from "./PromptEditAndView.tsx";
 import TestCasesEditAndView from "./TestCasesEditAndView.tsx";
-import {compareStringsIgnoringCase} from "../../Tools.tsx";
+import VariablesEdit from "./VariablesEdit.tsx";
 
 const Form = styled.form`
   display: block;
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  box-sizing: border-box;
 `;
 
 const Label = styled.label`
@@ -26,13 +20,6 @@ const BigButton = styled.button`
   font-size: 1.2em;
   font-weight: bold;
   padding: 0.5em 2em;
-`;
-
-const SimpleCard = styled.div`
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
 `;
 
 function deepcopy(oldMap: Map<string, string[]>): Map<string, string[]> {
@@ -79,10 +66,10 @@ type Props = {
 
 export default function NewTestRunPanel( props:Readonly<Props> ) {
     const [prompt, setPrompt] = useState<string>("");
-    const [variables, setVariables] = useState<string[]>([]);
     const [testcases, setTestcases] = useState<Map<string, string[]>[]>([]);
     if (DEBUG) console.debug(`Rendering NewTestRunPanel { scenarioId: [${props.scenarioId}] }`);
     let usedVars = new Set<number>();
+    let variablesCompGetter: null | (()=>string[]) = null;
 
     useEffect(() => {
         const storedNewTestRun = loadCurrentNewTestRun(props.scenarioId);
@@ -145,78 +132,43 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         setPrompt(newPrompt);
     }
 
-    function changeVariable( changeAction: (changedVariables: string[]) => void ) {
-        const changedVariables = [...variables];
-        changeAction(changedVariables);
-        saveFormValues( prompt, changedVariables, testcases );
-        setVariables(changedVariables);
-    }
-
-    function onAddVariable(value: string) {
-        changeVariable( changedVariables => changedVariables.push(value));
-    }
-
-    function onChangeVariable(value: string, index: number) {
-        changeVariable( changedVariables => changedVariables[index] = value);
-    }
-
-    function allowDeleteVariable(value: string, index: number): boolean {
-        changeVariable( changedVariables => changedVariables.splice(index, 1));
-        return true;
-    }
-
-    function convertTestcasesToString(testcases: Map<string, string[]>[]) {
-        return testcases.map(
-            (map, index) => {
-                return "["+ index +"] "+ Array.from(map.keys()).sort(compareStringsIgnoringCase).map(
-                    varName => {
-                        const strings = map.get(varName);
-                        if (strings)
-                            return varName +": [ "+ strings.join(",") +" ]";
-                        else
-                            return varName +": --";
-                    }
-                ).join(", ");
-            }
-        ).join("\r\n");
-    }
-
     function getVarColor(index: number): string {
         return "var(--text-background-var"+(index%6)+")";
     }
 
+    function getVariables() {
+        return !variablesCompGetter ? [] : variablesCompGetter();
+    }
+
     return (
-        <Form onSubmit={onSubmitForm}>
+        <>
             <Label>Prompt :</Label>
             <PromptEditAndView
                 prompt={prompt}
                 setPrompt={setChangedPrompt}
-                getVariables={()=>variables}
+                getVariables={getVariables}
                 getVarColor={getVarColor}
-                updateUsedVars={ usedVars_ => usedVars = usedVars_}
+                updateUsedVars={usedVars_ => usedVars = usedVars_}
             />
             <Label>Variables :</Label>
-            <SimpleCard>
-                <StringListInput
-                    values={variables}
-                    fieldSize={10}
-                    getFieldBgColor={getVarColor}
-                    onAddValue      ={onAddVariable}
-                    onChangeValue   ={onChangeVariable}
-                    allowDeleteValue={allowDeleteVariable}
-                />
-            </SimpleCard>
+            <VariablesEdit
+                variables={[]}
+                getVarColor={getVarColor}
+                saveFormValues={()=>{}}
+                setGetter={fcn => variablesCompGetter = fcn}
+            />
             <Label>Test Cases :</Label>
-            <TextArea readOnly={true} rows={3} value={convertTestcasesToString(testcases)}/>
             <TestCasesEditAndView
                 testcases={testcases.map(deepcopy)}
                 setTestcases={setChangedTestcases}
-                getVariables={()=>variables}
-                getUsedVars={()=>usedVars}
+                getVariables={getVariables}
+                getUsedVars={() => usedVars}
                 getVarColor={getVarColor}
             />
-            <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
-            <BigButton>Start Test Run</BigButton>
-        </Form>
+            <Form onSubmit={onSubmitForm}>
+                <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
+                <BigButton>Start Test Run</BigButton>
+            </Form>
+        </>
     )
 }
