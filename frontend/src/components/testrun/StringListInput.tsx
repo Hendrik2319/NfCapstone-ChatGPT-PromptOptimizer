@@ -57,6 +57,10 @@ export default function StringListInput( props:Readonly<Props> ) {
         }
     }
 
+    function generateKey(index: number) {
+        return index;
+    }
+
     return (
         <div className={"FlexRow InlineBlock"}>
             {props.labelComp}
@@ -65,7 +69,7 @@ export default function StringListInput( props:Readonly<Props> ) {
                     (value, index) =>
                        <InputField
                            $bgcolor={props.getFieldBgColor && index+1!==values.length ? props.getFieldBgColor(index) : 'var(--background-color)' }
-                           key={index}
+                           key={generateKey(index)}
                            size={props.fieldSize}
                            value={value}
                            onChange={e=>onInputChange(e,index)}

@@ -99,7 +99,8 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
                 {
                     parts.map( (part, index) => {
                         if (typeof part === "string") return part;
-                        return <ColoredSpan key={index} $bgcolor={props.getVarColor(part)}>{"{" + variables[part] + "}"}</ColoredSpan>
+                        const key = ""+index;
+                        return <ColoredSpan key={key} $bgcolor={props.getVarColor(part)}>{"{" + variables[part] + "}"}</ColoredSpan>
                     } )
                 }
             </>

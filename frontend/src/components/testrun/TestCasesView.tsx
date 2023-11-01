@@ -27,10 +27,14 @@ export default function TestCasesView( props: Readonly<Props> ) {
             .sort(compareStringsIgnoringCase);
     }
 
+    function generateKey(index: number) {
+        return index;
+    }
+
     return (
         <div className="FlexRow">{
             props.testcases.map((testcase, index) => (
-                <SimpleCard key={index}>
+                <SimpleCard key={generateKey(index)}>
                     <Id>Test Case {index+1}</Id>
                     <div className="FlexColumn">{
                         getVarNames(testcase).map(varName =>

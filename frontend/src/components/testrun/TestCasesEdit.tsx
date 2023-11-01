@@ -91,13 +91,17 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
     }
 
 
+    function generateKey(index: number) {
+        return index;
+    }
+
     return (
         <div>
             {"Test Case: "}
             <select value={selectedTestCaseIndex} onChange={onTestCaseSelectChange} disabled={props.testcases.length === 0}>
                 {
                     props.testcases.map( (tc, index) =>
-                        <option key={index} value={index}>{index+1}</option>
+                        <option key={generateKey(index)} value={index}>{index+1}</option>
                     )
                 }
             </select>
