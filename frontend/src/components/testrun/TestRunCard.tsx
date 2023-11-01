@@ -1,6 +1,7 @@
 import {TestAnswer, TestCase, TestRun} from "./Types.tsx";
 import styled from "styled-components";
 import {Id, Label} from "../StandardStyledComponents.tsx";
+import {compareStringsIgnoringCase} from "../../Tools.tsx";
 
 type Props = {
     testRun: TestRun
@@ -32,21 +33,11 @@ export default function TestRunCard( props:Readonly<Props> ) {
         )
     }
     function convertTestCase(testcase: TestCase, index: number) {
-        function sortVarNames(str1: string, str2: string): number {
-            const str1lc = str1.toLowerCase();
-            const str2lc = str2.toLowerCase();
-            if (str1lc < str2lc) return -1;
-            if (str1lc > str2lc) return +1;
-            if (str1 < str2) return -1;
-            if (str1 > str2) return +1;
-            return 0;
-        }
-
         return (
             <SimpleCard key={index}>
                 <Id>[{index}]</Id>
                 <div className="FlexColumn">{
-                    Array.from(testcase.keys()).sort(sortVarNames).map( (varName: string) => {
+                    Array.from(testcase.keys()).sort(compareStringsIgnoringCase).map( (varName: string) => {
                             const values = testcase.get(varName);
                             if (values) return convertVarValues(values, varName);
                     })
