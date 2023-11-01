@@ -1,7 +1,7 @@
 import StringListInput from "./StringListInput.tsx";
 import {useEffect, useState} from "react";
 import styled from "styled-components";
-import {DEBUG} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
 
 const SimpleCard = styled.div`
   border: 1px solid var(--border-color, #707070);
@@ -21,7 +21,7 @@ type Props = {
 export default function VariablesEdit( props: Readonly<Props> ) {
     const [variables, setVariables] = useState<string[]>(props.variables);
     props.setGetter( ()=>variables );
-    if (DEBUG) console.debug(`Rendering VariablesEdit {}`);
+    if (SHOW_RENDERING_HINTS) console.debug(`Rendering VariablesEdit {}`);
 
     useEffect(() => {
         setVariables(props.variables)

@@ -1,6 +1,6 @@
 import './FloatingDialogs.css'
 import {ReactNode} from "react";
-import {DEBUG} from "../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../Types.tsx";
 
 export type DialogControl<DialogOptions> = {
     closeDialog: ()=>void
@@ -12,7 +12,7 @@ export function createDialog<DialogOptions>( id:string, writeContent: ( dialogCo
     let initFunction: undefined | ((options:DialogOptions)=> void) = undefined
 
     function showDialog( visible:boolean, options?:DialogOptions ) {
-        if (DEBUG) console.debug(`FloatingDialog[ ${id} ] -> showDialog( visible:${visible}, options:${options} )`)
+        if (SHOW_RENDERING_HINTS) console.debug(`FloatingDialog[ ${id} ] -> showDialog( visible:${visible}, options:${options} )`)
         const dialog = document.querySelector('#'+id)
         if (dialog) {
             if (visible) {

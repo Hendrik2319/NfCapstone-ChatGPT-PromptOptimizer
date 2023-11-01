@@ -1,6 +1,6 @@
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
-import {DEBUG} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
 
 const TextArea = styled.textarea`
   height: 6em;
@@ -46,7 +46,7 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
     const [renderTrigger, setRenderTrigger] = useState<boolean>(true);
     props.setGetter( ()=>prompt );
     props.setVarChangeNotifier( ()=>setRenderTrigger(!renderTrigger) );
-    if (DEBUG) console.debug(`Rendering PromptEditAndView {}`);
+    if (SHOW_RENDERING_HINTS) console.debug(`Rendering PromptEditAndView {}`);
 
     useEffect(() => {
         setPrompt(props.prompt);

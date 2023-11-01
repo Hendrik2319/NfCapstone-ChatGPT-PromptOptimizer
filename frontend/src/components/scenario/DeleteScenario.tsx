@@ -1,4 +1,4 @@
-import {DEBUG} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
 import {Scenario, ScenarioDialogOptions} from "./Types.tsx";
 import {useState} from "react";
 
@@ -10,7 +10,7 @@ type Props = {
 
 export default function DeleteScenario( props: Readonly<Props> ) {
     const [ scenario, setScenario ] = useState<Scenario>();
-    if (DEBUG) console.debug(`Rendering DeleteScenario { ${!scenario ? 'no scenario' : 'scenario: ' + scenario.id} }`);
+    if (SHOW_RENDERING_HINTS) console.debug(`Rendering DeleteScenario { ${!scenario ? 'no scenario' : 'scenario: ' + scenario.id} }`);
 
     props.setInitFunction((options: ScenarioDialogOptions) => {
         setScenario(options.scenario);

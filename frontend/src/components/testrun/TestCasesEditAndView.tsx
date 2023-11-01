@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import TestCasesEdit from "./TestCasesEdit.tsx";
 import TestCasesView from "./TestCasesView.tsx";
 import {TestCase} from "./Types.tsx";
-import {DEBUG} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
 
 function cleanTestcases(rawTestcases: TestCase[], variables: string[]) {
     return rawTestcases.map(testcase => {
@@ -33,7 +33,7 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
     const [renderTrigger, setRenderTrigger] = useState<boolean>(true);
     props.setGetter( ()=>testcases );
     props.setVarChangeNotifier( ()=>setRenderTrigger(!renderTrigger) );
-    if (DEBUG) console.debug(`Rendering TestCasesEditAndView {}`);
+    if (SHOW_RENDERING_HINTS) console.debug(`Rendering TestCasesEditAndView {}`);
 
     useEffect(() => {
         setTestcases( cleanTestcases(props.testcases, variables) )

@@ -1,7 +1,7 @@
 import {convertNewTestRunFromDTO, convertNewTestRunIntoDTO, NewTestRun, TestCase, TestRun} from "./Types.tsx";
 import {FormEvent} from "react";
 import styled from "styled-components";
-import {DEBUG} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
 import axios from "axios";
 import PromptEditAndView from "./PromptEditAndView.tsx";
 import TestCasesEditAndView from "./TestCasesEditAndView.tsx";
@@ -65,7 +65,7 @@ type Props = {
 }
 
 export default function NewTestRunPanel( props:Readonly<Props> ) {
-    if (DEBUG) console.debug(`Rendering NewTestRunPanel { scenarioId: [${props.scenarioId}] }`);
+    if (SHOW_RENDERING_HINTS) console.debug(`Rendering NewTestRunPanel { scenarioId: [${props.scenarioId}] }`);
     let usedVars = new Set<number>();
     let variablesCompGetter: null | (()=>string[]) = null;
     let    promptCompGetter: null | (()=>string) = null;

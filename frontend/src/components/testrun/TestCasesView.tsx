@@ -2,7 +2,7 @@ import {Id, Label} from "../StandardStyledComponents.tsx";
 import {compareStringsIgnoringCase} from "../../Tools.tsx";
 import styled from "styled-components";
 import {TestCase} from "./Types.tsx";
-import {DEBUG} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
 
 const SimpleCard = styled.div`
   border: 1px solid var(--border-color, #707070);
@@ -20,7 +20,7 @@ type Props = {
 
 export default function TestCasesView( props: Readonly<Props> ) {
     const variables = props.getVariables ? props.getVariables() : null;
-    if (DEBUG) console.debug(`Rendering TestCasesView {}`);
+    if (SHOW_RENDERING_HINTS) console.debug(`Rendering TestCasesView {}`);
 
     function getVarNames( testcase: TestCase ) {
         if (variables != null) return variables;

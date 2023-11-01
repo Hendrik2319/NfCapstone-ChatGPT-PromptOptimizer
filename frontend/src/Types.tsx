@@ -1,3 +1,4 @@
+export const SHOW_RENDERING_HINTS: boolean = true;
 export const DEBUG: boolean = true;
 
 export type Prompt = {
