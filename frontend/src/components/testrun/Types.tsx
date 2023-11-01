@@ -32,15 +32,15 @@ export type TestAnswer = {
 }
 
 
-function convertObjectIntoMap<V>( obj: { [ key: string ]: V } ): Map<string,V> {
-    const map = new Map<string,V>();
-    for (const key in obj) map.set(key, obj[key]);
+function convertObjectIntoMap( obj: { [ key: string ]: string[] } ): Map<string,string[]> {
+    const map = new Map<string,string[]>();
+    for (const key in obj) map.set(key, obj[key].map(s=>s));
     return map;
 }
 
-export function convertMapIntoObject<V>( map: Map<string, V> ): { [ key: string ]: V } {
-    const obj: { [ key: string ]: V } = {};
-    map.forEach((value,key) => obj[key] = value);
+export function convertMapIntoObject( map: Map<string, string[]> ): { [ key: string ]: string[] } {
+    const obj: { [ key: string ]: string[] } = {};
+    map.forEach((value,key) => obj[key] = value.map(s=>s));
     return obj;
 }
 
@@ -54,9 +54,9 @@ export function convertTestRunFromDTO( testRunDTO: TestRunDTO ): TestRun {
         scenarioId: testRunDTO.scenarioId,
         timestamp : testRunDTO.timestamp,
         prompt    : testRunDTO.prompt,
-        variables : testRunDTO.variables,
+        variables : testRunDTO.variables.map(s=>s),
         testcases : testRunDTO.testcases.map(convertObjectIntoMap),
-        answers   : testRunDTO.answers
+        answers   : testRunDTO.answers.map(value=>{ return {...value}; })
     };
 }
 
@@ -67,8 +67,19 @@ export function convertNewTestRunIntoDTO( newTestRun: NewTestRun ): NewTestRunDT
         scenarioId: newTestRun.scenarioId,
     //  timestamp : newTestRun.timestamp,
         prompt    : newTestRun.prompt,
-        variables : newTestRun.variables,
+        variables : newTestRun.variables.map(s=>s),
         testcases : newTestRun.testcases.map(convertMapIntoObject),
+    //  answers   : newTestRun.answers
+    };
+}
+export function convertNewTestRunFromDTO( newTestRun: NewTestRunDTO ): NewTestRun {
+    return {
+    //  id        : newTestRun.id,
+        scenarioId: newTestRun.scenarioId,
+    //  timestamp : newTestRun.timestamp,
+        prompt    : newTestRun.prompt,
+        variables : newTestRun.variables.map(s=>s),
+        testcases : newTestRun.testcases.map(convertObjectIntoMap),
     //  answers   : newTestRun.answers
     };
 }
