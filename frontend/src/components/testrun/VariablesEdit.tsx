@@ -11,6 +11,7 @@ const SimpleCard = styled.div`
 
 type Props = {
     variables: string[]
+    isAllowedToDelete: (varName: string) => boolean
     getVarColor: (index: number) => string
     saveFormValues: (variables: string[]) => void
     setGetter: ( getter: ()=>string[] ) => void
@@ -52,8 +53,8 @@ export default function VariablesEdit( props: Readonly<Props> ) {
     }
 
     function allowDeleteVariable(value: string, index: number): boolean {
-        changeVariable( changedVariables => changedVariables.splice(index, 1));
-        // TODO: is var delete allowed
+        if (!props.isAllowedToDelete(value)) return false;
+        changeVariable(changedVariables => changedVariables.splice(index, 1));
         return true;
     }
 

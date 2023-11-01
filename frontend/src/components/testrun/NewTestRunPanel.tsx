@@ -118,6 +118,19 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         return "var(--text-background-var"+(index%6)+")";
     }
 
+    function isAllowedToDeleteVar(varName: string): boolean {
+        const testcases = getTestcases();
+        const tc = testcases.find(testcase => {
+            const values = testcase.get(varName);
+            return !values || values.length===0;
+        });
+        if (tc) {
+            alert("Can't delete variable.\r\nThere are at least 1 test case that have values for this variable.")
+            return false;
+        }
+        return true;
+    }
+
     // TODO: propagate changes in variables to PromptEditAndView and TestCasesEditAndView
     return (
         <>
@@ -133,6 +146,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
             <Label>Variables :</Label>
             <VariablesEdit
                 variables={storedNewTestRun.variables}
+                isAllowedToDelete={isAllowedToDeleteVar}
                 getVarColor={getVarColor}
                 saveFormValues={variables => saveFormValues(getPrompt(), variables, getTestcases())}
                 setGetter={fcn => variablesCompGetter = fcn}
