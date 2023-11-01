@@ -70,6 +70,8 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     let variablesCompGetter: null | (()=>string[]) = null;
     let    promptCompGetter: null | (()=>string) = null;
     let testcasesCompGetter: null | (()=>TestCase[]) = null;
+    let    promptVarChangeNotifier: null | (()=>void) = null;
+    let testcasesVarChangeNotifier: null | (()=>void) = null;
 
     const storedNewTestRun = loadCurrentNewTestRun(props.scenarioId) ?? copyValues(props.scenarioId, props.previous);
 
@@ -131,7 +133,14 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         return true;
     }
 
-    // TODO: propagate changes in variables to PromptEditAndView and TestCasesEditAndView
+    function onChangedVariables(variables: string[]) {
+        saveFormValues(getPrompt(), variables, getTestcases());
+        if (promptVarChangeNotifier)
+            promptVarChangeNotifier();
+        if (testcasesVarChangeNotifier)
+            testcasesVarChangeNotifier();
+    }
+
     return (
         <>
             <Label>Prompt :</Label>
@@ -142,13 +151,14 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 updateUsedVars={usedVars_ => usedVars = usedVars_}
                 onChangedPrompt={prompt => saveFormValues(prompt, getVariables(), getTestcases())}
                 setGetter={fcn => promptCompGetter = fcn}
+                setVarChangeNotifier={fcn => promptVarChangeNotifier = fcn}
             />
             <Label>Variables :</Label>
             <VariablesEdit
                 variables={storedNewTestRun.variables}
                 isAllowedToDelete={isAllowedToDeleteVar}
                 getVarColor={getVarColor}
-                onChangedVariables={variables => saveFormValues(getPrompt(), variables, getTestcases())}
+                onChangedVariables={onChangedVariables}
                 setGetter={fcn => variablesCompGetter = fcn}
             />
             <Label>Test Cases :</Label>
@@ -159,6 +169,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 getVarColor={getVarColor}
                 onChangedTestcases={testcases => saveFormValues(getPrompt(), getVariables(), testcases)}
                 setGetter={fcn => testcasesCompGetter = fcn}
+                setVarChangeNotifier={fcn => testcasesVarChangeNotifier = fcn}
             />
             <Form onSubmit={onSubmitForm}>
                 <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>

@@ -36,12 +36,14 @@ type Props = {
     updateUsedVars: (usedVars: Set<number>) => void
     onChangedPrompt: (prompt: string) => void
     setGetter: ( getter: ()=>string ) => void
+    setVarChangeNotifier: ( notifier: ()=>void )=>void
 }
 
 export default function PromptEditAndView( props:Readonly<Props> ) {
     const [prompt, setPrompt] = useState<string>(props.prompt);
     const [mode, setMode] = useState<Mode>("view");
     props.setGetter( ()=>prompt );
+    props.setVarChangeNotifier( ()=>setMode(mode==="edit" ? "edit" : "view") );
 
     useEffect(() => {
         setPrompt(props.prompt);

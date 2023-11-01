@@ -22,6 +22,7 @@ type Props = {
     getVarColor: (index: number) => string
     onChangedTestcases:  (testcases: TestCase[]) => void
     setGetter: ( getter: ()=>TestCase[] ) => void
+    setVarChangeNotifier: ( notifier: ()=>void )=>void
 }
 
 export default function TestCasesEditAndView(props:Readonly<Props> ) {
@@ -29,6 +30,7 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
     const [testcases, setTestcases] = useState<TestCase[]>( cleanTestcases(props.testcases, variables) );
     const [mode, setMode] = useState<Mode>("view");
     props.setGetter( ()=>testcases );
+    props.setVarChangeNotifier( ()=>setMode(mode==="edit" ? "edit" : "view") );
 
     useEffect(() => {
         setTestcases( cleanTestcases(props.testcases, variables) )
