@@ -3,6 +3,7 @@ import StringListInput from "./StringListInput.tsx";
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {TestCase} from "./Types.tsx";
+import {DEBUG} from "../../Types.tsx";
 
 const SimpleCard = styled.div`
   border: 1px solid var(--border-color, #707070);
@@ -36,6 +37,7 @@ type Props = {
 
 export default function TestCasesEdit( props: Readonly<Props> ) {
     const [selectedTestCaseIndex, setSelectedTestCaseIndex] = useState<number>(0);
+    if (DEBUG) console.debug(`Rendering TestCasesEdit {}`);
 
     const selectedTestcase: TestCase | null =
         selectedTestCaseIndex < props.testcases.length

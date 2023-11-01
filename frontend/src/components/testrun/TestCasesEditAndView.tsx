@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import TestCasesEdit from "./TestCasesEdit.tsx";
 import TestCasesView from "./TestCasesView.tsx";
 import {TestCase} from "./Types.tsx";
+import {DEBUG} from "../../Types.tsx";
 
 function cleanTestcases(rawTestcases: TestCase[], variables: string[]) {
     return rawTestcases.map(testcase => {
@@ -29,8 +30,10 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
     const variables = props.getVariables();
     const [testcases, setTestcases] = useState<TestCase[]>( cleanTestcases(props.testcases, variables) );
     const [mode, setMode] = useState<Mode>("view");
+    const [renderTrigger, setRenderTrigger] = useState<boolean>(true);
     props.setGetter( ()=>testcases );
-    props.setVarChangeNotifier( ()=>setMode(mode==="edit" ? "edit" : "view") );
+    props.setVarChangeNotifier( ()=>setRenderTrigger(!renderTrigger) );
+    if (DEBUG) console.debug(`Rendering TestCasesEditAndView {}`);
 
     useEffect(() => {
         setTestcases( cleanTestcases(props.testcases, variables) )
