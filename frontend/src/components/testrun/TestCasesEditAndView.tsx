@@ -18,7 +18,7 @@ type Mode = "edit" | "view";
 type Props = {
     testcases: TestCase[]
     getVariables: () => string[]
-    getUsedVars: () => Set<number> // TODO: delete if not needed
+    getUsedVars: () => Set<number> // delete if not needed
     getVarColor: (index: number) => string
     saveFormValues:  (testcases: TestCase[]) => void
     setGetter: ( getter: ()=>TestCase[] ) => void

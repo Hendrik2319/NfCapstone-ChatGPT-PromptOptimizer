@@ -37,25 +37,26 @@ type Props = {
 export default function TestCasesEdit( props: Readonly<Props> ) {
     const [selectedTestCaseIndex, setSelectedTestCaseIndex] = useState<number>(0);
 
+    const selectedTestcase: TestCase | null =
+        selectedTestCaseIndex < props.testcases.length
+            ? props.testcases[selectedTestCaseIndex]
+            : null;
+
     useEffect(() => {
         if (props.testcases.length <= selectedTestCaseIndex && 0 < props.testcases.length)
             setSelectedTestCaseIndex( props.testcases.length-1 );
     }, [selectedTestCaseIndex, props.testcases.length]);
 
+
     function onTestCaseSelectChange( event: ChangeEvent<HTMLSelectElement> ) {
         switchTo(parseInt(event.target.value));
     }
-
     function switchTo(newIndex: number) {
         if (newIndex<0) return;
         if (newIndex>=props.testcases.length) return;
         setSelectedTestCaseIndex(newIndex);
     }
 
-    const selectedTestcase: TestCase | null =
-        selectedTestCaseIndex < props.testcases.length
-            ? props.testcases[selectedTestCaseIndex]
-            : null;
 
     function changeVariable(varName: string, changeAction: (changedVariables: string[]) => void ) {
         if (!selectedTestcase) return;
@@ -65,36 +66,46 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
         copy[selectedTestCaseIndex].set(varName, values);
         props.setTestcases(copy);
     }
-
     function onAddValue(varName: string, value: string) {
         changeVariable(varName, values => values.push(value));
     }
-
     function onChangeValue(varName: string, value: string, index: number) {
         changeVariable(varName, values => values[index] = value);
     }
-
     function allowDeleteValue(varName: string, value: string, index: number) {
         changeVariable(varName, values => values.splice(index, 1));
         return true;
     }
 
-    const disabled = props.testcases.length === 0;
+
+    function addTestCase() {
+        const copy = props.testcases.map(deepcopy);
+        copy.push(new Map<string, string[]>());
+        props.setTestcases(copy);
+    }
+    function removeTestCase() {
+        if (0 < props.testcases.length) {
+            const copy = props.testcases.map(deepcopy);
+            props.setTestcases(copy.slice(0,-1));
+        }
+    }
+
+
     return (
         <div>
             {"Test Case: "}
-            <select value={selectedTestCaseIndex} onChange={onTestCaseSelectChange} disabled={disabled}>
+            <select value={selectedTestCaseIndex} onChange={onTestCaseSelectChange} disabled={props.testcases.length === 0}>
                 {
                     props.testcases.map( (tc, index) =>
                         <option key={index} value={index}>{index+1}</option>
                     )
                 }
             </select>
-            <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex-1)} disabled={disabled}>&lt;</button>
-            <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex+1)} disabled={disabled}>&gt;</button>
+            <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex-1)} disabled={props.testcases.length === 0}>&lt;</button>
+            <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex+1)} disabled={props.testcases.length === 0}>&gt;</button>
             {"  "}
-            <button type={"button"} onClick={()=>{ /*   TODO   */ }}>Add</button>
-            <button type={"button"} onClick={()=>{ /*   TODO   */ }}>Remove</button>
+            <button type={"button"} onClick={addTestCase   }>Add</button>
+            <button type={"button"} onClick={removeTestCase}>Remove</button>
             {
                 selectedTestcase &&
                 <SimpleCard>
