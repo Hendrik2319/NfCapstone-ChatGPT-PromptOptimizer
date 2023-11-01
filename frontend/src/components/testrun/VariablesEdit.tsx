@@ -37,10 +37,12 @@ export default function VariablesEdit( props: Readonly<Props> ) {
 
     function onChangeVariable(value: string, index: number) {
         changeVariable( changedVariables => changedVariables[index] = value);
+        // TODO: is var change allowed (vars with same name)
     }
 
     function allowDeleteVariable(value: string, index: number): boolean {
         changeVariable( changedVariables => changedVariables.splice(index, 1));
+        // TODO: is var delete allowed
         return true;
     }
 
