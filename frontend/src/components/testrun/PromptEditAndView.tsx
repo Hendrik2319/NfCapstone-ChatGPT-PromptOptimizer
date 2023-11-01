@@ -24,11 +24,16 @@ const View = styled.div`
   margin: 0;
 `;
 
+const ColoredSpan = styled.span<{ $bgcolor: string }>`
+  background: ${props => props.$bgcolor};
+`;
+
 type Mode = "edit" | "view";
 type Props = {
     prompt: string
     setPrompt: (prompt: string) => void
-    getParsedPromptOutput: (prompt: string) => JSX.Element
+    getVariables: () => string[]
+    getVarColor: (index: number) => string
     setUpdateCallback: ( callback: ()=>void ) =>void
 }
 
@@ -40,6 +45,11 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
         setPrompt(props.prompt);
     }, [props.prompt]);
 
+
+    props.setUpdateCallback( ()=> {
+        setMode("view");
+    } );
+
     function onPromptInput( event: ChangeEvent<HTMLTextAreaElement> ) {
         setPrompt(event.target.value);
     }
@@ -48,17 +58,52 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
         setMode("view");
         props.setPrompt(prompt);
     }
-
     function onFinishView() {
         setMode("edit");
     }
 
-    props.setUpdateCallback( ()=> {
-        setMode("view");
-    } );
+    function getParsedPromptOutput(prompt: string): JSX.Element {
+        const variables = props.getVariables();
+        const parts: (string | number)[] = [];
+
+        while (prompt !== "") {
+            let nextVarPos = -1;
+            let nextVarIndex = -1;
+            for (let i = 0; i < variables.length; i++) {
+                const pos = prompt.indexOf("{"+variables[i]+"}");
+                if (pos<0) continue;
+                if (nextVarPos<0 || nextVarPos>pos) {
+                    nextVarPos = pos;
+                    nextVarIndex = i;
+                }
+            }
+            if (nextVarPos<0)
+            { // no var found
+                parts.push(prompt);
+                prompt = "";
+            }
+            else
+            { // nearest var found at {nextVarPos}
+                parts.push(prompt.substring(0,nextVarPos));
+                parts.push(nextVarIndex);
+                prompt = prompt.substring( nextVarPos + ("{"+variables[nextVarIndex]+"}").length );
+            }
+        }
+
+        return (
+            <>
+                {
+                    parts.map( (part, index) => {
+                        if (typeof part === "string") return part;
+                        return <ColoredSpan key={index} $bgcolor={props.getVarColor(part)}>{"{" + variables[part] + "}"}</ColoredSpan>
+                    } )
+                }
+            </>
+        )
+    }
 
     switch (mode) {
         case "edit": return <TextArea value={prompt} onChange={onPromptInput} onBlur={onFinishEdit}/>;
-        case "view": return <View onClick={onFinishView}>{props.getParsedPromptOutput(prompt)}</View>;
+        case "view": return <View onClick={onFinishView}>{getParsedPromptOutput(prompt)}</View>;
     }
 }

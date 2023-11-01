@@ -34,10 +34,6 @@ const SimpleCard = styled.div`
   background: var(--background-color);
 `;
 
-const ColoredSpan = styled.span<{ $bgcolor: string }>`
-  background: ${props => props.$bgcolor};
-`;
-
 function deepcopy(oldMap: Map<string, string[]>): Map<string, string[]> {
     const newMap = new Map<string, string[]>();
     oldMap.forEach(
@@ -187,52 +183,14 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         return "var(--text-background-var"+(index%6)+")";
     }
 
-    function getParsedPromptOutput(prompt: string): JSX.Element {
-        const parts: (string | number)[] = [];
-
-        while (prompt !== "") {
-            let nextVarPos = -1;
-            let nextVarIndex = -1;
-            for (let i = 0; i < variables.length; i++) {
-                const pos = prompt.indexOf("{"+variables[i]+"}");
-                if (pos<0) continue;
-                if (nextVarPos<0 || nextVarPos>pos) {
-                    nextVarPos = pos;
-                    nextVarIndex = i;
-                }
-            }
-            if (nextVarPos<0)
-            { // no var found
-                parts.push(prompt);
-                prompt = "";
-            }
-            else
-            { // nearest var found at {nextVarPos}
-                parts.push(prompt.substring(0,nextVarPos));
-                parts.push(nextVarIndex);
-                prompt = prompt.substring( nextVarPos + ("{"+variables[nextVarIndex]+"}").length );
-            }
-        }
-
-        return (
-            <>
-                {
-                    parts.map( (part, index) => {
-                        if (typeof part === "string") return part;
-                        return <ColoredSpan key={index} $bgcolor={getVarColor(part)}>{"{" + variables[part] + "}"}</ColoredSpan>
-                    } )
-                }
-            </>
-        )
-    }
-
     return (
         <Form onSubmit={onSubmitForm}>
             <Label>Prompt :</Label>
             <PromptEditAndView
                 prompt={prompt}
                 setPrompt={setChangedPrompt}
-                getParsedPromptOutput={getParsedPromptOutput}
+                getVariables={()=>variables}
+                getVarColor={getVarColor}
                 setUpdateCallback={ fcn => promptEditViewUpdateCallback = fcn }
             />
             <Label>Variables :</Label>
