@@ -66,11 +66,13 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
         copy[selectedTestCaseIndex].set(varName, values);
         props.setTestcases(copy);
     }
-    function onAddValue(varName: string, value: string) {
+    function allowAddValue(varName: string, value: string) {
         changeVariable(varName, values => values.push(value));
+        return true;
     }
-    function onChangeValue(varName: string, value: string, index: number) {
+    function allowChangeValue(varName: string, value: string, index: number) {
         changeVariable(varName, values => values[index] = value);
+        return true;
     }
     function allowDeleteValue(varName: string, value: string, index: number) {
         changeVariable(varName, values => values.splice(index, 1));
@@ -124,8 +126,8 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
                                         values={values}
                                         fieldSize={10}
                                         // getFieldBgColor={getVarColor}
-                                        onAddValue      ={(value: string               ) => onAddValue      (varName, value       )}
-                                        onChangeValue   ={(value: string, index: number) => onChangeValue   (varName, value, index)}
+                                        allowAddValue   ={(value: string               ) => allowAddValue   (varName, value       )}
+                                        allowChangeValue={(value: string, index: number) => allowChangeValue(varName, value, index)}
                                         allowDeleteValue={(value: string, index: number) => allowDeleteValue(varName, value, index)}
                                     />
                                 </SimpleCard>

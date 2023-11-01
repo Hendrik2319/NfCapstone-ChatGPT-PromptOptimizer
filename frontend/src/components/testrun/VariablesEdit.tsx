@@ -31,13 +31,24 @@ export default function VariablesEdit( props: Readonly<Props> ) {
         setVariables(changedVariables);
     }
 
-    function onAddVariable(value: string) {
+    function allowAddVariable(value: string) {
+        const pos = variables.indexOf(value);
+        if (0<=pos) {
+            alert("Can't add variable with this value.\r\nNew variable will be equal to variable " + (pos + 1) + ".");
+            return false;
+        }
         changeVariable( changedVariables => changedVariables.push(value));
+        return true;
     }
 
-    function onChangeVariable(value: string, index: number) {
+    function allowChangeVariable(value: string, index: number) {
+        const pos = variables.indexOf(value);
+        if (0<=pos && pos!==index) {
+            alert("Can't change variable to this value.\r\nVariable " + (index + 1) + " will be equal to variable " + (pos + 1) + ".");
+            return false;
+        }
         changeVariable( changedVariables => changedVariables[index] = value);
-        // TODO: is var change allowed (vars with same name)
+        return true;
     }
 
     function allowDeleteVariable(value: string, index: number): boolean {
@@ -52,8 +63,8 @@ export default function VariablesEdit( props: Readonly<Props> ) {
                 values={variables}
                 fieldSize={10}
                 getFieldBgColor={props.getVarColor}
-                onAddValue      ={onAddVariable}
-                onChangeValue   ={onChangeVariable}
+                allowAddValue   ={allowAddVariable   }
+                allowChangeValue={allowChangeVariable}
                 allowDeleteValue={allowDeleteVariable}
             />
         </SimpleCard>
