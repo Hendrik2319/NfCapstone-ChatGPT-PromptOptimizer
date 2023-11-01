@@ -191,6 +191,9 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 setPrompt={setChangedPrompt}
                 getVariables={()=>variables}
                 getVarColor={getVarColor}
+                updateUsedVars={ usedVars => {
+                    // TODO
+                }}
                 setUpdateCallback={ fcn => promptEditViewUpdateCallback = fcn }
             />
             <Label>Variables :</Label>

@@ -33,6 +33,7 @@ type Props = {
     prompt: string
     setPrompt: (prompt: string) => void
     getVariables: () => string[]
+    updateUsedVars: (usedVars: Set<number>) => void
     getVarColor: (index: number) => string
     setUpdateCallback: ( callback: ()=>void ) =>void
 }
@@ -62,15 +63,17 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
         setMode("edit");
     }
 
-    function getParsedPromptOutput(prompt: string): JSX.Element {
+    function getParsedPromptOutput(): JSX.Element {
         const variables = props.getVariables();
         const parts: (string | number)[] = [];
+        const usedVars = new Set<number>();
+        let promptStr = prompt;
 
-        while (prompt !== "") {
+        while (promptStr !== "") {
             let nextVarPos = -1;
             let nextVarIndex = -1;
             for (let i = 0; i < variables.length; i++) {
-                const pos = prompt.indexOf("{"+variables[i]+"}");
+                const pos = promptStr.indexOf("{"+variables[i]+"}");
                 if (pos<0) continue;
                 if (nextVarPos<0 || nextVarPos>pos) {
                     nextVarPos = pos;
@@ -79,16 +82,19 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
             }
             if (nextVarPos<0)
             { // no var found
-                parts.push(prompt);
-                prompt = "";
+                parts.push(promptStr);
+                promptStr = "";
             }
             else
             { // nearest var found at {nextVarPos}
-                parts.push(prompt.substring(0,nextVarPos));
+                parts.push(promptStr.substring(0,nextVarPos));
                 parts.push(nextVarIndex);
-                prompt = prompt.substring( nextVarPos + ("{"+variables[nextVarIndex]+"}").length );
+                usedVars.add(nextVarIndex);
+                promptStr = promptStr.substring( nextVarPos + ("{"+variables[nextVarIndex]+"}").length );
             }
         }
+
+        props.updateUsedVars(usedVars);
 
         return (
             <>
@@ -104,6 +110,6 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
 
     switch (mode) {
         case "edit": return <TextArea value={prompt} onChange={onPromptInput} onBlur={onFinishEdit}/>;
-        case "view": return <View onClick={onFinishView}>{getParsedPromptOutput(prompt)}</View>;
+        case "view": return <View onClick={onFinishView}>{getParsedPromptOutput()}</View>;
     }
 }
