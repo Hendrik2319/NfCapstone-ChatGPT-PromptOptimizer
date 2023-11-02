@@ -72,7 +72,7 @@ type Props = {
 }
 
 export default function NewTestRunPanel( props:Readonly<Props> ) {
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering NewTestRunPanel { scenarioId: [${props.scenarioId}] }`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering NewTestRunPanel", { scenarioId: props.scenarioId });
     let usedVars = new Set<number>();
     let variablesCompGetter: null | (()=>string[]) = null;
     let    promptCompGetter: null | (()=>string) = null;

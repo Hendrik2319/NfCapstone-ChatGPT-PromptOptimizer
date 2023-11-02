@@ -8,7 +8,7 @@ type Props = {
 
 export default function SidePanel( props: Readonly<Props> ) {
     const [isOpen, setIsOpen] = useState<boolean>(false);
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering SidePanel { isOpen:${isOpen} }`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering SidePanel", { isOpen });
 
     return (
         <div className={"SidePanel"}>

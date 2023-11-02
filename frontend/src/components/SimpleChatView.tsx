@@ -6,7 +6,7 @@ import {Answer, DEBUG, Prompt, SHOW_RENDERING_HINTS} from "../Types.tsx";
 export default function SimpleChatView() {
     const [ prompt, setPrompt ] = useState<Prompt>({ prompt:"" });
     const [ answer, setAnswer ] = useState<Answer>({ answer:"" });
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering SimpleChatView {}`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering SimpleChatView");
 
     function onInputChange( event: ChangeEvent<HTMLTextAreaElement> ) {
         setPrompt({

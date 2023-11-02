@@ -37,7 +37,7 @@ type Props = {
 
 export default function TestCasesEdit( props: Readonly<Props> ) {
     const [selectedTestCaseIndex, setSelectedTestCaseIndex] = useState<number>(0);
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering TestCasesEdit {}`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering TestCasesEdit");
 
     const selectedTestcase: TestCase | null =
         selectedTestCaseIndex < props.testcases.length

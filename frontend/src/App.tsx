@@ -14,7 +14,7 @@ import TestRunsView from "./components/testrun/TestRunsView.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
-    if (SHOW_RENDERING_HINTS) console.debug("Rendering App {}");
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering App");
 
     useEffect(() => {
         setAppTheme( getCurrentDarkModeState() );

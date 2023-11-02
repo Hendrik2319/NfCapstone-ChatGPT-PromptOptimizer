@@ -42,7 +42,7 @@ export default function TestRunsView( props:Readonly<Props> ) {
     const [ testruns, setTestruns ] = useState<TestRun[]>([]);
     const [ tabState, setTabState ] = useState<TabState>("PrevTestRuns");
     const { id: scenarioId } = useParams();
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering TestRunsView { scenarioId: [${scenarioId}] }`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering TestRunsView", { scenarioId });
 
     const userCanStartNewTestRun =
         props.user && scenario &&

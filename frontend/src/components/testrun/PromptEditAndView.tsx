@@ -52,7 +52,7 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
     const [mode, setMode] = useState<Mode>("view");
     const [varChange, setVarChange] = useState<VarChange>({ index:-1, oldVarName:"", newVarName:"" });
     props.setGetter( ()=>prompt );
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering PromptEditAndView {}`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering PromptEditAndView");
 
     useEffect(() => {
         setPrompt(props.prompt);

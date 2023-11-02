@@ -20,7 +20,7 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
     const [mode, setMode] = useState<Mode>("view");
     const [renderTrigger, setRenderTrigger] = useState<boolean>(true);
     props.setGetter( ()=>testcases );
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering TestCasesEditAndView {}`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering TestCasesEditAndView");
 
     useEffect(() => {
         setTestcases( props.testcases );

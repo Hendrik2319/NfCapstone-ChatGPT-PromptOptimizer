@@ -23,7 +23,7 @@ type Props = {
 export default function VariablesEdit( props: Readonly<Props> ) {
     const [variables, setVariables] = useState<string[]>(props.variables);
     props.setGetter( ()=>variables );
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering VariablesEdit {}`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering VariablesEdit");
 
     useEffect(() => {
         setVariables(props.variables)

@@ -12,7 +12,7 @@ export function createDialog<DialogOptions>( id:string, writeContent: ( dialogCo
     let initFunction: undefined | ((options:DialogOptions)=> void) = undefined
 
     function showDialog( visible:boolean, options?:DialogOptions ) {
-        if (SHOW_RENDERING_HINTS) console.debug(`FloatingDialog[ ${id} ] -> showDialog( visible:${visible}, options:${options} )`)
+        if (SHOW_RENDERING_HINTS) console.debug(`FloatingDialog[ ${id} ] -> showDialog`, { visible, options })
         const dialog = document.querySelector('#'+id)
         if (dialog) {
             if (visible) {

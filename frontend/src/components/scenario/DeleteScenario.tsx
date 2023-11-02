@@ -10,7 +10,7 @@ type Props = {
 
 export default function DeleteScenario( props: Readonly<Props> ) {
     const [ scenario, setScenario ] = useState<Scenario>();
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering DeleteScenario { ${!scenario ? 'no scenario' : 'scenario: ' + scenario.id} }`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering DeleteScenario",  { scenario: !scenario ? "no scenario" : scenario.id });
 
     props.setInitFunction((options: ScenarioDialogOptions) => {
         setScenario(options.scenario);

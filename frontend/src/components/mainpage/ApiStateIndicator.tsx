@@ -5,7 +5,7 @@ import {ApiState, DEBUG, SHOW_RENDERING_HINTS} from "../../Types.tsx";
 
 export default function ApiStateIndicator() {
     const [ state, setState ] = useState<ApiState>()
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering ApiStateIndicator { state:${state} }`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering ApiStateIndicator", { state });
 
     useEffect( getState, [] )
 

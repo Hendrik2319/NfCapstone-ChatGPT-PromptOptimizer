@@ -20,7 +20,7 @@ type Props = {
 
 export default function TestCasesView( props: Readonly<Props> ) {
     const variables = props.getVariables ? props.getVariables() : null;
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering TestCasesView {}`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering TestCasesView");
 
     function getVarNames( testcase: TestCase ) {
         if (variables != null) return variables;

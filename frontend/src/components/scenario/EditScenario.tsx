@@ -11,7 +11,7 @@ type Props = {
 export default function EditScenario( props: Readonly<Props> ) {
     const [ label, setLabel ] = useState<string>("");
     const [ scenario, setScenario ] = useState<Scenario>();
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering EditScenario {}`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering EditScenario");
 
     props.setInitFunction((options: ScenarioDialogOptions) => {
         setScenario(options.scenario);

@@ -8,7 +8,7 @@ type Props = {
 
 export default function AddScenario( props:Readonly<Props> ) {
     const [ label, setLabel ] = useState<string>("");
-    if (SHOW_RENDERING_HINTS) console.debug(`Rendering AddScenario {}`)
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering AddScenario")
 
     function onChange( event: ChangeEvent<HTMLInputElement> ) {
         setLabel(event.target.value);
