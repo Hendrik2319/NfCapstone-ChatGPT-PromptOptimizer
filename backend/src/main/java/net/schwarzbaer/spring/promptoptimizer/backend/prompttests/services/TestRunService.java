@@ -1,6 +1,7 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
 import lombok.RequiredArgsConstructor;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Answer;
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptService;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewTestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
@@ -10,6 +11,8 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedE
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -58,9 +61,9 @@ public class TestRunService {
 		if (storedScenarioOpt.isEmpty())
 			throw new NoSuchElementException("Can't perform a TestRun, no Scenario with ID \"%s\" found.".formatted(newTestRun.scenarioId()));
 
-//		ZonedDateTime now = timeService.getNow();
+		ZonedDateTime now = timeService.getNow();
 
-//		List<TestRun.TestAnswer> answers = new ArrayList<>();
+		List<TestRun.TestAnswer> answers = new ArrayList<>();
 		PromptGenerator generator = new PromptGenerator(
 				newTestRun.prompt(),
 				newTestRun.variables(),
@@ -69,16 +72,27 @@ public class TestRunService {
 		generator.foreachPrompt(
 				(prompt, indexOfTestCase, label) -> {
 //					Answer answer = chatGptService.askChatGPT(new Prompt(prompt));
-//					answers.add(new TestRun.TestAnswer(indexOfTestCase, label, answer.answer()));
+					Answer answer = new Answer(
+							"Answer to Prompt: \"%s\"".formatted(prompt),
+							12,23,35
+					);
+					answers.add(new TestRun.TestAnswer(
+							indexOfTestCase,
+							label,
+							answer.answer(),
+							answer.promptTokens(),
+							answer.completionTokens(),
+							answer.totalTokens()
+					));
 				}
 		);
 
-//		testRunRepository.save(new TestRun(
-//				null, newTestRun.scenarioId(), now,
-//				newTestRun.prompt(),
-//				newTestRun.variables(),
-//				newTestRun.testcases(),
-//				answers
-//		));
+		testRunRepository.save(new TestRun(
+				null, newTestRun.scenarioId(), now,
+				newTestRun.prompt(),
+				newTestRun.variables(),
+				newTestRun.testcases(),
+				answers
+		));
 	}
 }

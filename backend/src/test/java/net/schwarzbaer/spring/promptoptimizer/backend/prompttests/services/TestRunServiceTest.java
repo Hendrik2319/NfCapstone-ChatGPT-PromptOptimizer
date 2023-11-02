@@ -48,7 +48,7 @@ class TestRunServiceTest {
 				ZonedDateTime.of(2023, 10, 29, 14, 30, 0, 0, ZoneId.systemDefault()),
 				"prompt", List.of("var1", "var2"),
 				List.of(Map.of("var1", List.of("value1"), "var2", List.of("value2"))),
-				List.of(new TestRun.TestAnswer(1, "label", "answer"))
+				List.of(new TestRun.TestAnswer(1, "label", "answer", 12, 23, 35))
 		);
 	}
 
@@ -277,7 +277,7 @@ class TestRunServiceTest {
 				List.of(
 						new TestRun.TestAnswer(
 								1, "the only answer",
-								"TestAnswer"
+								"TestAnswer",12,23,35
 						)
 				)
 		));
