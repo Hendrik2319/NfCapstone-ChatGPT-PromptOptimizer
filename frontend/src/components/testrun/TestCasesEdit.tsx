@@ -85,6 +85,7 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
     function addTestCase() {
         const copy = props.testcases.map(deepcopy);
         copy.push(new Map<string, string[]>());
+        setSelectedTestCaseIndex(copy.length-1);
         props.setTestcases(copy);
     }
     function removeTestCase() {
@@ -100,18 +101,23 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
     }
 
     return (
-        <div>
+        <SimpleCard>
             {"Test Case: "}
-            <select value={selectedTestCaseIndex} onChange={onTestCaseSelectChange} disabled={props.testcases.length === 0}>
-                {
-                    props.testcases.map( (tc, index) =>
-                        <option key={generateKey(index)} value={index}>{index+1}</option>
-                    )
-                }
-            </select>
-            <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex-1)} disabled={props.testcases.length === 0}>&lt;</button>
-            <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex+1)} disabled={props.testcases.length === 0}>&gt;</button>
-            {"  "}
+            {
+                props.testcases.length > 0 &&
+                <>
+                    <select value={selectedTestCaseIndex} onChange={onTestCaseSelectChange}>
+                        {
+                            props.testcases.map( (tc, index) =>
+                                <option key={generateKey(index)} value={index}>{index+1}</option>
+                            )
+                        }
+                    </select>
+                    <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex-1)}>&lt;</button>
+                    <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex+1)}>&gt;</button>
+                    {"  "}
+                </>
+            }
             <button type={"button"} onClick={addTestCase   }>Add</button>
             <button type={"button"} onClick={removeTestCase}>Remove</button>
             {
@@ -138,6 +144,6 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
                     }</div>
                 </SimpleCard>
             }
-        </div>
+        </SimpleCard>
     )
 }
