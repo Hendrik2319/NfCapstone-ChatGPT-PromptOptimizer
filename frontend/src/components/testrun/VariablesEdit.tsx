@@ -36,27 +36,37 @@ export default function VariablesEdit( props: Readonly<Props> ) {
         setVariables(changedVariables);
     }
 
-    function allowAddVariable(value: string, index: number) { // TODO: var names with {} are not allowed
-        const pos = variables.indexOf(value);
-        if (0<=pos) {
-            alert("Can't add variable with this value.\r\nNew variable will be equal to variable " + (pos + 1) + ".");
+    function checkName(varName: string, index: number, errorMsg1: string, errorMsg2: string) {
+        if (varName.includes("{") || varName.includes("}")) {
+            alert( errorMsg1+"\r\nCharacters like '{' or '}' are not allowed in variable names.");
             return false;
         }
-        changeVariable( changedVariables => changedVariables.push(value));
-        props.notifyOthersAboutChange(index, "", value);
+
+        const pos = variables.indexOf(varName);
+        if (0<=pos && pos!==index) {
+            alert( errorMsg1+"\r\n"+errorMsg2+" will be equal to variable "+ (pos + 1) +".");
+            return false;
+        }
         return true;
     }
 
-    function allowChangeVariable(value: string, index: number) { // TODO: var names with {} are not allowed
-        const pos = variables.indexOf(value);
-        if (0<=pos && pos!==index) {
-            alert("Can't change variable to this value.\r\nVariable " + (index + 1) + " will be equal to variable " + (pos + 1) + ".");
-            return false;
+    function allowAddVariable(value: string, index: number) {
+        const isAllowed = checkName(value,index,"Can't add variable with this name.", "New variable");
+        if (isAllowed) {
+            changeVariable( changedVariables => changedVariables.push(value));
+            props.notifyOthersAboutChange(index, "", value);
         }
-        const oldValue = variables[index];
-        changeVariable( changedVariables => changedVariables[index] = value);
-        props.notifyOthersAboutChange(index, oldValue, value);
-        return true;
+        return isAllowed;
+    }
+
+    function allowChangeVariable(value: string, index: number) {
+        const isAllowed = checkName(value, index, "Can't change variable to this name.","Variable "+ (index+1));
+        if (isAllowed) {
+            const oldValue = variables[index];
+            changeVariable( changedVariables => changedVariables[index] = value);
+            props.notifyOthersAboutChange(index, oldValue, value);
+        }
+        return isAllowed;
     }
 
     function allowDeleteVariable(value: string, index: number): boolean {

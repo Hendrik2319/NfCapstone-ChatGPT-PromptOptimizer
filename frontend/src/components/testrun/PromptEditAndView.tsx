@@ -132,7 +132,6 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
         }
 
         props.updateUsedVars(usedVars);
-        console.debug("PromptEditAndView.getParsedPromptOutput: parts", parts);
 
         return (
             <>

@@ -86,14 +86,13 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     function getPrompt   (): string     { return !   promptCompGetter ? storedNewTestRun.prompt    :    promptCompGetter(); }
     function getTestcases(): TestCase[] { return !testcasesCompGetter ? storedNewTestRun.testcases : testcasesCompGetter(); }
 
-    function saveFormValues(callerLabel: string, prompt: string, variables: string[], testcases: TestCase[]) {
+    function saveFormValues(prompt: string, variables: string[], testcases: TestCase[]) {
         storedNewTestRun = {
             prompt,
             scenarioId: props.scenarioId,
             variables,
             testcases
         };
-        console.debug("NewTestRunPanel.saveFormValues( "+callerLabel+" )", storedNewTestRun);
         saveCurrentNewTestRun(props.scenarioId, storedNewTestRun)
     }
 
@@ -143,7 +142,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     }
 
     const variablesChanged: VariablesChangeMethod = (index: number, oldVarName: string, newVarName: string): void => {
-        console.debug("NewTestRunPanel.variablesChanged( index:"+index+", VarName: "+oldVarName+" -> "+newVarName+" )");
         if (promptVarChangeNotifier)
             promptVarChangeNotifier(index, oldVarName, newVarName);
         if (testcasesVarChangeNotifier)
@@ -151,15 +149,15 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     }
 
     function onPromptChange( prompt: string ) {
-        saveFormValues("prompt", prompt, storedNewTestRun.variables, storedNewTestRun.testcases)
+        saveFormValues(prompt, storedNewTestRun.variables, storedNewTestRun.testcases)
     }
 
     function onVariablesChange( variables: string[] ) {
-        saveFormValues("variables", storedNewTestRun.prompt, variables, storedNewTestRun.testcases)
+        saveFormValues(storedNewTestRun.prompt, variables, storedNewTestRun.testcases)
     }
 
     function onTestcasesChange( testcases: TestCase[] ) {
-        saveFormValues("testcases", storedNewTestRun.prompt, storedNewTestRun.variables, testcases)
+        saveFormValues(storedNewTestRun.prompt, storedNewTestRun.variables, testcases)
     }
 
     function cleanupTestcases(testcases: TestCase[], variables: string[]) {
@@ -208,7 +206,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
                 <BigButton>Start Test Run</BigButton>
             </Form>
-            <button onClick={()=>console.debug("show stored values", storedNewTestRun)}>#DEBUG# show stored values</button>
         </>
     )
 }
