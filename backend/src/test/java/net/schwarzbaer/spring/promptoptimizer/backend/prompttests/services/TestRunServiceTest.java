@@ -258,27 +258,66 @@ class TestRunServiceTest {
 		when(scenarioService.getScenarioById("scenarioId1")).thenReturn(
 				Optional.of(new Scenario("scenarioId1", "author1", "label1"))
 		);
-		when(chatGptService.askChatGPT(new Prompt("TestPrompt"))).thenReturn(
-				new Answer("TestAnswer", 12,23,35)
-		);
+		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.1/value2.1"))).thenReturn( new Answer("TestAnswer/value1.1/value2.1", 12,23,35) );
+		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.1/value2.2"))).thenReturn( new Answer("TestAnswer/value1.1/value2.2", 12,23,35) );
+		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.2/value2.1"))).thenReturn( new Answer("TestAnswer/value1.2/value2.1", 12,23,35) );
+		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.2/value2.2"))).thenReturn( new Answer("TestAnswer/value1.2/value2.2", 12,23,35) );
+		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.3/value2.1"))).thenReturn( new Answer("TestAnswer/value1.3/value2.1", 12,23,35) );
+		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.3/value2.2"))).thenReturn( new Answer("TestAnswer/value1.3/value2.2", 12,23,35) );
+		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.4/value2.3"))).thenReturn( new Answer("TestAnswer/value1.4/value2.3", 12,23,35) );
+		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.4/value2.4"))).thenReturn( new Answer("TestAnswer/value1.4/value2.4", 12,23,35) );
+
 		ZonedDateTime now = ZonedDateTime.now();
 		when(timeService.getNow()).thenReturn(now);
 
 		// When
 		testRunService.performTestRun(new NewTestRun(
-				"scenarioId1", "TestPrompt", List.of(), List.of()
+				"scenarioId1", "TestPrompt/{var1}/{var2}",
+				List.of("var1","var2"),
+				List.of(
+						Map.of(
+								"var1", List.of("value1.1", "value1.2", "value1.3"),
+								"var2", List.of("value2.1", "value2.2")
+						),
+						Map.of(
+								"var1", List.of("value1.4"),
+								"var2", List.of("value2.3", "value2.4")
+						)
+				)
 		));
 
 		// Then
+		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.1/value2.1"));
+		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.1/value2.2"));
+		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.2/value2.1"));
+		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.2/value2.2"));
+		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.3/value2.1"));
+		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.3/value2.2"));
+		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.4/value2.3"));
+		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.4/value2.4"));
 		verify(testRunRepository).save(new TestRun(
 				null, "scenarioId1", now,
-				"TestPrompt",
-				List.of(), List.of(),
+				"TestPrompt/{var1}/{var2}",
+				List.of("var1","var2"),
 				List.of(
-						new TestRun.TestAnswer(
-								1, "the only answer",
-								"TestAnswer",12,23,35
+						Map.of(
+								"var1", List.of("value1.1", "value1.2", "value1.3"),
+								"var2", List.of("value2.1", "value2.2")
+						),
+						Map.of(
+								"var1", List.of("value1.4"),
+								"var2", List.of("value2.3", "value2.4")
 						)
+				),
+				List.of(
+						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.1\" var2:\"value2.1\" }","TestAnswer/value1.1/value2.1",12,23,35),
+						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.1\" var2:\"value2.2\" }","TestAnswer/value1.1/value2.2",12,23,35),
+						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.2\" var2:\"value2.1\" }","TestAnswer/value1.2/value2.1",12,23,35),
+						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.2\" var2:\"value2.2\" }","TestAnswer/value1.2/value2.2",12,23,35),
+						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.3\" var2:\"value2.1\" }","TestAnswer/value1.3/value2.1",12,23,35),
+						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.3\" var2:\"value2.2\" }","TestAnswer/value1.3/value2.2",12,23,35),
+						new TestRun.TestAnswer(1, "TestCase 2 { var1:\"value1.4\" var2:\"value2.3\" }","TestAnswer/value1.4/value2.3",12,23,35),
+						new TestRun.TestAnswer(1, "TestCase 2 { var1:\"value1.4\" var2:\"value2.4\" }","TestAnswer/value1.4/value2.4",12,23,35)
 				)
 		));
 	}

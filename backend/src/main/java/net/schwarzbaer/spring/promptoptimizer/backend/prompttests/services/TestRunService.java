@@ -3,6 +3,7 @@ package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 import lombok.RequiredArgsConstructor;
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Answer;
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptService;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Prompt;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewTestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
@@ -71,11 +72,7 @@ public class TestRunService {
 		);
 		generator.foreachPrompt(
 				(prompt, indexOfTestCase, label) -> {
-//					Answer answer = chatGptService.askChatGPT(new Prompt(prompt));
-					Answer answer = new Answer(
-							"Answer to Prompt: \"%s\"".formatted(prompt),
-							12,23,35
-					);
+					Answer answer = chatGptService.askChatGPT(new Prompt(prompt));
 					answers.add(new TestRun.TestAnswer(
 							indexOfTestCase,
 							label,
