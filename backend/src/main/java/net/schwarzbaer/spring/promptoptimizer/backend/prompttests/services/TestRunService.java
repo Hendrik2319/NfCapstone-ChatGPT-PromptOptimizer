@@ -1,9 +1,7 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
 import lombok.RequiredArgsConstructor;
-import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Answer;
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptService;
-import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Prompt;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewTestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
@@ -60,16 +58,27 @@ public class TestRunService {
 		if (storedScenarioOpt.isEmpty())
 			throw new NoSuchElementException("Can't perform a TestRun, no Scenario with ID \"%s\" found.".formatted(newTestRun.scenarioId()));
 
-		Answer answer = chatGptService.askChatGPT(new Prompt(newTestRun.prompt()));
+//		ZonedDateTime now = timeService.getNow();
 
-		testRunRepository.save(new TestRun(
-				null, newTestRun.scenarioId(), timeService.getNow(),
+//		List<TestRun.TestAnswer> answers = new ArrayList<>();
+		PromptGenerator generator = new PromptGenerator(
 				newTestRun.prompt(),
 				newTestRun.variables(),
-				newTestRun.testcases(),
-				List.of(
-						new TestRun.TestAnswer(1, "the only answer", answer.answer())
-				)
-		));
+				newTestRun.testcases()
+		);
+		generator.foreachPrompt(
+				(prompt, indexOfTestCase, label) -> {
+//					Answer answer = chatGptService.askChatGPT(new Prompt(prompt));
+//					answers.add(new TestRun.TestAnswer(indexOfTestCase, label, answer.answer()));
+				}
+		);
+
+//		testRunRepository.save(new TestRun(
+//				null, newTestRun.scenarioId(), now,
+//				newTestRun.prompt(),
+//				newTestRun.variables(),
+//				newTestRun.testcases(),
+//				answers
+//		));
 	}
 }

@@ -107,7 +107,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
             .then((response) => {
                 if (response.status !== 200)
                     throw new Error(`Get wrong response status, when performing a test run: ${response.status}`);
-                clearCurrentNewTestRun(props.scenarioId);
+                // clearCurrentNewTestRun(props.scenarioId);
                 props.onSuccessfulTestRun();
             })
             .catch((error) => {
