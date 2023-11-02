@@ -3,12 +3,20 @@ import TestCasesEdit from "./TestCasesEdit.tsx";
 import TestCasesView from "./TestCasesView.tsx";
 import {TestCase, VariablesChangeMethod} from "./Types.tsx";
 import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
+import styled from "styled-components";
+
+const SimpleCard = styled.div`
+  border: 1px solid var(--border-color, #707070);
+  border-radius: 4px;
+  padding: 0.2em;
+  background: var(--background-color);
+`;
 
 type Mode = "edit" | "view";
 type Props = {
     testcases: TestCase[]
     getVariables: () => string[]
-    getUsedVars: () => Set<number> // delete if not needed
+    getUsedVars: () => Set<number>
     getVarColor: (index: number) => string
     onTestcasesChange:  (testcases: TestCase[]) => void
     setGetter: ( getter: ()=>TestCase[] ) => void
@@ -48,27 +56,54 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
         }
     } );
 
-    if (mode === "view")
-        return (
-            <>
-                <button type={"button"} onClick={ () => setMode("edit") }>Switch to Edit</button>
-                <TestCasesView
-                    testcases={testcases}
-                    getVariables={props.getVariables}
-                />
-            </>
-        );
+    function computeNumberOfAPIRequests() {
+        const usedVars = props.getUsedVars();
+        const variables = props.getVariables().filter((varName, index) => usedVars.has(index))
+        return testcases
+            .map(
+                testcase => {
+                    return variables
+                        .map(
+                            varName => {
+                                const values = testcase.get(varName);
+                                return !values ? 0 : values.length;
+                            }
+                        )
+                        .reduce( (n1,n2)=>n1*n2, 1 );
+                }
+            )
+            .reduce( (n1,n2)=>n1+n2, 0 );
+    }
 
-    if (mode === "edit")
-        return (
-            <>
-                <button type={"button"} onClick={ () => setMode("view") }>Switch to View</button>
-                <TestCasesEdit
-                    testcases={testcases}
-                    setTestcases={onChangedTestcases}
-                    getVariables={props.getVariables}
-                    getVarColor={props.getVarColor}
-                />
-            </>
-        );
+    const numberOfAPIRequests = computeNumberOfAPIRequests();
+    return (
+        <SimpleCard>
+            {
+                mode === "view" &&
+                <>
+                    <button type={"button"} onClick={ () => setMode("edit") }>Switch to Edit</button>
+                    <TestCasesView
+                        testcases={testcases}
+                        getVariables={props.getVariables}
+                    />
+                </>
+            }
+            {
+                mode === "edit" &&
+                <>
+                    <button type={"button"} onClick={ () => setMode("view") }>Switch to View</button>
+                    <TestCasesEdit
+                        testcases={testcases}
+                        setTestcases={onChangedTestcases}
+                        getVariables={props.getVariables}
+                        getVarColor={props.getVarColor}
+                    />
+                </>
+            }
+            {
+                testcases.length > 0 &&
+                <SimpleCard>Number of needed API requests: {numberOfAPIRequests} {numberOfAPIRequests>20 && "!!"}</SimpleCard>
+            }
+        </SimpleCard>
+    );
 }
