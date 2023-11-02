@@ -4,13 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-import java.io.PrintStream;
 import java.util.*;
 
 @RequiredArgsConstructor
 class PromptGenerator {
-
-	private static final PrintStream DEBUG_OUT = System.out;
 
 	private final String prompt;
 	private final List<String> variables;
@@ -25,18 +22,10 @@ class PromptGenerator {
 	void foreachPrompt(@NonNull PromptAction action) {
 		List<Part> parts = getParts();
 
-
-		DEBUG_OUT.printf("UsedVars: %s%n", usedVars);
-		DEBUG_OUT.printf("Parts: [%d]%n", parts.size() * 2 - 1);
-		for (int i=0; i<parts.size(); i++) {
-			Part part = parts.get(i);
-			if (part.varName==null)
-				DEBUG_OUT.printf("\"%s\" ", part.before);
-			else
-				DEBUG_OUT.printf("\"%s\" <%s> ", part.before, part.varName);
+		if (usedVars.isEmpty()) {
+			action.process(prompt, -1, "A Single Request");
+			return;
 		}
-		DEBUG_OUT.println();
-
 
 		for (int i=0; i<testcases.size(); i++)
 			foreachPrompt(i, testcases.get(i), parts, action);
@@ -62,16 +51,16 @@ class PromptGenerator {
 			String prompt = buildPrompt(parts, values);
 			String label = buildLabel(testcaseIndex, values, usedVarsList);
 			action.process(prompt, testcaseIndex, label);
-			DEBUG_OUT.printf("[%d] | \"%s\" | \"%s\"%n", testcaseIndex, label, prompt);
 		});
 	}
 
 	private String buildLabel(int testcaseIndex, Map<String, String> values, List<String> usedVarsList) {
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("[%d]".formatted(testcaseIndex));
+		sb.append("TestCase %d {".formatted(testcaseIndex+1));
 		for (String varName : usedVarsList)
 			sb.append(" %s:\"%s\"".formatted(varName, values.get(varName)));
+		sb.append(" }");
 
 		return sb.toString();
 	}
