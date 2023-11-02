@@ -1,5 +1,7 @@
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
+import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
+import {VariablesChangeMethod} from "./Types.tsx";
 
 const TextArea = styled.textarea`
   height: 6em;
@@ -31,25 +33,34 @@ const ColoredSpan = styled.span<{ $bgcolor: string }>`
 type Mode = "edit" | "view";
 type Props = {
     prompt: string
-    setPrompt: (prompt: string) => void
     getVariables: () => string[]
-    updateUsedVars: (usedVars: Set<number>) => void
     getVarColor: (index: number) => string
-    setUpdateCallback: ( callback: ()=>void ) =>void
+    updateUsedVars: (usedVars: Set<number>) => void
+    onPromptChange: (prompt: string) => void
+    setGetter: ( getter: ()=>string ) => void
+    setVarChangeNotifier: ( notifier: VariablesChangeMethod )=>void
+}
+
+type VarChange = {
+    index: number
+    oldVarName: string
+    newVarName: string
 }
 
 export default function PromptEditAndView( props:Readonly<Props> ) {
-    const [prompt, setPrompt] = useState<string>("");
+    const [prompt, setPrompt] = useState<string>(props.prompt);
     const [mode, setMode] = useState<Mode>("view");
+    const [varChange, setVarChange] = useState<VarChange>({ index:-1, oldVarName:"", newVarName:"" });
+    props.setGetter( ()=>prompt );
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering PromptEditAndView");
 
     useEffect(() => {
         setPrompt(props.prompt);
     }, [props.prompt]);
 
-
-    props.setUpdateCallback( ()=> {
-        setMode("view");
-    } );
+    props.setVarChangeNotifier( (index: number, oldVarName: string, newVarName: string) => {
+        setVarChange({ index, oldVarName, newVarName });
+    });
 
     function onPromptInput( event: ChangeEvent<HTMLTextAreaElement> ) {
         setPrompt(event.target.value);
@@ -57,19 +68,44 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
 
     function onFinishEdit() {
         setMode("view");
-        props.setPrompt(prompt);
+        props.onPromptChange(prompt);
     }
     function onFinishView() {
         setMode("edit");
     }
 
+    function fixVariables(variables: string[]): string[] {
+        let copy = Array.from(variables);
+        if (varChange.index>=0)
+        {
+            const oldVarNameIsEmpty = varChange.oldVarName==="";
+            const newVarNameIsEmpty = varChange.newVarName === "";
+            const oldVarNameIsAtIndex = varChange.index < variables.length && variables[varChange.index] === varChange.oldVarName;
+
+            if ( oldVarNameIsEmpty && ! newVarNameIsEmpty && varChange.index===variables.length)
+            { // add
+                copy.push(varChange.newVarName);
+            }
+            else if ( ! oldVarNameIsEmpty && newVarNameIsEmpty && oldVarNameIsAtIndex)
+            { // delete
+                copy = copy.splice(varChange.index, 1);
+            }
+            else if ( ! oldVarNameIsEmpty && ! newVarNameIsEmpty && oldVarNameIsAtIndex)
+            { // change
+                copy[varChange.index] = varChange.newVarName;
+            }
+        }
+        return copy;
+    }
+
     function getParsedPromptOutput(): JSX.Element {
-        const variables = props.getVariables();
+        const variables = fixVariables(props.getVariables());
         const parts: (string | number)[] = [];
         const usedVars = new Set<number>();
         let promptStr = prompt;
 
-        while (promptStr !== "") {
+        while (promptStr !== "")
+        {
             let nextVarPos = -1;
             let nextVarIndex = -1;
             for (let i = 0; i < variables.length; i++) {
@@ -80,6 +116,7 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
                     nextVarIndex = i;
                 }
             }
+
             if (nextVarPos<0)
             { // no var found
                 parts.push(promptStr);
@@ -101,7 +138,8 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
                 {
                     parts.map( (part, index) => {
                         if (typeof part === "string") return part;
-                        return <ColoredSpan key={index} $bgcolor={props.getVarColor(part)}>{"{" + variables[part] + "}"}</ColoredSpan>
+                        const key = ""+index;
+                        return <ColoredSpan key={key} $bgcolor={props.getVarColor(part)}>{"{" + variables[part] + "}"}</ColoredSpan>
                     } )
                 }
             </>

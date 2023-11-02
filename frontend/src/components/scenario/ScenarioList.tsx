@@ -1,5 +1,5 @@
 import "./ScenarioList.css";
-import {DEBUG, UserInfos} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS, UserInfos} from "../../Types.tsx";
 import axios from "axios";
 import {ChangeEvent, useEffect, useState} from "react";
 import ScenarioCard from "./ScenarioCard.tsx";
@@ -17,7 +17,7 @@ export default function ScenarioList( props:Readonly<Props> ) {
     const [ scenarios, setScenarios ] = useState<Scenario[]>([]);
     const [ showAll, setShowAll ] = useState<boolean>(false);
     const { user } = props;
-    if (DEBUG) console.debug(`Rendering ScenarioList { scenarios: [${scenarios.length}] }`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering ScenarioList", { scenarios: scenarios.length });
 
     useEffect(loadScenarios, [ showAll ]);
 

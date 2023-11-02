@@ -6,7 +6,7 @@ import {useEffect, useState} from "react";
 import {DarkModeState, getCurrentDarkModeState} from "./components/mainpage/DarkModeSwitch.Functions.tsx";
 import axios from "axios";
 import SidePanel from "./components/mainpage/SidePanel.tsx";
-import {DEBUG, UserInfos} from "./Types.tsx";
+import {DEBUG, SHOW_RENDERING_HINTS, UserInfos} from "./Types.tsx";
 import {Link, Route, Routes} from "react-router-dom";
 import MainPage from "./components/mainpage/MainPage.tsx";
 import RouteProtection from "./components/mainpage/RouteProtection.tsx";
@@ -14,7 +14,7 @@ import TestRunsView from "./components/testrun/TestRunsView.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
-    if (DEBUG) console.debug("Rendering App {}");
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering App");
 
     useEffect(() => {
         setAppTheme( getCurrentDarkModeState() );
@@ -44,7 +44,7 @@ export default function App() {
     function determineCurrentUser() {
         axios.get("/api/users/me")
             .then(response => {
-                if (DEBUG) console.log(response.data);
+                if (DEBUG) console.debug(response.data);
                 setUser(response.data);
             })
     }

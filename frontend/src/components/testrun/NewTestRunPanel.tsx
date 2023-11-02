@@ -1,18 +1,21 @@
-import {convertNewTestRunFromDTO, convertNewTestRunIntoDTO, NewTestRun, TestRun} from "./Types.tsx";
-import {FormEvent, useEffect, useState} from "react";
+import {
+    convertNewTestRunFromDTO,
+    convertNewTestRunIntoDTO,
+    NewTestRun,
+    TestCase,
+    TestRun,
+    VariablesChangeMethod
+} from "./Types.tsx";
+import {FormEvent} from "react";
 import styled from "styled-components";
-import {DEBUG} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
 import axios from "axios";
-import StringListInput from "./StringListInput.tsx";
 import PromptEditAndView from "./PromptEditAndView.tsx";
+import TestCasesEditAndView from "./TestCasesEditAndView.tsx";
+import VariablesEdit from "./VariablesEdit.tsx";
 
 const Form = styled.form`
   display: block;
-`;
-
-const TextArea = styled.textarea`
-  width: 100%;
-  box-sizing: border-box;
 `;
 
 const Label = styled.label`
@@ -26,15 +29,7 @@ const BigButton = styled.button`
   padding: 0.5em 2em;
 `;
 
-const SimpleCard = styled.div`
-  display: block;
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
-`;
-
-function deepcopy(oldMap: Map<string, string[]>): Map<string, string[]> {
+function deepcopy(oldMap: TestCase): TestCase {
     const newMap = new Map<string, string[]>();
     oldMap.forEach(
         (value, key) => newMap.set(key, value.map(t => t)))
@@ -77,48 +72,38 @@ type Props = {
 }
 
 export default function NewTestRunPanel( props:Readonly<Props> ) {
-    const [prompt, setPrompt] = useState<string>("");
-    const [variables, setVariables] = useState<string[]>([]);
-    const [testcases, setTestcases] = useState<Map<string, string[]>[]>([]);
-    if (DEBUG) console.debug(`Rendering NewTestRunPanel { scenarioId: [${props.scenarioId}] }`);
-    let promptEditViewUpdateCallback: null | (()=>void) = null;
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering NewTestRunPanel", { scenarioId: props.scenarioId });
+    let usedVars = new Set<number>();
+    let variablesCompGetter: null | (()=>string[]) = null;
+    let    promptCompGetter: null | (()=>string) = null;
+    let testcasesCompGetter: null | (()=>TestCase[]) = null;
+    let    promptVarChangeNotifier: null | VariablesChangeMethod = null;
+    let testcasesVarChangeNotifier: null | VariablesChangeMethod = null;
 
-    useEffect(() => {
-        const storedNewTestRun = loadCurrentNewTestRun(props.scenarioId);
-        if (storedNewTestRun) setNewTestRun(storedNewTestRun);
-        else setNewTestRun( copyValues(props.scenarioId, props.previous) );
-    }, [props.previous, props.scenarioId]);
+    let storedNewTestRun = loadCurrentNewTestRun(props.scenarioId) ?? copyValues(props.scenarioId, props.previous);
 
-    function setNewTestRun(newTestRun: NewTestRun) {
-        setPrompt   (newTestRun.prompt   );
-        setVariables(newTestRun.variables);
-        setTestcases(newTestRun.testcases);
-    }
-    function getNewTestRun(): NewTestRun {
-        return {
+    function getVariables(): string[]   { return !variablesCompGetter ? storedNewTestRun.variables : variablesCompGetter(); }
+    function getPrompt   (): string     { return !   promptCompGetter ? storedNewTestRun.prompt    :    promptCompGetter(); }
+    function getTestcases(): TestCase[] { return !testcasesCompGetter ? storedNewTestRun.testcases : testcasesCompGetter(); }
+
+    function saveFormValues(prompt: string, variables: string[], testcases: TestCase[]) {
+        storedNewTestRun = {
             prompt,
             scenarioId: props.scenarioId,
             variables,
             testcases
-        }
-    }
-
-    function resetForm() {
-        clearCurrentNewTestRun(props.scenarioId);
-        setNewTestRun( copyValues(props.scenarioId, props.previous) );
-    }
-
-    function saveFormValues(prompt: string, variables: string[], testcases: Map<string, string[]>[]) {
-        saveCurrentNewTestRun(props.scenarioId, {
-            prompt,
-            scenarioId: props.scenarioId,
-            variables,
-            testcases
-        })
+        };
+        saveCurrentNewTestRun(props.scenarioId, storedNewTestRun)
     }
 
     function performTestRun() {
-        axios.post(`/api/testrun`, convertNewTestRunIntoDTO( getNewTestRun() ))
+        const data = convertNewTestRunIntoDTO( {
+            prompt: getPrompt(),
+            scenarioId: props.scenarioId,
+            variables: getVariables(),
+            testcases: getTestcases()
+        } );
+        axios.post(`/api/testrun`, data)
             .then((response) => {
                 if (response.status !== 200)
                     throw new Error(`Get wrong response status, when performing a test run: ${response.status}`);
@@ -135,82 +120,92 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         performTestRun();
     }
 
-    function setChangedPrompt(newPrompt: string) {
-        console.debug("setChangedPrompt( "+newPrompt+" )");
-        saveFormValues(newPrompt, variables, testcases);
-        setPrompt(newPrompt);
-    }
-
-    function changeVariable( changeAction: (changedVariables: string[]) => void ) {
-        const changedVariables = [...variables];
-        changeAction(changedVariables);
-        saveFormValues( prompt, changedVariables, testcases );
-        if (promptEditViewUpdateCallback)
-            promptEditViewUpdateCallback();
-        setVariables(changedVariables);
-    }
-
-    function onAddVariable(value: string) {
-        changeVariable( changedVariables => changedVariables.push(value));
-    }
-
-    function onChangeVariable(value: string, index: number) {
-        changeVariable( changedVariables => changedVariables[index] = value);
-    }
-
-    function allowDeleteVariable(value: string, index: number): boolean {
-        changeVariable( changedVariables => changedVariables.splice(index, 1));
-        return true;
-    }
-
-    function convertTestcasesToString(testcases: Map<string, string[]>[]) {
-        return testcases.map(
-            (map, index) => {
-                return "["+ index +"] "+ Array.from(map.keys()).sort().map(
-                    varName => {
-                        const strings = map.get(varName);
-                        if (strings)
-                            return varName +": [ "+ strings.join(",") +" ]";
-                        else
-                            return varName +": --";
-                    }
-                ).join(", ");
-            }
-        ).join("\r\n");
+    function resetForm() {
+        clearCurrentNewTestRun(props.scenarioId);
     }
 
     function getVarColor(index: number): string {
         return "var(--text-background-var"+(index%6)+")";
     }
 
+    function isAllowedToDeleteVar(varName: string): boolean {
+        const testcases = getTestcases();
+        const tc = testcases.find(testcase => {
+            const values = testcase.get(varName);
+            return values && values.length!==0;
+        });
+        if (tc) {
+            alert("Can't delete variable.\r\nThere are at least 1 test case that have values for this variable.")
+            return false;
+        }
+        return true;
+    }
+
+    const variablesChanged: VariablesChangeMethod = (index: number, oldVarName: string, newVarName: string): void => {
+        if (promptVarChangeNotifier)
+            promptVarChangeNotifier(index, oldVarName, newVarName);
+        if (testcasesVarChangeNotifier)
+            testcasesVarChangeNotifier(index, oldVarName, newVarName);
+    }
+
+    function onPromptChange( prompt: string ) {
+        saveFormValues(prompt, storedNewTestRun.variables, storedNewTestRun.testcases)
+    }
+
+    function onVariablesChange( variables: string[] ) {
+        saveFormValues(storedNewTestRun.prompt, variables, storedNewTestRun.testcases)
+    }
+
+    function onTestcasesChange( testcases: TestCase[] ) {
+        saveFormValues(storedNewTestRun.prompt, storedNewTestRun.variables, testcases)
+    }
+
+    function cleanupTestcases(testcases: TestCase[], variables: string[]) {
+        return testcases.map(testcase => {
+            const cleanedTestcase: TestCase = new Map<string, string[]>();
+            variables.forEach(varName => {
+                const values = testcase.get(varName);
+                cleanedTestcase.set(varName, !values ? [] : values.map(s => s));
+            });
+            return cleanedTestcase;
+        });
+    }
+
     return (
-        <Form onSubmit={onSubmitForm}>
+        <>
             <Label>Prompt :</Label>
             <PromptEditAndView
-                prompt={prompt}
-                setPrompt={setChangedPrompt}
-                getVariables={()=>variables}
+                prompt={storedNewTestRun.prompt}
+                getVariables={getVariables}
                 getVarColor={getVarColor}
-                updateUsedVars={ usedVars => {
-                    // TODO
-                }}
-                setUpdateCallback={ fcn => promptEditViewUpdateCallback = fcn }
+                updateUsedVars={usedVars_ => usedVars = usedVars_}
+                onPromptChange={onPromptChange}
+                setGetter={fcn => promptCompGetter = fcn}
+                setVarChangeNotifier={fcn => promptVarChangeNotifier = fcn}
             />
             <Label>Variables :</Label>
-            <SimpleCard>
-                <StringListInput
-                    values={variables}
-                    fieldSize={10}
-                    getFieldBgColor={getVarColor}
-                    onAddValue      ={onAddVariable}
-                    onChangeValue   ={onChangeVariable}
-                    allowDeleteValue={allowDeleteVariable}
-                />
-            </SimpleCard>
+            <VariablesEdit
+                variables={storedNewTestRun.variables}
+                isAllowedToDelete={isAllowedToDeleteVar}
+                getVarColor={getVarColor}
+                notifyOthersAboutChange={variablesChanged}
+                onVariablesChange={onVariablesChange}
+                setGetter={fcn => variablesCompGetter = fcn}
+            />
             <Label>Test Cases :</Label>
-            <TextArea readOnly={true} rows={3} value={convertTestcasesToString(testcases)}/>
-            <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
-            <BigButton>Start Test Run</BigButton>
-        </Form>
+            <TestCasesEditAndView
+                testcases={cleanupTestcases(storedNewTestRun.testcases, storedNewTestRun.variables)}
+                getVariables={getVariables}
+                getUsedVars={() => usedVars}
+                getVarColor={getVarColor}
+                onTestcasesChange={onTestcasesChange}
+                setGetter={fcn => testcasesCompGetter = fcn}
+                setVarChangeNotifier={fcn => testcasesVarChangeNotifier = fcn}
+            />
+            <Form onSubmit={onSubmitForm}>
+                <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
+                <BigButton>Start Test Run</BigButton>
+            </Form>
+        </>
     )
 }

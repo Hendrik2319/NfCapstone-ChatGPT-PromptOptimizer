@@ -6,7 +6,7 @@ import {
     getSystemDarkModeState,
     setStoredDarkModeSwitchState
 } from "./DarkModeSwitch.Functions.tsx";
-import {DEBUG} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
 
 type Props = {
     onChange: ( state: DarkModeState ) => void
@@ -15,7 +15,7 @@ type Props = {
 export default function DarkModeSwitch( props: Readonly<Props> ) {
     const [ switchState, setSwitchState ] = useState<DarkModeSwitchState>("system");
     const { onChange: globalOnChangeState } = props;
-    if (DEBUG) console.debug(`Rendering DarkModeSwitch { switchState:${switchState} }`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering DarkModeSwitch", { switchState });
 
     useEffect(() => {
         setSwitchState( getStoredDarkModeSwitchState() );

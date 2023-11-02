@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {convertTestRunsFromDTOs, TestRun} from "./Types.tsx";
 import {Scenario} from "../scenario/Types.tsx";
-import {DEBUG, UserInfos} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS, UserInfos} from "../../Types.tsx";
 import TestRunCard from "./TestRunCard.tsx";
 import NewTestRunPanel from "./NewTestRunPanel.tsx";
 
@@ -42,7 +42,7 @@ export default function TestRunsView( props:Readonly<Props> ) {
     const [ testruns, setTestruns ] = useState<TestRun[]>([]);
     const [ tabState, setTabState ] = useState<TabState>("PrevTestRuns");
     const { id: scenarioId } = useParams();
-    if (DEBUG) console.debug(`Rendering TestRunsView { scenarioId: [${scenarioId}] }`);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering TestRunsView", { scenarioId });
 
     const userCanStartNewTestRun =
         props.user && scenario &&

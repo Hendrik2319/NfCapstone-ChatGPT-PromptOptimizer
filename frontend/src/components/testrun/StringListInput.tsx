@@ -11,10 +11,11 @@ const InputField = styled.input<{ $bgcolor: string }>`
 `;
 
 type Props = {
+    labelComp?: JSX.Element
     values: string[]
     fieldSize: number
-    onAddValue: (value: string, index: number) => void
-    onChangeValue: (value: string, index: number) => void
+    allowAddValue   : (value: string, index: number) => boolean
+    allowChangeValue: (value: string, index: number) => boolean
     allowDeleteValue: (value: string, index: number) => boolean
     getFieldBgColor?: (index: number) => string
 }
@@ -32,11 +33,13 @@ export default function StringListInput( props:Readonly<Props> ) {
         const value: string = event.target.value;
         if (index == values.length-1)
         {
-            const newValues: string[] = [...values];
-            newValues[index] = value;
-            newValues.push( "" );
-            setValues(newValues);
-            props.onAddValue(value, index);
+            const isAllowed = props.allowAddValue(value, index);
+            if (isAllowed) {
+                const newValues: string[] = [...values];
+                newValues[index] = value;
+                newValues.push("");
+                setValues(newValues);
+            }
         }
         else if (value === "")
         {
@@ -49,21 +52,28 @@ export default function StringListInput( props:Readonly<Props> ) {
         }
         else
         {
-            const newValues: string[] = [...values];
-            newValues[index] = value;
-            setValues(newValues);
-            props.onChangeValue(value, index);
+            const isAllowed = props.allowChangeValue(value, index);
+            if (isAllowed) {
+                const newValues: string[] = [...values];
+                newValues[index] = value;
+                setValues(newValues);
+            }
         }
     }
 
+    function generateKey(index: number) {
+        return index;
+    }
+
     return (
-        <div className={"FlexRow"}>
+        <div className={"FlexRow InlineBlock"}>
+            {props.labelComp}
             {
                 values.map(
                     (value, index) =>
                        <InputField
-                           $bgcolor={props.getFieldBgColor ? props.getFieldBgColor(index) : 'var(--background-color)' }
-                           key={index}
+                           $bgcolor={props.getFieldBgColor && index+1!==values.length ? props.getFieldBgColor(index) : 'var(--background-color)' }
+                           key={generateKey(index)}
                            size={props.fieldSize}
                            value={value}
                            onChange={e=>onInputChange(e,index)}
