@@ -41,17 +41,26 @@ type Props = {
     setVarChangeNotifier: ( notifier: VariablesChangeMethod )=>void
 }
 
+type VarChange = {
+    index: number
+    oldVarName: string
+    newVarName: string
+}
+
 export default function PromptEditAndView( props:Readonly<Props> ) {
     const [prompt, setPrompt] = useState<string>(props.prompt);
     const [mode, setMode] = useState<Mode>("view");
-    const [renderTrigger, setRenderTrigger] = useState<boolean>(true);
+    const [varChange, setVarChange] = useState<VarChange>({ index:-1, oldVarName:"", newVarName:"" });
     props.setGetter( ()=>prompt );
-    props.setVarChangeNotifier( ()=>setRenderTrigger(!renderTrigger) );
     if (SHOW_RENDERING_HINTS) console.debug(`Rendering PromptEditAndView {}`);
 
     useEffect(() => {
         setPrompt(props.prompt);
     }, [props.prompt]);
+
+    props.setVarChangeNotifier( (index: number, oldVarName: string, newVarName: string) => {
+        setVarChange({ index, oldVarName, newVarName });
+    });
 
     function onPromptInput( event: ChangeEvent<HTMLTextAreaElement> ) {
         setPrompt(event.target.value);
@@ -65,9 +74,32 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
         setMode("edit");
     }
 
+    function fixVariables(variables: string[]): string[] {
+        let copy = Array.from(variables);
+        if (varChange.index>=0)
+        {
+            const oldVarNameIsEmpty = varChange.oldVarName==="";
+            const newVarNameIsEmpty = varChange.newVarName === "";
+            const oldVarNameIsAtIndex = varChange.index < variables.length && variables[varChange.index] === varChange.oldVarName;
+
+            if ( oldVarNameIsEmpty && ! newVarNameIsEmpty && varChange.index===variables.length)
+            { // add
+                copy.push(varChange.newVarName);
+            }
+            else if ( ! oldVarNameIsEmpty && newVarNameIsEmpty && oldVarNameIsAtIndex)
+            { // delete
+                copy = copy.splice(varChange.index, 1);
+            }
+            else if ( ! oldVarNameIsEmpty && ! newVarNameIsEmpty && oldVarNameIsAtIndex)
+            { // change
+                copy[varChange.index] = varChange.newVarName;
+            }
+        }
+        return copy;
+    }
+
     function getParsedPromptOutput(): JSX.Element {
-        const variables = props.getVariables(); // TODO: gets an old list
-        console.debug("PromptEditAndView.getParsedPromptOutput", variables);
+        const variables = fixVariables(props.getVariables());
         const parts: (string | number)[] = [];
         const usedVars = new Set<number>();
         let promptStr = prompt;
@@ -100,6 +132,7 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
         }
 
         props.updateUsedVars(usedVars);
+        console.debug("PromptEditAndView.getParsedPromptOutput: parts", parts);
 
         return (
             <>
