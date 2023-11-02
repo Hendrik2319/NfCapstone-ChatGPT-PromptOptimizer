@@ -36,7 +36,7 @@ export default function VariablesEdit( props: Readonly<Props> ) {
         setVariables(changedVariables);
     }
 
-    function allowAddVariable(value: string, index: number) {
+    function allowAddVariable(value: string, index: number) { // TODO: var names with {} are not allowed
         const pos = variables.indexOf(value);
         if (0<=pos) {
             alert("Can't add variable with this value.\r\nNew variable will be equal to variable " + (pos + 1) + ".");
@@ -47,7 +47,7 @@ export default function VariablesEdit( props: Readonly<Props> ) {
         return true;
     }
 
-    function allowChangeVariable(value: string, index: number) {
+    function allowChangeVariable(value: string, index: number) { // TODO: var names with {} are not allowed
         const pos = variables.indexOf(value);
         if (0<=pos && pos!==index) {
             alert("Can't change variable to this value.\r\nVariable " + (index + 1) + " will be equal to variable " + (pos + 1) + ".");

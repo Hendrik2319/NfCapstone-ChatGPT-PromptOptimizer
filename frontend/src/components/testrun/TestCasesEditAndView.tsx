@@ -4,17 +4,6 @@ import TestCasesView from "./TestCasesView.tsx";
 import {TestCase, VariablesChangeMethod} from "./Types.tsx";
 import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
 
-function cleanTestcases(rawTestcases: TestCase[], variables: string[]) {
-    return rawTestcases.map(testcase => {
-        const cleanedTestcase: TestCase = new Map<string, string[]>();
-        variables.forEach(varName => {
-            const values = testcase.get(varName);
-            cleanedTestcase.set(varName, !values ? [] : values.map(s => s));
-        });
-        return cleanedTestcase;
-    });
-}
-
 type Mode = "edit" | "view";
 type Props = {
     testcases: TestCase[]
@@ -27,17 +16,15 @@ type Props = {
 }
 
 export default function TestCasesEditAndView(props:Readonly<Props> ) {
-    const variables = props.getVariables();
-    const [testcases, setTestcases] = useState<TestCase[]>( cleanTestcases(props.testcases, variables) );
+    const [testcases, setTestcases] = useState<TestCase[]>( props.testcases );
     const [mode, setMode] = useState<Mode>("view");
     const [renderTrigger, setRenderTrigger] = useState<boolean>(true);
     props.setGetter( ()=>testcases );
     if (SHOW_RENDERING_HINTS) console.debug(`Rendering TestCasesEditAndView {}`);
-    console.debug("TestCasesEditAndView", variables, testcases);
 
     useEffect(() => {
-        setTestcases( cleanTestcases(props.testcases, variables) )
-    }, [props.testcases, variables]);
+        setTestcases( props.testcases );
+    }, [props.testcases]);
 
     function onChangedTestcases( testcases: TestCase[] ) {
         props.onTestcasesChange(testcases);
@@ -48,15 +35,11 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
         if (oldVarName==="" || newVarName==="")
             setRenderTrigger(!renderTrigger);
         else {
-            console.debug("TestCasesEditAndView.VarChangeNotifier( index:"+index+", VarName: "+oldVarName+" -> "+newVarName+" )");
             onChangedTestcases(
-                testcases.map( (testcase, index) => {
+                testcases.map( (testcase) => {
                     const changedTestcase = new Map<string, string[]>();
                     testcase.forEach((values, varName) => {
-                        if (oldVarName===varName) {
-                            console.debug("TestCasesEditAndView.VarChangeNotifier: TestCase["+index+"] rename Var["+varName+"] "+oldVarName+" -> "+newVarName+" )", values);
-                            varName = newVarName;
-                        }
+                        if (oldVarName===varName) varName = newVarName;
                         changedTestcase.set(varName, Array.from(values));
                     })
                     return changedTestcase;

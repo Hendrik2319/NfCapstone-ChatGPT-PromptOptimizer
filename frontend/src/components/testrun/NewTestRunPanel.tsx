@@ -86,14 +86,14 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     function getPrompt   (): string     { return !   promptCompGetter ? storedNewTestRun.prompt    :    promptCompGetter(); }
     function getTestcases(): TestCase[] { return !testcasesCompGetter ? storedNewTestRun.testcases : testcasesCompGetter(); }
 
-    function saveFormValues(prompt: string, variables: string[], testcases: TestCase[]) {
+    function saveFormValues(callerLabel: string, prompt: string, variables: string[], testcases: TestCase[]) {
         storedNewTestRun = {
             prompt,
             scenarioId: props.scenarioId,
             variables,
             testcases
         };
-        console.debug("NewTestRunPanel.saveFormValues", storedNewTestRun);
+        console.debug("NewTestRunPanel.saveFormValues( "+callerLabel+" )", storedNewTestRun);
         saveCurrentNewTestRun(props.scenarioId, storedNewTestRun)
     }
 
@@ -150,6 +150,29 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
             testcasesVarChangeNotifier(index, oldVarName, newVarName);
     }
 
+    function onPromptChange( prompt: string ) {
+        saveFormValues("prompt", prompt, storedNewTestRun.variables, storedNewTestRun.testcases)
+    }
+
+    function onVariablesChange( variables: string[] ) {
+        saveFormValues("variables", storedNewTestRun.prompt, variables, storedNewTestRun.testcases)
+    }
+
+    function onTestcasesChange( testcases: TestCase[] ) {
+        saveFormValues("testcases", storedNewTestRun.prompt, storedNewTestRun.variables, testcases)
+    }
+
+    function cleanupTestcases(testcases: TestCase[], variables: string[]) {
+        return testcases.map(testcase => {
+            const cleanedTestcase: TestCase = new Map<string, string[]>();
+            variables.forEach(varName => {
+                const values = testcase.get(varName);
+                cleanedTestcase.set(varName, !values ? [] : values.map(s => s));
+            });
+            return cleanedTestcase;
+        });
+    }
+
     return (
         <>
             <Label>Prompt :</Label>
@@ -158,7 +181,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 getVariables={getVariables}
                 getVarColor={getVarColor}
                 updateUsedVars={usedVars_ => usedVars = usedVars_}
-                onPromptChange={prompt => saveFormValues(prompt, getVariables(), getTestcases())}
+                onPromptChange={onPromptChange}
                 setGetter={fcn => promptCompGetter = fcn}
                 setVarChangeNotifier={fcn => promptVarChangeNotifier = fcn}
             />
@@ -168,16 +191,16 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 isAllowedToDelete={isAllowedToDeleteVar}
                 getVarColor={getVarColor}
                 notifyOthersAboutChange={variablesChanged}
-                onVariablesChange={variables => saveFormValues(getPrompt(), variables, getTestcases())}
+                onVariablesChange={onVariablesChange}
                 setGetter={fcn => variablesCompGetter = fcn}
             />
             <Label>Test Cases :</Label>
             <TestCasesEditAndView
-                testcases={storedNewTestRun.testcases}
+                testcases={cleanupTestcases(storedNewTestRun.testcases, storedNewTestRun.variables)}
                 getVariables={getVariables}
                 getUsedVars={() => usedVars}
                 getVarColor={getVarColor}
-                onTestcasesChange={testcases => saveFormValues(getPrompt(), getVariables(), testcases)}
+                onTestcasesChange={onTestcasesChange}
                 setGetter={fcn => testcasesCompGetter = fcn}
                 setVarChangeNotifier={fcn => testcasesVarChangeNotifier = fcn}
             />
@@ -185,6 +208,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
                 <BigButton>Start Test Run</BigButton>
             </Form>
+            <button onClick={()=>console.debug("show stored values", storedNewTestRun)}>#DEBUG# show stored values</button>
         </>
     )
 }
