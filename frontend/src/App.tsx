@@ -11,6 +11,7 @@ import {Link, Route, Routes} from "react-router-dom";
 import MainPage from "./components/mainpage/MainPage.tsx";
 import RouteProtection from "./components/mainpage/RouteProtection.tsx";
 import TestRunsView from "./components/testrun/TestRunsView.tsx";
+import ImageTest from "./components/mainpage/ImageTest.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
@@ -87,6 +88,7 @@ export default function App() {
                     <Route path={"/scenario/:id"} element={<TestRunsView user={user}/>}/>
                 </Route>
             </Routes>
+            <ImageTest/>
         </>
     )
 }
