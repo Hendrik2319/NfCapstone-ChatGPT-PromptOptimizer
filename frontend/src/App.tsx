@@ -7,19 +7,21 @@ import {DarkModeState, getCurrentDarkModeState} from "./components/mainpage/Dark
 import axios from "axios";
 import SidePanel from "./components/mainpage/SidePanel.tsx";
 import {DEBUG, SHOW_RENDERING_HINTS, UserInfos} from "./Types.tsx";
-import {Link, Route, Routes} from "react-router-dom";
+import {Link, Route, Routes, useLocation} from "react-router-dom";
 import MainPage from "./components/mainpage/MainPage.tsx";
 import RouteProtection from "./components/mainpage/RouteProtection.tsx";
 import TestRunsView from "./components/testrun/TestRunsView.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
+    const location = useLocation();
     if (SHOW_RENDERING_HINTS) console.debug("Rendering App");
 
     useEffect(() => {
         setAppTheme( getCurrentDarkModeState() );
     }, []);
-    useEffect(determineCurrentUser, []);
+
+    useEffect(determineCurrentUser, [ location.pathname ]);
 
     function setAppTheme(state: DarkModeState) {
         document.body.classList.remove( state === "dark" ? "light" : "dark" );
@@ -44,7 +46,7 @@ export default function App() {
     function determineCurrentUser() {
         axios.get("/api/users/me")
             .then(response => {
-                if (DEBUG) console.debug(response.data);
+                if (DEBUG) console.debug("determineCurrentUser", response.data);
                 setUser(response.data);
             })
     }
