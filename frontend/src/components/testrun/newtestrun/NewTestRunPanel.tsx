@@ -1,18 +1,18 @@
 import {
-    convertNewTestRunFromDTO,
     convertNewTestRunIntoDTO,
     NewTestRun,
     TestCase,
     TestRun,
     VariablesChangeMethod
-} from "./Types.tsx";
+} from "../Types.tsx";
 import {FormEvent} from "react";
 import styled from "styled-components";
-import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../../Types.tsx";
 import axios from "axios";
 import PromptEditAndView from "./PromptEditAndView.tsx";
 import TestCasesEditAndView from "./TestCasesEditAndView.tsx";
 import VariablesEdit from "./VariablesEdit.tsx";
+import {clearCurrentNewTestRun, loadCurrentNewTestRun, saveCurrentNewTestRun} from "./NewTestRunStoarage.tsx";
 
 const Form = styled.form`
   display: block;
@@ -50,19 +50,6 @@ function copyValues( scenarioId: string, data?: NewTestRun ) {
         variables: [],
         testcases: []
     };
-}
-
-const KEY_CURRENT_NEW_TEST_RUN: string = "NewTestRunPanel.CurrentNewTestRun";
-
-function saveCurrentNewTestRun( scenarioId: string, newTestRun: NewTestRun ) {
-    localStorage.setItem(KEY_CURRENT_NEW_TEST_RUN+"."+scenarioId, JSON.stringify( convertNewTestRunIntoDTO(newTestRun) ));
-}
-function loadCurrentNewTestRun(scenarioId: string): NewTestRun | undefined  {
-    const str = localStorage.getItem(KEY_CURRENT_NEW_TEST_RUN+"."+scenarioId);
-    if (str) return convertNewTestRunFromDTO( JSON.parse(str) );
-}
-function clearCurrentNewTestRun(scenarioId: string) {
-    localStorage.setItem(KEY_CURRENT_NEW_TEST_RUN+"."+scenarioId, "");
 }
 
 type Props = {
@@ -107,7 +94,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
             .then((response) => {
                 if (response.status !== 200)
                     throw new Error(`Get wrong response status, when performing a test run: ${response.status}`);
-                // clearCurrentNewTestRun(props.scenarioId);
                 props.onSuccessfulTestRun();
             })
             .catch((error) => {

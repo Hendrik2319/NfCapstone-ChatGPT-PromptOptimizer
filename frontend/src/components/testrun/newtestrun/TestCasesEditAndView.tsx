@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
 import TestCasesEdit from "./TestCasesEdit.tsx";
 import TestCasesView from "./TestCasesView.tsx";
-import {TestCase, VariablesChangeMethod} from "./Types.tsx";
-import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
+import {TestCase, VariablesChangeMethod} from "../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../../Types.tsx";
 import styled from "styled-components";
 
 const SimpleCard = styled.div`

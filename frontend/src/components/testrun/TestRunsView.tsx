@@ -4,7 +4,7 @@ import axios from "axios";
 import {convertTestRunsFromDTOs, TestRun} from "./Types.tsx";
 import {Scenario} from "../scenario/Types.tsx";
 import {SHOW_RENDERING_HINTS, UserInfos} from "../../Types.tsx";
-import NewTestRunPanel from "./NewTestRunPanel.tsx";
+import NewTestRunPanel from "./newtestrun/NewTestRunPanel.tsx";
 import TestRunsList from "./TestRunsList.tsx";
 
 function loadScenario( scenarioId: string, callback: (scenario: Scenario)=>void ){

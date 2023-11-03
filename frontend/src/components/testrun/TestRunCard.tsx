@@ -1,7 +1,7 @@
 import {TestAnswer, TestRun} from "./Types.tsx";
 import styled from "styled-components";
 import {BigLabel, Id, Label} from "../StandardStyledComponents.tsx";
-import TestCasesView from "./TestCasesView.tsx";
+import TestCasesView from "./newtestrun/TestCasesView.tsx";
 import {ChangeEvent, useState} from "react";
 
 const BaseCard = styled.div`
