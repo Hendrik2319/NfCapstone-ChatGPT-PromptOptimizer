@@ -53,7 +53,7 @@ function copyValues( scenarioId: string, data?: NewTestRun ) {
 }
 
 type Props = {
-    previous?: TestRun
+    base?: TestRun
     scenarioId: string
     onSuccessfulTestRun: ()=>void
 }
@@ -67,7 +67,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
     let    promptVarChangeNotifier: null | VariablesChangeMethod = null;
     let testcasesVarChangeNotifier: null | VariablesChangeMethod = null;
 
-    let storedNewTestRun = loadCurrentNewTestRun(props.scenarioId) ?? copyValues(props.scenarioId, props.previous);
+    let storedNewTestRun = loadCurrentNewTestRun(props.scenarioId) ?? copyValues(props.scenarioId, props.base);
 
     function getVariables(): string[]   { return !variablesCompGetter ? storedNewTestRun.variables : variablesCompGetter(); }
     function getPrompt   (): string     { return !   promptCompGetter ? storedNewTestRun.prompt    :    promptCompGetter(); }

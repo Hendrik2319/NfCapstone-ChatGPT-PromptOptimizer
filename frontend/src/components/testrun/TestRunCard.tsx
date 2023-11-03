@@ -29,9 +29,14 @@ const ValueBlock = styled.div`
     margin-top: 0.5em;
 `;
 
+const StartNewButton = styled.button`
+  margin-bottom: 0.5em;
+`;
+
 type Props = {
     testRun: TestRun
     rateAnswers_MaxWordCount?: number
+    startNewTestRun: ()=>void
 }
 type SelectedAnswerValueToShow = "answer" | "tokens"
 
@@ -68,6 +73,7 @@ export default function TestRunCard( props:Readonly<Props> ) {
 
     return (
         <BaseCard>
+            <StartNewButton onClick={props.startNewTestRun}>Start A New TestRun</StartNewButton>
             <Id>id         : {props.testRun.id        }</Id>
             <Id>scenarioId : {props.testRun.scenarioId}</Id>
 
@@ -102,7 +108,10 @@ export default function TestRunCard( props:Readonly<Props> ) {
                 <div className="FlexRow">{
                     props.testRun.answers.map(answer =>
                         <AnswerCard key={answer.indexOfTestCase+answer.label} $bgcolor={getBgColorOfAnswer(answer)}>
-                            <Id>[{answer.indexOfTestCase+1}] {answer.label}</Id>
+                            <Id>
+                                {answer.indexOfTestCase>=0 && "["+(answer.indexOfTestCase+1)+"] " }
+                                {answer.label}
+                            </Id>
                             {
                                 answerValueToShow === "answer" && answer.answer
                             }

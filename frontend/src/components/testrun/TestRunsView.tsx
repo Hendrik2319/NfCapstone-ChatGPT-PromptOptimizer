@@ -1,3 +1,4 @@
+import "./TestRunsView.css";
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
@@ -6,6 +7,7 @@ import {Scenario} from "../scenario/Types.tsx";
 import {SHOW_RENDERING_HINTS, UserInfos} from "../../Types.tsx";
 import NewTestRunPanel from "./newtestrun/NewTestRunPanel.tsx";
 import TestRunsList from "./TestRunsList.tsx";
+import {clearCurrentNewTestRun} from "./newtestrun/NewTestRunStoarage.tsx";
 
 function loadScenario( scenarioId: string, callback: (scenario: Scenario)=>void ){
     axios.get(`/api/scenario/${scenarioId}`)
@@ -41,6 +43,7 @@ export default function TestRunsView( props:Readonly<Props> ) {
     const [ scenario, setScenario ] = useState<Scenario>();
     const [ testruns, setTestruns ] = useState<TestRun[]>([]);
     const [ tabState, setTabState ] = useState<TabState>("PrevTestRuns");
+    const [ baseForNewTestRun, setBaseForNewTestRun ] = useState<TestRun>();
     const { id: scenarioId } = useParams();
     if (SHOW_RENDERING_HINTS) console.debug("Rendering TestRunsView", { scenarioId });
 
@@ -54,6 +57,7 @@ export default function TestRunsView( props:Readonly<Props> ) {
                 loadTestRuns(scenarioId, testruns => {
                     setScenario(scenario);
                     setTestruns(testruns);
+                    setBaseForNewTestRun(undefined); // --> use last in list
                 });
             });
         }
@@ -69,6 +73,7 @@ export default function TestRunsView( props:Readonly<Props> ) {
             loadTestRuns(scenarioId, testruns => {
                 setTestruns(testruns);
                 setTabState("PrevTestRuns");
+                setBaseForNewTestRun(undefined); // --> use last in list
             });
     }
 
@@ -80,25 +85,39 @@ export default function TestRunsView( props:Readonly<Props> ) {
         return 0;
     });
 
-    const last: TestRun | undefined = testruns.length===0 ? undefined : testruns[testruns.length-1];
+    function startNewTestRunFromList( base: TestRun, scenarioId: string ) {
+        clearCurrentNewTestRun(scenarioId);
+        setBaseForNewTestRun(base);
+        setTabState("NewTestRun");
+    }
 
     return (
         <>
             <h3>Scenario "{scenario?.label}"</h3>
             <div>
-                <button onClick={()=>setTabState("PrevTestRuns")}>Previous TestRuns</button>
+                <button className={tabState==="PrevTestRuns" ? "active" : ""} onClick={()=>setTabState("PrevTestRuns")}>Previous TestRuns</button>
                 {
                     userCanStartNewTestRun &&
-                    <button onClick={()=>setTabState("NewTestRun")}>New TestRun</button>
+                    <button className={tabState==="NewTestRun" ? "active" : ""} onClick={()=>setTabState("NewTestRun")}>New TestRun</button>
                 }
             </div>
             {
                 tabState==="PrevTestRuns" && scenarioId &&
-                <TestRunsList testruns={testruns} scenarioId={scenarioId}/>
+                <TestRunsList
+                    scenarioId={scenarioId}
+                    testruns={testruns}
+                    startNewTestRun={base => startNewTestRunFromList( base, scenarioId )}
+                />
             }
             {
                 tabState==="NewTestRun" && scenarioId &&
-                <NewTestRunPanel previous={last} scenarioId={scenarioId} onSuccessfulTestRun={onSuccessfulTestRun}/>
+                <NewTestRunPanel
+                    scenarioId={scenarioId}
+                    base={
+                        baseForNewTestRun ?? testruns.length===0 ? undefined : testruns[testruns.length-1]
+                    }
+                    onSuccessfulTestRun={onSuccessfulTestRun}
+                />
             }
         </>
     )

@@ -20,6 +20,7 @@ const InputField = styled.input`
 type Props = {
     testruns: TestRun[]
     scenarioId: string
+    startNewTestRun: (base: TestRun)=>void
 }
 
 export default function TestRunsList( props:Readonly<Props> ) {
@@ -71,6 +72,7 @@ export default function TestRunsList( props:Readonly<Props> ) {
                         key={testRun.id}
                         testRun={testRun}
                         rateAnswers_MaxWordCount={maxWordCount}
+                        startNewTestRun={()=>props.startNewTestRun(testRun)}
                     />
                 )
             }</div>
