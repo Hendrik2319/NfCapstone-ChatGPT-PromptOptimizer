@@ -2,7 +2,6 @@ package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import java.util.*;
 
@@ -12,15 +11,13 @@ class PromptGenerator {
 	private final String prompt;
 	private final List<String> variables;
 	private final List<Map<String, List<String>>> testcases;
-	private final HashSet<String> usedVars = new HashSet<>();
 
 	interface PromptAction {
 		void process(@NonNull String prompt, int indexOfTestCase, @NonNull String label);
 	}
-	private record Part(@NonNull String before, @Nullable String varName) {}
 
 	void foreachPrompt(@NonNull PromptAction action) {
-		List<Part> parts = getParts();
+		HashSet<String> usedVars = determineUsedVars();
 
 		if (usedVars.isEmpty()) {
 			action.process(prompt, -1, "A Single Request");
@@ -28,10 +25,18 @@ class PromptGenerator {
 		}
 
 		for (int i=0; i<testcases.size(); i++)
-			foreachPrompt(i, testcases.get(i), parts, action);
+			foreachPrompt(i, testcases.get(i), usedVars, action);
 	}
 
-	private void foreachPrompt(int testcaseIndex, Map<String, List<String>> testcase, List<Part> parts, PromptAction action) {
+	private HashSet<String> determineUsedVars() {
+		HashSet<String> usedVars = new HashSet<>();
+		for (String varName : variables)
+			if (prompt.contains("{%s}".formatted(varName)))
+				usedVars.add(varName);
+		return usedVars;
+	}
+
+	private void foreachPrompt(int testcaseIndex, Map<String, List<String>> testcase, HashSet<String> usedVars, PromptAction action) {
 		Comparator<String> ignoringCaseComparator = Comparator.<String, String>comparing(String::toLowerCase).thenComparing(Comparator.naturalOrder());
 
 		Map<String, List<String>> valuesMap = new HashMap<>();
@@ -48,7 +53,7 @@ class PromptGenerator {
 				.toList();
 
 		runLoopsRecursive(0, usedVarsList, valuesMap, new HashMap<>(), values -> {
-			String prompt = buildPrompt(parts, values);
+			String prompt = buildPrompt(values);
 			String label = buildLabel(testcaseIndex, values, usedVarsList);
 			action.process(prompt, testcaseIndex, label);
 		});
@@ -65,20 +70,13 @@ class PromptGenerator {
 		return sb.toString();
 	}
 
-	private String buildPrompt(List<Part> parts, Map<String, String> values) {
-		StringBuilder sb = new StringBuilder();
+	private String buildPrompt(Map<String, String> values) {
+		String promptStr = prompt;
 
-		for (Part part : parts) {
-			sb.append(part.before);
-			if (part.varName!=null) {
-				String value = values.get(part.varName);
-				if (value==null)
-					throw new IllegalStateException("[Unexpected State] Can't find variable value: { parts:%s, values:%s }".formatted(parts, values));
-				sb.append(value);
-			}
-		}
+		for (Map.Entry<String, String> entry : values.entrySet())
+			promptStr = promptStr.replace("{%s}".formatted(entry.getKey()), entry.getValue());
 
-		return sb.toString();
+		return promptStr;
 	}
 
 	private interface LoopAction {
@@ -105,50 +103,4 @@ class PromptGenerator {
 			runLoopsRecursive(index+1, usedVarsList, valuesMap, selectedValues, action);
 		}
 	}
-
-	private List<Part> getParts() {
-		ArrayList<Part> parts = new ArrayList<>();
-
-		String promptStr = this.prompt;
-		while (!promptStr.isEmpty())
-		{
-			int nearestVarPos = -1;
-			int nearestVarIndex = -1;
-
-			for (int i=0; i<variables.size(); i++)
-			{
-				String variable = variables.get(i);
-				String placeholder = "{%s}".formatted(variable);
-				int pos = promptStr.indexOf(placeholder);
-				if (pos < 0) continue;
-				if (nearestVarPos < 0 || pos < nearestVarPos)
-				{
-					nearestVarPos = pos;
-					nearestVarIndex = i;
-				}
-			}
-
-			if (nearestVarPos < 0)
-			{ // no var found
-				parts.add(new Part(promptStr, null ));
-				promptStr = "";
-			}
-			else
-			{ // nearest var found at {nextVarPos}
-				String variable = variables.get(nearestVarIndex);
-				String placeholder = "{%s}".formatted(variable);
-
-				usedVars.add( variable );
-				parts.add(new Part(
-						promptStr.substring(0,nearestVarPos),
-						variable
-				));
-
-				promptStr = promptStr.substring( nearestVarPos + placeholder.length() );
-			}
-		}
-
-		return parts;
-	}
-
 }
