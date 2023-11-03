@@ -21,6 +21,8 @@
     --text-background-var3: #40A0A0;
     --text-background-var4: #A040A0;
     --text-background-var5: #A0A040;
+    --text-background-fail: #A04040;
+    --text-background-success: #40A040;
 }
 .light {
     --background-color: #ffffff;
@@ -44,6 +46,8 @@
     --text-background-var3: #c0ffff;
     --text-background-var4: #ffc0ff;
     --text-background-var5: #ffffc0;
+    --text-background-fail: #ffc0c0;
+    --text-background-success: #c0ffc0;
 }
 body {
     background-color: var(--background-color, #FFFFFF);
@@ -77,13 +81,17 @@ nav a {
     cursor: default;
 }
 
-button, select, .CurrentUser a, nav a {
+button, select {
+    font-size: 1em;
+}
+
+button, select, .CurrentUser a, nav a, .ButtonLike {
     color: var(--button-text-color, #000000);
     border: 1px solid var(--button-border-color, #707070);
     border-radius: 0.3em;
     background-color: var(--button-background-color, #f0f0f0);
 }
-button:hover, select:hover, .CurrentUser a:hover, nav a:hover {
+button:hover, select:hover, .CurrentUser a:hover, nav a:hover, .ButtonLike:hover {
     background-color: var(--button-background-color-hover, #e0e0e0);
 }
 

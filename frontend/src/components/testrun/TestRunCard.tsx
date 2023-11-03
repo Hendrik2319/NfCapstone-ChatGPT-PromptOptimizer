@@ -18,12 +18,20 @@ const SimpleCard = styled.div`
     padding: 0.2em;
 `;
 
+const AnswerCard = styled.div<{ $bgcolor: string }>`
+  background: ${props => props.$bgcolor};
+  border: 1px solid var(--border-color, #707070);
+  border-radius: 4px;
+  padding: 0.2em;
+`;
+
 const ValueBlock = styled.div`
     margin-top: 0.5em;
 `;
 
 type Props = {
     testRun: TestRun
+    rateAnswers_MaxWordCount?: number
 }
 type SelectedAnswerValueToShow = "answer" | "tokens"
 
@@ -43,6 +51,19 @@ export default function TestRunCard( props:Readonly<Props> ) {
             typeof answer.completionTokens == "number" ||
             typeof answer.totalTokens      == "number"
         );
+    }
+
+    function getWordCount(answer: string) {
+        const words = answer.split(/\s+/);
+        return words.length;
+    }
+
+    function getBgColorOfAnswer(answer: TestAnswer) {
+        if (props.rateAnswers_MaxWordCount)
+            return getWordCount(answer.answer) > props.rateAnswers_MaxWordCount
+                ? "var(--text-background-fail)"
+                : "var(--text-background-success)";
+        return "var(--background-color)";
     }
 
     return (
@@ -80,7 +101,7 @@ export default function TestRunCard( props:Readonly<Props> ) {
                 </select>
                 <div className="FlexRow">{
                     props.testRun.answers.map(answer =>
-                        <SimpleCard key={answer.indexOfTestCase+answer.label}>
+                        <AnswerCard key={answer.indexOfTestCase+answer.label} $bgcolor={getBgColorOfAnswer(answer)}>
                             <Id>[{answer.indexOfTestCase+1}] {answer.label}</Id>
                             {
                                 answerValueToShow === "answer" && answer.answer
@@ -98,9 +119,24 @@ export default function TestRunCard( props:Readonly<Props> ) {
                                         : <>No Token values</>
                                 )
                             }
-                        </SimpleCard>
+                        </AnswerCard>
                     )
                 }</div>
+                {
+                    props.rateAnswers_MaxWordCount &&
+                    <SimpleCard>
+                        {
+                            props.testRun.answers
+                                .filter( answer => props.rateAnswers_MaxWordCount && getWordCount(answer.answer) <= props.rateAnswers_MaxWordCount)
+                                .length
+                            +" / "+
+                            props.testRun.answers.length
+                            +" have max. "+
+                            props.rateAnswers_MaxWordCount
+                            +" word(s)"
+                        }
+                    </SimpleCard>
+                }
             </ValueBlock>
 
         </BaseCard>
