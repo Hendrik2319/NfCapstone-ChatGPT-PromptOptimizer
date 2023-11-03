@@ -1,11 +1,4 @@
-import {
-    convertNewTestRunIntoDTO,
-    NewTestRun,
-    TestCase,
-    TestRun,
-    VariablesChangeMethod
-} from "../Types.tsx";
-import {FormEvent} from "react";
+import {convertNewTestRunIntoDTO, NewTestRun, TestCase, TestRun, VariablesChangeMethod} from "../Types.tsx";
 import styled from "styled-components";
 import {SHOW_RENDERING_HINTS} from "../../../Types.tsx";
 import axios from "axios";
@@ -13,10 +6,6 @@ import PromptEditAndView from "./PromptEditAndView.tsx";
 import TestCasesEditAndView from "./TestCasesEditAndView.tsx";
 import VariablesEdit from "./VariablesEdit.tsx";
 import {loadCurrentNewTestRun, saveCurrentNewTestRun} from "./NewTestRunStoarage.tsx";
-
-const Form = styled.form`
-  display: block;
-`;
 
 const Label = styled.label`
   margin-top: 0.5em;
@@ -101,11 +90,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
             })
     }
 
-    function onSubmitForm( event: FormEvent<HTMLFormElement> ) {
-        event.preventDefault();
-        performTestRun();
-    }
-
     function getVarColor(index: number): string {
         return "var(--text-background-var"+(index%6)+")";
     }
@@ -184,9 +168,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 setGetter={fcn => testcasesCompGetter = fcn}
                 setVarChangeNotifier={fcn => testcasesVarChangeNotifier = fcn}
             />
-            <Form onSubmit={onSubmitForm}>
-                <BigButton>Start Test Run</BigButton>
-            </Form>
+            <BigButton onClick={performTestRun}>Start Test Run</BigButton>
         </>
     )
 }

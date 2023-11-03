@@ -7,7 +7,7 @@ import {Scenario} from "../scenario/Types.tsx";
 import {SHOW_RENDERING_HINTS, UserInfos} from "../../Types.tsx";
 import NewTestRunPanel from "./newtestrun/NewTestRunPanel.tsx";
 import TestRunsList from "./TestRunsList.tsx";
-import {clearCurrentNewTestRun} from "./newtestrun/NewTestRunStoarage.tsx";
+import {saveCurrentNewTestRun} from "./newtestrun/NewTestRunStoarage.tsx";
 
 function loadScenario( scenarioId: string, callback: (scenario: Scenario)=>void ){
     axios.get(`/api/scenario/${scenarioId}`)
@@ -86,7 +86,12 @@ export default function TestRunsView( props:Readonly<Props> ) {
     });
 
     function startNewTestRunFromList( base: TestRun, scenarioId: string ) {
-        clearCurrentNewTestRun(scenarioId);
+        saveCurrentNewTestRun(scenarioId, {
+           scenarioId,
+           prompt: base.prompt,
+           variables: base.variables,
+           testcases: base.testcases
+        });
         setBaseForNewTestRun(base);
         setTabState("NewTestRun");
     }
