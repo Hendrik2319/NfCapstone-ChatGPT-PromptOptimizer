@@ -114,7 +114,7 @@ export default function TestRunsView( props:Readonly<Props> ) {
                 <NewTestRunPanel
                     scenarioId={scenarioId}
                     base={
-                        baseForNewTestRun ?? testruns.length===0 ? undefined : testruns[testruns.length-1]
+                        baseForNewTestRun ?? (testruns.length===0 ? undefined : testruns[testruns.length-1])
                     }
                     onSuccessfulTestRun={onSuccessfulTestRun}
                 />

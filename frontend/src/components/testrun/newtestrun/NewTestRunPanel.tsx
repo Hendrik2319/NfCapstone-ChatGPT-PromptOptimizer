@@ -12,7 +12,7 @@ import axios from "axios";
 import PromptEditAndView from "./PromptEditAndView.tsx";
 import TestCasesEditAndView from "./TestCasesEditAndView.tsx";
 import VariablesEdit from "./VariablesEdit.tsx";
-import {clearCurrentNewTestRun, loadCurrentNewTestRun, saveCurrentNewTestRun} from "./NewTestRunStoarage.tsx";
+import {loadCurrentNewTestRun, saveCurrentNewTestRun} from "./NewTestRunStoarage.tsx";
 
 const Form = styled.form`
   display: block;
@@ -106,10 +106,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
         performTestRun();
     }
 
-    function resetForm() {
-        clearCurrentNewTestRun(props.scenarioId);
-    }
-
     function getVarColor(index: number): string {
         return "var(--text-background-var"+(index%6)+")";
     }
@@ -189,7 +185,6 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 setVarChangeNotifier={fcn => testcasesVarChangeNotifier = fcn}
             />
             <Form onSubmit={onSubmitForm}>
-                <BigButton type={"button"} onClick={resetForm}>Reset</BigButton>
                 <BigButton>Start Test Run</BigButton>
             </Form>
         </>
