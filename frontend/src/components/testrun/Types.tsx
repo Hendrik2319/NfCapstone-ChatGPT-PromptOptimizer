@@ -29,9 +29,9 @@ export type TestAnswer = {
     indexOfTestCase: number
     label : string
     answer: string
-    promptTokens    : number
-    completionTokens: number
-    totalTokens     : number
+    promptTokens?    : number
+    completionTokens?: number
+    totalTokens?     : number
 }
 
 

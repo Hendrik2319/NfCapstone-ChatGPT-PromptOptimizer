@@ -4,8 +4,8 @@ import axios from "axios";
 import {convertTestRunsFromDTOs, TestRun} from "./Types.tsx";
 import {Scenario} from "../scenario/Types.tsx";
 import {SHOW_RENDERING_HINTS, UserInfos} from "../../Types.tsx";
-import TestRunCard from "./TestRunCard.tsx";
 import NewTestRunPanel from "./NewTestRunPanel.tsx";
+import TestRunsList from "./TestRunsList.tsx";
 
 function loadScenario( scenarioId: string, callback: (scenario: Scenario)=>void ){
     axios.get(`/api/scenario/${scenarioId}`)
@@ -93,15 +93,13 @@ export default function TestRunsView( props:Readonly<Props> ) {
                 }
             </div>
             {
-                tabState==="PrevTestRuns" &&
-                <div className="FlexRowNoWrap">
-                    { testruns.map(testRun => <TestRunCard key={testRun.id} testRun={testRun}/>) }
-                </div>
+                tabState==="PrevTestRuns" && scenarioId &&
+                <TestRunsList testruns={testruns} scenarioId={scenarioId}/>
             }
             {
                 tabState==="NewTestRun" && scenarioId &&
                 <NewTestRunPanel previous={last} scenarioId={scenarioId} onSuccessfulTestRun={onSuccessfulTestRun}/>
             }
-            </>
+        </>
     )
 }
