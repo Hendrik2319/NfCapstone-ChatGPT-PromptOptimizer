@@ -16,7 +16,9 @@ public record TestRun(
 	public record TestAnswer(
 			int indexOfTestCase,
 			String label,
-			String answer
-	) {
-	}
+			String answer,
+			int promptTokens,
+			int completionTokens,
+			int totalTokens
+	) {}
 }

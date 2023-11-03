@@ -71,7 +71,7 @@ class TestRunIntegrationTest {
 				ZonedDateTime.of(2023, 10, 29, 14, 30, 0, 0, ZoneId.systemDefault()),
 				"prompt", List.of("var1", "var2"),
 				List.of(Map.of("var1", List.of("value1"), "var2", List.of("value2"))),
-				List.of(new TestRun.TestAnswer(1, "label", "answer"))
+				List.of(new TestRun.TestAnswer(1, "label", "answer",12,23,35))
 		);
 	}
 
@@ -84,7 +84,7 @@ class TestRunIntegrationTest {
 			    "prompt"    : "prompt",
 			    "variables" : ["var1","var2"],
 			    "testcases" : [{"var1":["value1"],"var2":["value2"]}],
-			    "answers"   : [{"indexOfTestCase":1,"label":"label","answer":"answer"}]
+			    "answers"   : [{"indexOfTestCase":1,"label":"label","answer":"answer","promptTokens":12,"completionTokens":23,"totalTokens":35}]
 			}
 		""".formatted(
 				testRunId==null ? "" : "\"id\": \"%s\",".formatted(testRunId),

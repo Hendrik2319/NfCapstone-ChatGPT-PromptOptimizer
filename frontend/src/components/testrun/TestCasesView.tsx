@@ -34,20 +34,25 @@ export default function TestCasesView( props: Readonly<Props> ) {
     }
 
     return (
-        <div className="FlexRow">{
-            props.testcases.map((testcase, index) => (
-                <SimpleCard key={generateKey(index)}>
-                    <Id>Test Case {index+1}</Id>
-                    <div className="FlexColumn">{
-                        getVarNames(testcase).map(varName =>
-                            <SimpleCard key={varName}>
-                                <Label>{varName}: </Label>
-                                {testcase.get(varName)?.map(str => "\"" + str + "\"").join(", ")}
-                            </SimpleCard>
-                        )
-                    }</div>
-                </SimpleCard>
-            ))
-        }</div>
+        <SimpleCard className="FlexRow">
+            {
+                props.testcases.length===0 && <>Currently are no Test Cases defined.</>
+            }
+            {
+                props.testcases.map((testcase, index) => (
+                    <SimpleCard key={generateKey(index)}>
+                        <Id>Test Case {index+1}</Id>
+                        <div className="FlexColumn">{
+                            getVarNames(testcase).map(varName =>
+                                <SimpleCard key={varName}>
+                                    <Label>{varName}: </Label>
+                                    {testcase.get(varName)?.map(str => "\"" + str + "\"").join(", ")}
+                                </SimpleCard>
+                            )
+                        }</div>
+                    </SimpleCard>
+                ))
+            }
+        </SimpleCard>
     )
 }

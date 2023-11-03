@@ -12,6 +12,8 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedE
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -60,16 +62,34 @@ public class TestRunService {
 		if (storedScenarioOpt.isEmpty())
 			throw new NoSuchElementException("Can't perform a TestRun, no Scenario with ID \"%s\" found.".formatted(newTestRun.scenarioId()));
 
-		Answer answer = chatGptService.askChatGPT(new Prompt(newTestRun.prompt()));
+		ZonedDateTime now = timeService.getNow();
+
+		List<TestRun.TestAnswer> answers = new ArrayList<>();
+		PromptGenerator generator = new PromptGenerator(
+				newTestRun.prompt(),
+				newTestRun.variables(),
+				newTestRun.testcases()
+		);
+		generator.foreachPrompt(
+				(prompt, indexOfTestCase, label) -> {
+					Answer answer = chatGptService.askChatGPT(new Prompt(prompt));
+					answers.add(new TestRun.TestAnswer(
+							indexOfTestCase,
+							label,
+							answer.answer(),
+							answer.promptTokens(),
+							answer.completionTokens(),
+							answer.totalTokens()
+					));
+				}
+		);
 
 		testRunRepository.save(new TestRun(
-				null, newTestRun.scenarioId(), timeService.getNow(),
+				null, newTestRun.scenarioId(), now,
 				newTestRun.prompt(),
 				newTestRun.variables(),
 				newTestRun.testcases(),
-				List.of(
-						new TestRun.TestAnswer(1, "the only answer", answer.answer())
-				)
+				answers
 		));
 	}
 }
