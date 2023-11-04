@@ -1,7 +1,7 @@
 import './App.css'
 import axios from "axios";
 import {useEffect, useState} from "react";
-import {Link, Route, Routes, useLocation} from "react-router-dom";
+import {Link, Navigate, Route, Routes, useLocation} from "react-router-dom";
 import {DarkModeState, getCurrentDarkModeState} from "./pages/Main/components/DarkModeSwitch.Functions.tsx";
 import {DEBUG, SHOW_RENDERING_HINTS, UserInfos} from "./models/BaseTypes.tsx";
 import RouteProtection from "./components/RouteProtection.tsx";
@@ -90,6 +90,7 @@ export default function App() {
                     <Route path={"/scenario/:id"} element={<TestRunsPage user={user}/>}/>
                     <Route path={"/scenario/:id/newtestrun"} element={<NewTestRunPage/>}/>
                 </Route>
+                <Route path={"/*"} element={<Navigate to={"/"}/>}/>
             </Routes>
         </>
     )
