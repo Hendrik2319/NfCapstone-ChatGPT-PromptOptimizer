@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.lang.NonNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -125,6 +126,9 @@ class PromptGeneratorTest {
 	@Test
 	void whenForeachPrompt_getsPromptWithTestcaseWithAnEmptyValuesList() {
 		// Given
+		HashMap<String, List<String>> testcase3 = new HashMap<>();
+		testcase3.put("var1", null);
+		testcase3.put("var2", List.of("value2.5"));
 		promptGenerator = new PromptGenerator(
 				"{var1}##{var2}",
 				List.of("var1","var2"),
@@ -136,7 +140,8 @@ class PromptGeneratorTest {
 						Map.of(
 								"var1", List.of(),
 								"var2", List.of("value2.3", "value2.4")
-						)
+						),
+						testcase3
 				)
 		);
 

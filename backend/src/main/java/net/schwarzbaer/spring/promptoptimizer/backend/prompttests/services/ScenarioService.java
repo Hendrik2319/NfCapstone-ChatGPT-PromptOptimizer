@@ -8,6 +8,7 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.UserInfos;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedException;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.UserService;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -71,15 +72,15 @@ public class ScenarioService {
 		return Optional.of(storedScenario);
 	}
 
-	private void checkAuthorIDs(String action, String authorID) throws UserIsNotAllowedException {
+	private void checkAuthorIDs(@NonNull String action, @NonNull String authorID) throws UserIsNotAllowedException {
 		checkAuthorIDs(action, authorID, null);
 	}
-	private void checkAuthorIDs(String action, String authorID1, String authorID2) throws UserIsNotAllowedException {
+	private void checkAuthorIDs(@NonNull String action, @NonNull String authorID1, @Nullable String authorID2) throws UserIsNotAllowedException {
 		UserInfos currentUser = userService.getCurrentUser();
 		if (currentUser.isUser()) {
 			if (currentUser.userDbId()==null)
 				throw new UserIsNotAllowedException("Current user has no [userDbId]");
-			if ((authorID1 !=null && !currentUser.userDbId().equals(authorID1)) ||
+			if (!currentUser.userDbId().equals(authorID1) ||
 					(authorID2 !=null && !currentUser.userDbId().equals(authorID2)) )
 				throw new UserIsNotAllowedException("Current user is not allowed to "+ action +" a Scenario of another user.");
 		} else
