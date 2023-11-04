@@ -6,7 +6,7 @@ import {
     getSystemDarkModeState,
     setStoredDarkModeSwitchState
 } from "./DarkModeSwitch.Functions.tsx";
-import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 
 type Props = {
     onChange: ( state: DarkModeState ) => void

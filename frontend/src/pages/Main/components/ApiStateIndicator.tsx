@@ -1,7 +1,7 @@
 import "./ApiStateIndicator.css"
 import axios from "axios";
 import {useEffect, useState} from "react";
-import {ApiState, DEBUG, SHOW_RENDERING_HINTS} from "../../Types.tsx";
+import {ApiState, DEBUG, SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 
 export default function ApiStateIndicator() {
     const [ state, setState ] = useState<ApiState>()

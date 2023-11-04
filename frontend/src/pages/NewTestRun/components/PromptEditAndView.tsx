@@ -1,7 +1,7 @@
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
-import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
-import {VariablesChangeMethod} from "./Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
+import {VariablesChangeMethod} from "../../../models/TestRunTypes.tsx";
 
 const TextArea = styled.textarea`
   height: 6em;

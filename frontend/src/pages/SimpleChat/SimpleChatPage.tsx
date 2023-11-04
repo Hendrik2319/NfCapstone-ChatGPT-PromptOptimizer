@@ -1,9 +1,9 @@
-import './SimpleChatView.css';
+import './SimpleChatPage.css';
 import {ChangeEvent, FormEvent, useState} from "react";
 import axios from "axios";
-import {Answer, DEBUG, Prompt, SHOW_RENDERING_HINTS} from "../Types.tsx";
+import {Answer, DEBUG, Prompt, SHOW_RENDERING_HINTS} from "../../models/BaseTypes.tsx";
 
-export default function SimpleChatView() {
+export default function SimpleChatPage() {
     const [ prompt, setPrompt ] = useState<Prompt>({ prompt:"" });
     const [ answer, setAnswer ] = useState<Answer>({ answer:"" });
     if (SHOW_RENDERING_HINTS) console.debug("Rendering SimpleChatView");

@@ -1,4 +1,4 @@
-import {TestRun} from "./Types.tsx";
+import {TestRun} from "../../../models/TestRunTypes.tsx";
 import TestRunCard from "./TestRunCard.tsx";
 import {ChangeEvent, useState} from "react";
 import styled from "styled-components";
@@ -20,6 +20,7 @@ const InputField = styled.input`
 type Props = {
     testruns: TestRun[]
     scenarioId: string
+    startNewTestRun?: (base: TestRun)=>void
 }
 
 export default function TestRunsList( props:Readonly<Props> ) {
@@ -36,6 +37,13 @@ export default function TestRunsList( props:Readonly<Props> ) {
         let n = parseInt(event.target.value);
         if (isNaN(n)) n = 0;
         setMaxWordCount(n);
+    }
+
+    function createStartNewTestRunCallback( testRun: TestRun ) {
+        if (props.startNewTestRun) {
+            const fcn = props.startNewTestRun;
+            return () => fcn(testRun);
+        }
     }
 
     if (props.testruns.length === 0)
@@ -71,6 +79,7 @@ export default function TestRunsList( props:Readonly<Props> ) {
                         key={testRun.id}
                         testRun={testRun}
                         rateAnswers_MaxWordCount={maxWordCount}
+                        startNewTestRun={createStartNewTestRunCallback(testRun)}
                     />
                 )
             }</div>

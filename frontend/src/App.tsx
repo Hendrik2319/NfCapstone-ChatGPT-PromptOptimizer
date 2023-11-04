@@ -1,25 +1,28 @@
 import './App.css'
-import SimpleChatView from "./components/SimpleChatView.tsx";
-import ApiStateIndicator from "./components/mainpage/ApiStateIndicator.tsx";
-import DarkModeSwitch from "./components/mainpage/DarkModeSwitch.tsx";
-import {useEffect, useState} from "react";
-import {DarkModeState, getCurrentDarkModeState} from "./components/mainpage/DarkModeSwitch.Functions.tsx";
 import axios from "axios";
-import SidePanel from "./components/mainpage/SidePanel.tsx";
-import {DEBUG, SHOW_RENDERING_HINTS, UserInfos} from "./Types.tsx";
-import {Link, Route, Routes} from "react-router-dom";
-import MainPage from "./components/mainpage/MainPage.tsx";
-import RouteProtection from "./components/mainpage/RouteProtection.tsx";
-import TestRunsView from "./components/testrun/TestRunsView.tsx";
+import {useEffect, useState} from "react";
+import {Link, Route, Routes, useLocation} from "react-router-dom";
+import {DarkModeState, getCurrentDarkModeState} from "./pages/Main/components/DarkModeSwitch.Functions.tsx";
+import {DEBUG, SHOW_RENDERING_HINTS, UserInfos} from "./models/BaseTypes.tsx";
+import RouteProtection from "./components/RouteProtection.tsx";
+import ApiStateIndicator from "./pages/Main/components/ApiStateIndicator.tsx";
+import DarkModeSwitch from "./pages/Main/components/DarkModeSwitch.tsx";
+import SidePanel from "./pages/Main/components/SidePanel.tsx";
+import MainPage from "./pages/Main/MainPage.tsx";
+import SimpleChatPage from "./pages/SimpleChat/SimpleChatPage.tsx";
+import TestRunsPage from "./pages/TestRuns/TestRunsPage.tsx";
+import NewTestRunPage from "./pages/NewTestRun/NewTestRunPage.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
+    const location = useLocation();
     if (SHOW_RENDERING_HINTS) console.debug("Rendering App");
 
     useEffect(() => {
         setAppTheme( getCurrentDarkModeState() );
     }, []);
-    useEffect(determineCurrentUser, []);
+
+    useEffect(determineCurrentUser, [ location.pathname ]);
 
     function setAppTheme(state: DarkModeState) {
         document.body.classList.remove( state === "dark" ? "light" : "dark" );
@@ -44,7 +47,7 @@ export default function App() {
     function determineCurrentUser() {
         axios.get("/api/users/me")
             .then(response => {
-                if (DEBUG) console.debug(response.data);
+                if (DEBUG) console.debug("determineCurrentUser", response.data);
                 setUser(response.data);
             })
     }
@@ -83,8 +86,9 @@ export default function App() {
             <Routes>
                 <Route path={"/"} element={<MainPage user={user} login={login}/>}/>
                 <Route element={<RouteProtection backPath="/" condition={user?.isAuthenticated && (user.isUser || user.isAdmin)}/>}>
-                    <Route path={"/chat"} element={<SimpleChatView/>}/>
-                    <Route path={"/scenario/:id"} element={<TestRunsView user={user}/>}/>
+                    <Route path={"/chat"} element={<SimpleChatPage/>}/>
+                    <Route path={"/scenario/:id"} element={<TestRunsPage user={user}/>}/>
+                    <Route path={"/scenario/:id/newtestrun"} element={<NewTestRunPage/>}/>
                 </Route>
             </Routes>
         </>

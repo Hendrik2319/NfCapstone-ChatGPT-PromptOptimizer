@@ -149,3 +149,8 @@ textarea {
 .InlineBlock {
     display: inline-block;
 }
+
+.BreadCrumbs a {
+    text-decoration: none;
+    color: var(--text-color-biglabel)
+}

@@ -1,9 +1,9 @@
-import {Id} from "../StandardStyledComponents.tsx";
+import {Id} from "../../../components/StandardStyledComponents.tsx";
 import StringListInput from "./StringListInput.tsx";
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
-import {TestCase} from "./Types.tsx";
-import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
+import {TestCase} from "../../../models/TestRunTypes.tsx";
+import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 
 const SimpleCard = styled.div`
   border: 1px solid var(--border-color, #707070);
