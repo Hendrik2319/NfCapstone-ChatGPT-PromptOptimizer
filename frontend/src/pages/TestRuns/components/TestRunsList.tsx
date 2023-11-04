@@ -1,4 +1,4 @@
-import {TestRun} from "./Types.tsx";
+import {TestRun} from "../../../models/TestRunTypes.tsx";
 import TestRunCard from "./TestRunCard.tsx";
 import {ChangeEvent, useState} from "react";
 import styled from "styled-components";

@@ -1,7 +1,7 @@
 import {Link} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {loadScenario} from "./services/BackendAPI.tsx";
-import {Scenario} from "./scenario/Types.tsx";
+import {loadScenario} from "../global_functions/BackendAPI.tsx";
+import {Scenario} from "../models/ScenarioTypes.tsx";
 
 type Props = {
     scenarioId?: string

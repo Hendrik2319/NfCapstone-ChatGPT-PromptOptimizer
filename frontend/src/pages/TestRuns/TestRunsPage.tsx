@@ -1,13 +1,13 @@
-import "./TestRunsView.css";
+import "./TestRunsPage.css";
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {TestRun} from "./Types.tsx";
-import {Scenario} from "../scenario/Types.tsx";
-import {SHOW_RENDERING_HINTS, UserInfos} from "../../Types.tsx";
-import {isCurrentNewTestRunStored, saveCurrentNewTestRun} from "./newtestrun/NewTestRunStoarage.tsx";
-import {loadScenario, loadTestRuns} from "../services/BackendAPI.tsx";
-import TestRunsList from "./TestRunsList.tsx";
-import BreadCrumbs from "../BreadCrumbs.tsx";
+import {SHOW_RENDERING_HINTS, UserInfos} from "../../models/BaseTypes.tsx";
+import {isCurrentNewTestRunStored, saveCurrentNewTestRun} from "../../global_functions/NewTestRunStoarage.tsx";
+import {loadScenario, loadTestRuns} from "../../global_functions/BackendAPI.tsx";
+import TestRunsList from "./components/TestRunsList.tsx";
+import BreadCrumbs from "../../components/BreadCrumbs.tsx";
+import {Scenario} from "../../models/ScenarioTypes.tsx";
+import {TestRun} from "../../models/TestRunTypes.tsx";
 
 type Props = {
     user?: UserInfos

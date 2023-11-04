@@ -1,7 +1,7 @@
-import {Scenario, ScenarioDialogOptions} from "./Types.tsx";
 import {useNavigate} from "react-router-dom";
-import {Id, Label} from "../StandardStyledComponents.tsx";
+import {Id, Label} from "../../../components/StandardStyledComponents.tsx";
 import styled from "styled-components";
+import {Scenario, ScenarioDialogOptions} from "../../../models/ScenarioTypes.tsx";
 
 type Props = {
     scenario: Scenario

@@ -1,4 +1,4 @@
-import {convertNewTestRunFromDTO, convertNewTestRunIntoDTO, NewTestRun} from "../Types.tsx";
+import {convertNewTestRunFromDTO, convertNewTestRunIntoDTO, NewTestRun} from "../models/TestRunTypes.tsx";
 
 const KEY_CURRENT_NEW_TEST_RUN: string = "NewTestRunPanel.CurrentNewTestRun";
 

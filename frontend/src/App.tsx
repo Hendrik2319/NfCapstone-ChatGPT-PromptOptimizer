@@ -2,16 +2,16 @@ import './App.css'
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {Link, Route, Routes, useLocation} from "react-router-dom";
-import {DarkModeState, getCurrentDarkModeState} from "./components/mainpage/DarkModeSwitch.Functions.tsx";
-import {DEBUG, SHOW_RENDERING_HINTS, UserInfos} from "./Types.tsx";
-import RouteProtection from "./components/mainpage/RouteProtection.tsx";
-import ApiStateIndicator from "./components/mainpage/ApiStateIndicator.tsx";
-import DarkModeSwitch from "./components/mainpage/DarkModeSwitch.tsx";
-import SidePanel from "./components/mainpage/SidePanel.tsx";
-import MainPage from "./components/mainpage/MainPage.tsx";
-import SimpleChatPage from "./components/SimpleChatPage.tsx";
-import TestRunsPage from "./components/testrun/TestRunsPage.tsx";
-import NewTestRunPage from "./components/testrun/newtestrun/NewTestRunPage.tsx";
+import {DarkModeState, getCurrentDarkModeState} from "./pages/Main/components/DarkModeSwitch.Functions.tsx";
+import {DEBUG, SHOW_RENDERING_HINTS, UserInfos} from "./models/BaseTypes.tsx";
+import RouteProtection from "./components/RouteProtection.tsx";
+import ApiStateIndicator from "./pages/Main/components/ApiStateIndicator.tsx";
+import DarkModeSwitch from "./pages/Main/components/DarkModeSwitch.tsx";
+import SidePanel from "./pages/Main/components/SidePanel.tsx";
+import MainPage from "./pages/Main/MainPage.tsx";
+import SimpleChatPage from "./pages/SimpleChat/SimpleChatPage.tsx";
+import TestRunsPage from "./pages/TestRuns/TestRunsPage.tsx";
+import NewTestRunPage from "./pages/NewTestRun/NewTestRunPage.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();

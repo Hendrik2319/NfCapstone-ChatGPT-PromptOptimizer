@@ -1,5 +1,5 @@
-import {Scenario} from "../scenario/Types.tsx";
-import {convertNewTestRunIntoDTO, convertTestRunsFromDTOs, NewTestRun, TestRun} from "../testrun/Types.tsx";
+import {Scenario} from "../models/ScenarioTypes.tsx";
+import {convertNewTestRunIntoDTO, convertTestRunsFromDTOs, NewTestRun, TestRun} from "../models/TestRunTypes.tsx";
 import axios from "axios";
 
 export function loadScenario( scenarioId: string, callerLabel: string, callback: (scenario: Scenario)=>void ){

@@ -1,6 +1,6 @@
 import './FloatingDialogs.css'
 import {ReactNode} from "react";
-import {SHOW_RENDERING_HINTS} from "../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../models/BaseTypes.tsx";
 
 export type DialogControl<DialogOptions> = {
     closeDialog: ()=>void

@@ -1,13 +1,13 @@
-import {TestCase, VariablesChangeMethod} from "../Types.tsx";
+import {TestCase, VariablesChangeMethod} from "../../models/TestRunTypes.tsx";
 import styled from "styled-components";
-import {SHOW_RENDERING_HINTS} from "../../../Types.tsx";
-import PromptEditAndView from "./PromptEditAndView.tsx";
-import TestCasesEditAndView from "./TestCasesEditAndView.tsx";
-import VariablesEdit from "./VariablesEdit.tsx";
-import {loadCurrentNewTestRun, saveCurrentNewTestRun} from "./NewTestRunStoarage.tsx";
+import {SHOW_RENDERING_HINTS} from "../../models/BaseTypes.tsx";
+import PromptEditAndView from "./components/PromptEditAndView.tsx";
+import TestCasesEditAndView from "./components/TestCasesEditAndView.tsx";
+import VariablesEdit from "./components/VariablesEdit.tsx";
+import {loadCurrentNewTestRun, saveCurrentNewTestRun} from "../../global_functions/NewTestRunStoarage.tsx";
 import {useNavigate, useParams} from "react-router-dom";
-import {performTestRun} from "../../services/BackendAPI.tsx";
-import BreadCrumbs from "../../BreadCrumbs.tsx";
+import {performTestRun} from "../../global_functions/BackendAPI.tsx";
+import BreadCrumbs from "../../components/BreadCrumbs.tsx";
 
 const Label = styled.label`
   margin-top: 0.5em;

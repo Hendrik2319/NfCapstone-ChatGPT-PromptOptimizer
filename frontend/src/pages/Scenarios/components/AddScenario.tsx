@@ -1,5 +1,5 @@
 import {ChangeEvent, FormEvent, useState} from "react";
-import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 
 type Props = {
     addScenario: ( label: string ) => void

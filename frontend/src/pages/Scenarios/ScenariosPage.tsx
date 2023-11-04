@@ -1,20 +1,20 @@
-import "./ScenarioList.css";
-import {SHOW_RENDERING_HINTS, UserInfos} from "../../Types.tsx";
+import "./ScenariosPage.css";
+import {SHOW_RENDERING_HINTS, UserInfos} from "../../models/BaseTypes.tsx";
 import axios from "axios";
 import {ChangeEvent, useEffect, useState} from "react";
-import ScenarioCard from "./ScenarioCard.tsx";
-import {createDialog} from "../FloatingDialogs.tsx";
-import AddScenario from "./AddScenario.tsx";
-import EditScenario from "./EditScenario.tsx";
-import DeleteScenario from "./DeleteScenario.tsx";
-import {NewScenario, Scenario, ScenarioDialogOptions} from "./Types.tsx";
-import BreadCrumbs from "../BreadCrumbs.tsx";
+import ScenarioCard from "./components/ScenarioCard.tsx";
+import {createDialog} from "../../components/FloatingDialogs.tsx";
+import AddScenario from "./components/AddScenario.tsx";
+import EditScenario from "./components/EditScenario.tsx";
+import DeleteScenario from "./components/DeleteScenario.tsx";
+import BreadCrumbs from "../../components/BreadCrumbs.tsx";
+import {NewScenario, Scenario, ScenarioDialogOptions} from "../../models/ScenarioTypes.tsx";
 
 type Props = {
     user: UserInfos
 }
 
-export default function ScenarioList( props:Readonly<Props> ) {
+export default function ScenariosPage(props:Readonly<Props> ) {
     const [ scenarios, setScenarios ] = useState<Scenario[]>([]);
     const [ showAll, setShowAll ] = useState<boolean>(false);
     const { user } = props;

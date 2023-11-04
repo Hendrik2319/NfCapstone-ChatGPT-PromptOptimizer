@@ -1,6 +1,6 @@
-import {SHOW_RENDERING_HINTS} from "../../Types.tsx";
-import {Scenario, ScenarioDialogOptions} from "./Types.tsx";
+import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 import {useState} from "react";
+import {Scenario, ScenarioDialogOptions} from "../../../models/ScenarioTypes.tsx";
 
 type Props = {
     deleteScenario: (id: string) => void
