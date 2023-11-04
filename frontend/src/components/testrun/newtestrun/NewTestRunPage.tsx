@@ -1,11 +1,13 @@
-import {convertNewTestRunIntoDTO, NewTestRun, TestCase, TestRun, VariablesChangeMethod} from "../Types.tsx";
+import {TestCase, VariablesChangeMethod} from "../Types.tsx";
 import styled from "styled-components";
 import {SHOW_RENDERING_HINTS} from "../../../Types.tsx";
-import axios from "axios";
 import PromptEditAndView from "./PromptEditAndView.tsx";
 import TestCasesEditAndView from "./TestCasesEditAndView.tsx";
 import VariablesEdit from "./VariablesEdit.tsx";
 import {loadCurrentNewTestRun, saveCurrentNewTestRun} from "./NewTestRunStoarage.tsx";
+import {useNavigate, useParams} from "react-router-dom";
+import {performTestRun} from "../../services/BackendAPI.tsx";
+import BreadCrumbs from "../../BreadCrumbs.tsx";
 
 const Label = styled.label`
   margin-top: 0.5em;
@@ -18,76 +20,52 @@ const BigButton = styled.button`
   padding: 0.5em 2em;
 `;
 
-function deepcopy(oldMap: TestCase): TestCase {
-    const newMap = new Map<string, string[]>();
-    oldMap.forEach(
-        (value, key) => newMap.set(key, value.map(t => t)))
-    return newMap;
-}
-
-function copyValues( scenarioId: string, data?: NewTestRun ) {
-    if (data)
-        return {
-            prompt: data.prompt,
-            scenarioId: scenarioId,
-            variables: data.variables.map(str=>str),
-            testcases: data.testcases.map(deepcopy)
-        };
-    return {
-        prompt: "",
-        scenarioId: scenarioId,
-        variables: [],
-        testcases: []
-    };
-}
-
-type Props = {
-    base?: TestRun
-    scenarioId: string
-    onSuccessfulTestRun: ()=>void
-}
-
-export default function NewTestRunPanel( props:Readonly<Props> ) {
-    if (SHOW_RENDERING_HINTS) console.debug("Rendering NewTestRunPanel", { scenarioId: props.scenarioId });
+export default function NewTestRunPage() {
+    const { id: scenarioId } = useParams();
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering NewTestRunPanel", { scenarioId: scenarioId });
     let usedVars = new Set<number>();
     let variablesCompGetter: null | (()=>string[]) = null;
     let    promptCompGetter: null | (()=>string) = null;
     let testcasesCompGetter: null | (()=>TestCase[]) = null;
     let    promptVarChangeNotifier: null | VariablesChangeMethod = null;
     let testcasesVarChangeNotifier: null | VariablesChangeMethod = null;
+    const navigate = useNavigate();
 
-    let storedNewTestRun = loadCurrentNewTestRun(props.scenarioId) ?? copyValues(props.scenarioId, props.base);
+    if (!scenarioId) {
+        navigate("/");
+        return <>No Scenario found</>
+    }
 
-    function getVariables(): string[]   { return !variablesCompGetter ? storedNewTestRun.variables : variablesCompGetter(); }
-    function getPrompt   (): string     { return !   promptCompGetter ? storedNewTestRun.prompt    :    promptCompGetter(); }
-    function getTestcases(): TestCase[] { return !testcasesCompGetter ? storedNewTestRun.testcases : testcasesCompGetter(); }
+    let storedNewTestRun = loadCurrentNewTestRun(scenarioId) ?? {
+        prompt: "",
+        scenarioId,
+        variables: [],
+        testcases: []
+    };
 
-    function saveFormValues(prompt: string, variables: string[], testcases: TestCase[]) {
+    function getVariables(): string[]   { return variablesCompGetter ? variablesCompGetter() : storedNewTestRun.variables; }
+    function getPrompt   (): string     { return    promptCompGetter ?    promptCompGetter() : storedNewTestRun.prompt   ; }
+    function getTestcases(): TestCase[] { return testcasesCompGetter ? testcasesCompGetter() : storedNewTestRun.testcases; }
+
+    function saveFormValues(prompt: string, scenarioId: string, variables: string[], testcases: TestCase[]) {
         storedNewTestRun = {
             prompt,
-            scenarioId: props.scenarioId,
+            scenarioId,
             variables,
             testcases
         };
-        saveCurrentNewTestRun(props.scenarioId, storedNewTestRun)
+        saveCurrentNewTestRun(scenarioId, storedNewTestRun)
     }
 
-    function performTestRun() {
-        const data = convertNewTestRunIntoDTO( {
-            prompt: getPrompt(),
-            scenarioId: props.scenarioId,
-            variables: getVariables(),
-            testcases: getTestcases()
-        } );
-        axios.post(`/api/testrun`, data)
-            .then((response) => {
-                if (response.status !== 200)
-                    throw new Error(`Get wrong response status, when performing a test run: ${response.status}`);
-                props.onSuccessfulTestRun();
-            })
-            .catch((error) => {
-                console.error("ERROR[NewTestRunPanel.performTestRun]", error);
-            })
+    function performTestRun_intern(scenarioId: string) {
+        performTestRun({
+                prompt: getPrompt(),
+                scenarioId: scenarioId,
+                variables: getVariables(),
+                testcases: getTestcases()
+            },
+            "NewTestRunPanel",
+            () => navigate("/scenario/" + scenarioId))
     }
 
     function getVarColor(index: number): string {
@@ -114,16 +92,16 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
             testcasesVarChangeNotifier(index, oldVarName, newVarName);
     }
 
-    function onPromptChange( prompt: string ) {
-        saveFormValues(prompt, storedNewTestRun.variables, storedNewTestRun.testcases)
+    function onPromptChange( scenarioId: string, prompt: string ) {
+        saveFormValues(prompt, scenarioId, storedNewTestRun.variables, storedNewTestRun.testcases)
     }
 
-    function onVariablesChange( variables: string[] ) {
-        saveFormValues(storedNewTestRun.prompt, variables, storedNewTestRun.testcases)
+    function onVariablesChange( scenarioId: string, variables: string[] ) {
+        saveFormValues(storedNewTestRun.prompt, scenarioId, variables, storedNewTestRun.testcases)
     }
 
-    function onTestcasesChange( testcases: TestCase[] ) {
-        saveFormValues(storedNewTestRun.prompt, storedNewTestRun.variables, testcases)
+    function onTestcasesChange( scenarioId: string, testcases: TestCase[] ) {
+        saveFormValues(storedNewTestRun.prompt, scenarioId, storedNewTestRun.variables, testcases)
     }
 
     function cleanupTestcases(testcases: TestCase[], variables: string[]) {
@@ -139,13 +117,14 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
 
     return (
         <>
+            <BreadCrumbs scenarioId={scenarioId} isNewTestRun={true}/>
             <Label>Prompt :</Label>
             <PromptEditAndView
                 prompt={storedNewTestRun.prompt}
                 getVariables={getVariables}
                 getVarColor={getVarColor}
                 updateUsedVars={usedVars_ => usedVars = usedVars_}
-                onPromptChange={onPromptChange}
+                onPromptChange={prompt => onPromptChange(scenarioId, prompt)}
                 setGetter={fcn => promptCompGetter = fcn}
                 setVarChangeNotifier={fcn => promptVarChangeNotifier = fcn}
             />
@@ -155,7 +134,7 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 isAllowedToDelete={isAllowedToDeleteVar}
                 getVarColor={getVarColor}
                 notifyOthersAboutChange={variablesChanged}
-                onVariablesChange={onVariablesChange}
+                onVariablesChange={variables => onVariablesChange(scenarioId, variables)}
                 setGetter={fcn => variablesCompGetter = fcn}
             />
             <Label>Test Cases :</Label>
@@ -164,11 +143,11 @@ export default function NewTestRunPanel( props:Readonly<Props> ) {
                 getVariables={getVariables}
                 getUsedVars={() => usedVars}
                 getVarColor={getVarColor}
-                onTestcasesChange={onTestcasesChange}
+                onTestcasesChange={testcases => onTestcasesChange(scenarioId, testcases)}
                 setGetter={fcn => testcasesCompGetter = fcn}
                 setVarChangeNotifier={fcn => testcasesVarChangeNotifier = fcn}
             />
-            <BigButton onClick={performTestRun}>Start Test Run</BigButton>
+            <BigButton onClick={()=>performTestRun_intern(scenarioId)}>Start Test Run</BigButton>
         </>
     )
 }

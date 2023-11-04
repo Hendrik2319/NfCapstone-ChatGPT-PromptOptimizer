@@ -36,7 +36,7 @@ const StartNewButton = styled.button`
 type Props = {
     testRun: TestRun
     rateAnswers_MaxWordCount?: number
-    startNewTestRun: ()=>void
+    startNewTestRun?: ()=>void
 }
 type SelectedAnswerValueToShow = "answer" | "tokens"
 
@@ -73,7 +73,10 @@ export default function TestRunCard( props:Readonly<Props> ) {
 
     return (
         <BaseCard>
-            <StartNewButton onClick={props.startNewTestRun}>Start a new based on this</StartNewButton>
+            {
+                props.startNewTestRun &&
+                <StartNewButton onClick={props.startNewTestRun}>Start a new based on this</StartNewButton>
+            }
             <Id>id         : {props.testRun.id        }</Id>
             <Id>scenarioId : {props.testRun.scenarioId}</Id>
 

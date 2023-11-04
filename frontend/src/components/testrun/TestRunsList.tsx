@@ -20,7 +20,7 @@ const InputField = styled.input`
 type Props = {
     testruns: TestRun[]
     scenarioId: string
-    startNewTestRun: (base: TestRun)=>void
+    startNewTestRun?: (base: TestRun)=>void
 }
 
 export default function TestRunsList( props:Readonly<Props> ) {
@@ -37,6 +37,13 @@ export default function TestRunsList( props:Readonly<Props> ) {
         let n = parseInt(event.target.value);
         if (isNaN(n)) n = 0;
         setMaxWordCount(n);
+    }
+
+    function createStartNewTestRunCallback( testRun: TestRun ) {
+        if (props.startNewTestRun) {
+            const fcn = props.startNewTestRun;
+            return () => fcn(testRun);
+        }
     }
 
     if (props.testruns.length === 0)
@@ -72,7 +79,7 @@ export default function TestRunsList( props:Readonly<Props> ) {
                         key={testRun.id}
                         testRun={testRun}
                         rateAnswers_MaxWordCount={maxWordCount}
-                        startNewTestRun={()=>props.startNewTestRun(testRun)}
+                        startNewTestRun={createStartNewTestRunCallback(testRun)}
                     />
                 )
             }</div>

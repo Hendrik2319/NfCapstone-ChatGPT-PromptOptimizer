@@ -8,6 +8,7 @@ import AddScenario from "./AddScenario.tsx";
 import EditScenario from "./EditScenario.tsx";
 import DeleteScenario from "./DeleteScenario.tsx";
 import {NewScenario, Scenario, ScenarioDialogOptions} from "./Types.tsx";
+import BreadCrumbs from "../BreadCrumbs.tsx";
 
 type Props = {
     user: UserInfos
@@ -109,7 +110,7 @@ export default function ScenarioList( props:Readonly<Props> ) {
 
     return (
         <>
-            <h3>Scenarios</h3>
+            <BreadCrumbs/>
             {
                 user.isAdmin &&
                 <label><input type="checkbox" checked={showAll} onChange={onShowAllChange}/> of all users</label>
