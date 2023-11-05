@@ -57,19 +57,24 @@ export default function TestRunWaitPage() {
                 Please wait.<br/>
                 {
                     runningTestRuns.length==0
-                        ? "No TestRuns are" :
+                        ? "No TestRuns are " :
                     runningTestRuns.length==1
-                        ? "A TestRun is"
-                        : "Some TestRuns are"
+                        ? "A TestRun is "
+                        : "Some TestRuns are "
                 }
-                in progress ... [idle image]
+                in progress ...
             </p>
             {
                 runningTestRuns.map( (rtr, index) =>
-                    <p key={generateKey(rtr, index)} className={"SimpleCard"}>
+                    <p key={generateKey(rtr, index)} className="SimpleCard">
                         TestRun {rtr.promptIndex+1}/{rtr.totalAmountOfPrompts}<br/>
-                        <BigLabel>Label  : </BigLabel>{rtr.label}<br/>
-                        <BigLabel>Prompt : </BigLabel>{rtr.prompt}
+                        <progress value={rtr.promptIndex} max={rtr.totalAmountOfPrompts} >
+                            {rtr.promptIndex+1}/{rtr.totalAmountOfPrompts}
+                        </progress><br/>
+                        <BigLabel>Label  : </BigLabel>
+                        <div className="SimpleCard">{rtr.label}</div>
+                        <BigLabel>Prompt : </BigLabel>
+                        <div className="SimpleCard">{rtr.prompt}</div>
                     </p>
                 )
             }
