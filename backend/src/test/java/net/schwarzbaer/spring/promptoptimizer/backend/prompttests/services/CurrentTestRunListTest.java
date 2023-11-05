@@ -140,7 +140,7 @@ class CurrentTestRunListTest {
 		addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
 		addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
 		CurrentTestRunList.ListEntry unknownEntry =
-				currentTestRunList.createNewEntryForUnitTest(2, 5, "prompt1a", "label1a");
+				new CurrentTestRunList.ListEntry(currentTestRunList, 2, 5, "prompt1a", "label1a");
 
 		// When
 		currentTestRunList.removeEntry("scenarioId1", unknownEntry);

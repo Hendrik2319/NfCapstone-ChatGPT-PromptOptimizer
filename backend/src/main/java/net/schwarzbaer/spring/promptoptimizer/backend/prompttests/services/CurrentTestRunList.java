@@ -14,13 +14,9 @@ public class CurrentTestRunList {
 		return currentTestRuns;
 	}
 
-	ListEntry createNewEntryForUnitTest(int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
-		return new ListEntry(promptIndex, totalAmountOfPrompts, prompt, label);
-	}
-
 	public synchronized ListEntry createNewEntry(String scenarioId) {
 		List<ListEntry> entries = currentTestRuns.computeIfAbsent(scenarioId, key->new ArrayList<>());
-		ListEntry listEntry = new ListEntry();
+		ListEntry listEntry = new ListEntry(this);
 		entries.add(listEntry);
 		return listEntry;
 	}
@@ -40,17 +36,19 @@ public class CurrentTestRunList {
 	}
 
 	@Getter
-	public class ListEntry {
+	public static class ListEntry {
 
+		private final CurrentTestRunList container;
 		private int promptIndex;
 		private int totalAmountOfPrompts;
 		private String prompt;
 		private String label;
 
-		private ListEntry() {
-			this(-1, -1, null, null);
+		ListEntry(CurrentTestRunList container) {
+			this(container,-1, -1, null, null);
 		}
-		private ListEntry(int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
+		ListEntry(CurrentTestRunList container, int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
+			this.container = container;
 			this.promptIndex = promptIndex;
 			this.totalAmountOfPrompts = totalAmountOfPrompts;
 			this.prompt = prompt;
@@ -58,7 +56,7 @@ public class CurrentTestRunList {
 		}
 
 		public void setValues(int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
-			synchronized (CurrentTestRunList.this) {
+			synchronized (container) {
 				this.promptIndex = promptIndex;
 				this.totalAmountOfPrompts = totalAmountOfPrompts;
 				this.prompt = prompt;
