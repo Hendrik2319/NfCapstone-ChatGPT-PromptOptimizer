@@ -25,7 +25,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class TestRunServiceTest {
 
@@ -263,7 +264,8 @@ class TestRunServiceTest {
 		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.1/value2.2"))).thenReturn( new Answer("TestAnswer/value1.1/value2.2", 12,23,35) );
 		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.2/value2.1"))).thenReturn( new Answer("TestAnswer/value1.2/value2.1", 12,23,35) );
 		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.2/value2.2"))).thenReturn( new Answer("TestAnswer/value1.2/value2.2", 12,23,35) );
-		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.3/value2.1"))).thenReturn( new Answer("TestAnswer/value1.3/value2.1", 12,23,35) );
+		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.3/value2.1"))).thenThrow(RuntimeException.class);
+//		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.3/value2.1"))).thenReturn( new Answer("TestAnswer/value1.3/value2.1", 12,23,35) );
 		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.3/value2.2"))).thenReturn( new Answer("TestAnswer/value1.3/value2.2", 12,23,35) );
 		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.4/value2.3"))).thenReturn( new Answer("TestAnswer/value1.4/value2.3", 12,23,35) );
 		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.4/value2.4"))).thenReturn( new Answer("TestAnswer/value1.4/value2.4", 12,23,35) );
@@ -298,10 +300,10 @@ class TestRunServiceTest {
 		verify(runningTestRunsListEntry).setValues(1,8, "TestPrompt/value1.1/value2.2","TestCase 1 { var1:\"value1.1\" var2:\"value2.2\" }");
 		verify(runningTestRunsListEntry).setValues(2,8, "TestPrompt/value1.2/value2.1","TestCase 1 { var1:\"value1.2\" var2:\"value2.1\" }");
 		verify(runningTestRunsListEntry).setValues(3,8, "TestPrompt/value1.2/value2.2","TestCase 1 { var1:\"value1.2\" var2:\"value2.2\" }");
-		verify(runningTestRunsListEntry).setValues(4,8, "TestPrompt/value1.3/value2.1","TestCase 1 { var1:\"value1.3\" var2:\"value2.1\" }");
-		verify(runningTestRunsListEntry).setValues(5,8, "TestPrompt/value1.3/value2.2","TestCase 1 { var1:\"value1.3\" var2:\"value2.2\" }");
-		verify(runningTestRunsListEntry).setValues(6,8, "TestPrompt/value1.4/value2.3","TestCase 2 { var1:\"value1.4\" var2:\"value2.3\" }");
-		verify(runningTestRunsListEntry).setValues(7,8, "TestPrompt/value1.4/value2.4","TestCase 2 { var1:\"value1.4\" var2:\"value2.4\" }");
+//		verify(runningTestRunsListEntry).setValues(4,8, "TestPrompt/value1.3/value2.1","TestCase 1 { var1:\"value1.3\" var2:\"value2.1\" }");
+		verify(runningTestRunsListEntry).setValues(4,8, "TestPrompt/value1.3/value2.2","TestCase 1 { var1:\"value1.3\" var2:\"value2.2\" }");
+		verify(runningTestRunsListEntry).setValues(5,8, "TestPrompt/value1.4/value2.3","TestCase 2 { var1:\"value1.4\" var2:\"value2.3\" }");
+		verify(runningTestRunsListEntry).setValues(6,8, "TestPrompt/value1.4/value2.4","TestCase 2 { var1:\"value1.4\" var2:\"value2.4\" }");
 		verify(runningTestRunsList).removeEntry("scenarioId1", runningTestRunsListEntry);
 
 		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.1/value2.1"));
@@ -332,7 +334,7 @@ class TestRunServiceTest {
 						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.1\" var2:\"value2.2\" }","TestAnswer/value1.1/value2.2",12,23,35),
 						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.2\" var2:\"value2.1\" }","TestAnswer/value1.2/value2.1",12,23,35),
 						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.2\" var2:\"value2.2\" }","TestAnswer/value1.2/value2.2",12,23,35),
-						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.3\" var2:\"value2.1\" }","TestAnswer/value1.3/value2.1",12,23,35),
+//						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.3\" var2:\"value2.1\" }","TestAnswer/value1.3/value2.1",12,23,35),
 						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.3\" var2:\"value2.2\" }","TestAnswer/value1.3/value2.2",12,23,35),
 						new TestRun.TestAnswer(1, "TestCase 2 { var1:\"value1.4\" var2:\"value2.3\" }","TestAnswer/value1.4/value2.3",12,23,35),
 						new TestRun.TestAnswer(1, "TestCase 2 { var1:\"value1.4\" var2:\"value2.4\" }","TestAnswer/value1.4/value2.4",12,23,35)
