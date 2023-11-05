@@ -5,7 +5,7 @@ import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenari
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.CurrentTestRunList;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.RunningTestRunsList;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
 import okhttp3.mockwebserver.MockWebServer;
@@ -43,7 +43,7 @@ class TestRunIntegrationTest {
 	@Autowired private MockMvc mockMvc;
 	@Autowired private ScenarioRepository scenarioRepository;
 	@Autowired private TestRunRepository testRunRepository;
-	@Autowired private CurrentTestRunList currentTestRunList;
+	@Autowired private RunningTestRunsList runningTestRunsList;
 
 	private static MockWebServer mockWebServer;
 
@@ -466,7 +466,7 @@ class TestRunIntegrationTest {
 	@Test @DirtiesContext
 	void whenGetCurrentTestRunsOfScenario_isCalledWithoutRunningTestsOfGivenScenario_returnsEmptyList() throws Exception {
 		whenGetCurrentTestRunsOfScenario_returnsEmptyList("scenarioId2", () ->
-				currentTestRunList.createNewEntry("scenarioId1")
+				runningTestRunsList.createNewEntry("scenarioId1")
 		);
 	}
 	private void whenGetCurrentTestRunsOfScenario_returnsEmptyList(String scenarioId, Runnable configure) throws Exception {
@@ -488,7 +488,7 @@ class TestRunIntegrationTest {
 	@Test @DirtiesContext
 	void whenGetCurrentTestRunsOfScenario_isCalled_returnsList() throws Exception {
 		// Given
-		CurrentTestRunList.ListEntry entry1 = currentTestRunList.createNewEntry("scenarioId1");
+		RunningTestRunsList.ListEntry entry1 = runningTestRunsList.createNewEntry("scenarioId1");
 		entry1.setValues(3, 4, "prompt1", "label1");
 
 		// When

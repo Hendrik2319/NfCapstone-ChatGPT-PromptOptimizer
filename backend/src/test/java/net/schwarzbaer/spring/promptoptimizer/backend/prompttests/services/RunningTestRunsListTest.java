@@ -8,24 +8,24 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CurrentTestRunListTest {
+class RunningTestRunsListTest {
 
-	private CurrentTestRunList currentTestRunList;
-	private Map<String, List<CurrentTestRunList.ListEntry>> currentTestRuns;
+	private RunningTestRunsList runningTestRunsList;
+	private Map<String, List<RunningTestRunsList.ListEntry>> runningTestRuns;
 
 	@BeforeEach
 	void setup() {
-		currentTestRunList = new CurrentTestRunList();
-		currentTestRuns = currentTestRunList.getCurrentTestRunsForUnitTest();
+		runningTestRunsList = new RunningTestRunsList();
+		runningTestRuns = runningTestRunsList.getDataForUnitTest();
 	}
 
-	private CurrentTestRunList.ListEntry addEntry(String scenarioId, int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
-		CurrentTestRunList.ListEntry entry = currentTestRunList.createNewEntry(scenarioId);
+	private RunningTestRunsList.ListEntry addEntry(String scenarioId, int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
+		RunningTestRunsList.ListEntry entry = runningTestRunsList.createNewEntry(scenarioId);
 		entry.setValues(promptIndex, totalAmountOfPrompts, prompt, label);
 		return entry;
 	}
 
-	private void assertEntryEquals(CurrentTestRunList.ListEntry entry, int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
+	private void assertEntryEquals(RunningTestRunsList.ListEntry entry, int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
 		assertNotNull(entry);
 		assertEquals(promptIndex         , entry.getPromptIndex         (), "promptIndex"         );
 		assertEquals(totalAmountOfPrompts, entry.getTotalAmountOfPrompts(), "totalAmountOfPrompts");
@@ -38,14 +38,14 @@ class CurrentTestRunListTest {
 		// Given
 
 		// When
-		CurrentTestRunList.ListEntry actual = currentTestRunList.createNewEntry("scenarioId1");
+		RunningTestRunsList.ListEntry actual = runningTestRunsList.createNewEntry("scenarioId1");
 
 		// Then
-		List<CurrentTestRunList.ListEntry> entries = currentTestRuns.get("scenarioId1");
+		List<RunningTestRunsList.ListEntry> entries = runningTestRuns.get("scenarioId1");
 		assertNotNull(entries);
 		assertEquals(1, entries.size());
 
-		CurrentTestRunList.ListEntry storedEntry = entries.get(0);
+		RunningTestRunsList.ListEntry storedEntry = entries.get(0);
 		assertNotNull(storedEntry);
 		assertEntryEquals(storedEntry, -1, -1, null, null);
 
@@ -56,17 +56,17 @@ class CurrentTestRunListTest {
 	@Test
 	void whenSetValues() {
 		// Given
-		CurrentTestRunList.ListEntry entry = currentTestRunList.createNewEntry("scenarioId1");
+		RunningTestRunsList.ListEntry entry = runningTestRunsList.createNewEntry("scenarioId1");
 
 		// When
 		entry.setValues(2, 5, "prompt", "label");
 
 		// Then
-		List<CurrentTestRunList.ListEntry> entries = currentTestRuns.get("scenarioId1");
+		List<RunningTestRunsList.ListEntry> entries = runningTestRuns.get("scenarioId1");
 		assertNotNull(entries);
 		assertEquals(1, entries.size());
 
-		CurrentTestRunList.ListEntry storedEntry = entries.get(0);
+		RunningTestRunsList.ListEntry storedEntry = entries.get(0);
 		assertEntryEquals(storedEntry,2, 5, "prompt", "label");
 	}
 
@@ -78,14 +78,14 @@ class CurrentTestRunListTest {
 		addEntry("scenarioId2", 5, 5, "prompt2" , "label2" );
 
 		// When
-		List<CurrentTestRunList.ListEntry> actual = currentTestRunList.getEntries("scenarioId1");
+		List<RunningTestRunsList.ListEntry> actual = runningTestRunsList.getEntries("scenarioId1");
 
 		// Then
 		assertNotNull(actual);
 		assertEquals(2, actual.size());
 
-		CurrentTestRunList.ListEntry entry0 = actual.get(0);
-		CurrentTestRunList.ListEntry entry1 = actual.get(1);
+		RunningTestRunsList.ListEntry entry0 = actual.get(0);
+		RunningTestRunsList.ListEntry entry1 = actual.get(1);
 		assertEntryEquals(entry0,2, 5, "prompt1a", "label1a");
 		assertEntryEquals(entry1,3, 4, "prompt1b", "label1b");
 	}
@@ -95,42 +95,42 @@ class CurrentTestRunListTest {
 		// Given
 
 		// When
-		List<CurrentTestRunList.ListEntry> actual = currentTestRunList.getEntries("scenarioId1");
+		List<RunningTestRunsList.ListEntry> actual = runningTestRunsList.getEntries("scenarioId1");
 
 		// Then
-		List<CurrentTestRunList.ListEntry> expected = List.of();
+		List<RunningTestRunsList.ListEntry> expected = List.of();
 		assertEquals(expected, actual);
 	}
 
 	@Test
 	void whenRemoveEntry_isCalledWithCorrespondingEntry() {
 		// Given
-		CurrentTestRunList.ListEntry entry1a =
+		RunningTestRunsList.ListEntry entry1a =
 				addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
 		addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
 
 		// When
-		currentTestRunList.removeEntry("scenarioId1", entry1a);
+		runningTestRunsList.removeEntry("scenarioId1", entry1a);
 
 		// Then
-		List<CurrentTestRunList.ListEntry> entries = currentTestRuns.get("scenarioId1");
+		List<RunningTestRunsList.ListEntry> entries = runningTestRuns.get("scenarioId1");
 		assertNotNull(entries);
 		assertEquals(1, entries.size());
 
-		CurrentTestRunList.ListEntry remainingEntry = entries.get(0);
+		RunningTestRunsList.ListEntry remainingEntry = entries.get(0);
 		assertEntryEquals(remainingEntry,3, 4, "prompt1b", "label1b");
 	}
 
 	@Test
 	void whenRemoveEntry_isCalledWithLastEntry() {
 		// Given
-		CurrentTestRunList.ListEntry entry1a = addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
+		RunningTestRunsList.ListEntry entry1a = addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
 
 		// When
-		currentTestRunList.removeEntry("scenarioId1", entry1a);
+		runningTestRunsList.removeEntry("scenarioId1", entry1a);
 
 		// Then
-		List<CurrentTestRunList.ListEntry> entries = currentTestRuns.get("scenarioId1");
+		List<RunningTestRunsList.ListEntry> entries = runningTestRuns.get("scenarioId1");
 		assertNull(entries);
 	}
 
@@ -139,19 +139,19 @@ class CurrentTestRunListTest {
 		// Given
 		addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
 		addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
-		CurrentTestRunList.ListEntry unknownEntry =
-				new CurrentTestRunList.ListEntry(currentTestRunList, 2, 5, "prompt1a", "label1a");
+		RunningTestRunsList.ListEntry unknownEntry =
+				new RunningTestRunsList.ListEntry(runningTestRunsList, 2, 5, "prompt1a", "label1a");
 
 		// When
-		currentTestRunList.removeEntry("scenarioId1", unknownEntry);
+		runningTestRunsList.removeEntry("scenarioId1", unknownEntry);
 
 		// Then
-		List<CurrentTestRunList.ListEntry> entries = currentTestRuns.get("scenarioId1");
+		List<RunningTestRunsList.ListEntry> entries = runningTestRuns.get("scenarioId1");
 		assertNotNull(entries);
 		assertEquals(2, entries.size());
 
-		CurrentTestRunList.ListEntry entry0 = entries.get(0);
-		CurrentTestRunList.ListEntry entry1 = entries.get(1);
+		RunningTestRunsList.ListEntry entry0 = entries.get(0);
+		RunningTestRunsList.ListEntry entry1 = entries.get(1);
 		assertEntryEquals(entry0,2, 5, "prompt1a", "label1a");
 		assertEntryEquals(entry1,3, 4, "prompt1b", "label1b");
 	}
