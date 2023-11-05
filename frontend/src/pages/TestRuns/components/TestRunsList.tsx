@@ -3,6 +3,10 @@ import TestRunCard from "./TestRunCard.tsx";
 import {ChangeEvent, useState} from "react";
 import styled from "styled-components";
 
+const MainPanel = styled.div`
+    margin-top: 0.5em;
+`;
+
 const RateLabel = styled.label`
   display: inline-block;
   padding: 0.2em 0.5em;
@@ -47,10 +51,10 @@ export default function TestRunsList( props:Readonly<Props> ) {
     }
 
     if (props.testruns.length === 0)
-        return <>No Stored TestRuns</>;
+        return <MainPanel>No Stored TestRuns</MainPanel>;
 
     return (
-        <>
+        <MainPanel>
             <div>
                 {"Rate Answers : "}
                 <RateLabel className="ButtonLike">
@@ -83,6 +87,6 @@ export default function TestRunsList( props:Readonly<Props> ) {
                     />
                 )
             }</div>
-        </>
+        </MainPanel>
     )
 }

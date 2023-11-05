@@ -1,6 +1,7 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Answer;
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptService;
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Prompt;
@@ -19,6 +20,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TestRunService {
 
@@ -26,6 +28,7 @@ public class TestRunService {
 	private final ScenarioService scenarioService;
 	private final ChatGptService chatGptService;
 	private final TimeService timeService;
+	private final RunningTestRunsList runningTestRunsList;
 
 	public List<TestRun> getTestRunsOfScenario(@NonNull String scenarioId)
 			throws UserIsNotAllowedException
@@ -70,19 +73,28 @@ public class TestRunService {
 				newTestRun.variables(),
 				newTestRun.testcases()
 		);
+		RunningTestRunsList.ListEntry listEntry = runningTestRunsList.createNewEntry(newTestRun.scenarioId());
 		generator.foreachPrompt(
-				(prompt, indexOfTestCase, label) -> {
-					Answer answer = chatGptService.askChatGPT(new Prompt(prompt));
-					answers.add(new TestRun.TestAnswer(
-							indexOfTestCase,
-							label,
-							answer.answer(),
-							answer.promptTokens(),
-							answer.completionTokens(),
-							answer.totalTokens()
-					));
+				(prompt, indexOfTestCase, totalAmountOfPrompts, label) -> {
+					listEntry.setValues(answers.size(), totalAmountOfPrompts, prompt, label);
+					Answer answer = null;
+					try {
+						answer = chatGptService.askChatGPT(new Prompt(prompt));
+					} catch (Exception e) {
+						log.error("%s while requesting ChatGPT API: %s".formatted(e.getClass().getSimpleName(), e.getMessage()));
+					}
+					if (answer!=null)
+						answers.add(new TestRun.TestAnswer(
+								indexOfTestCase,
+								label,
+								answer.answer(),
+								answer.promptTokens(),
+								answer.completionTokens(),
+								answer.totalTokens()
+						));
 				}
 		);
+		runningTestRunsList.removeEntry(newTestRun.scenarioId(), listEntry);
 
 		testRunRepository.save(new TestRun(
 				null, newTestRun.scenarioId(), now,

@@ -12,6 +12,7 @@ import MainPage from "./pages/Main/MainPage.tsx";
 import SimpleChatPage from "./pages/SimpleChat/SimpleChatPage.tsx";
 import TestRunsPage from "./pages/TestRuns/TestRunsPage.tsx";
 import NewTestRunPage from "./pages/NewTestRun/NewTestRunPage.tsx";
+import TestRunWaitPage from "./pages/TestRunWaitPage.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
@@ -89,6 +90,7 @@ export default function App() {
                     <Route path={"/chat"} element={<SimpleChatPage/>}/>
                     <Route path={"/scenario/:id"} element={<TestRunsPage user={user}/>}/>
                     <Route path={"/scenario/:id/newtestrun"} element={<NewTestRunPage/>}/>
+                    <Route path={"/scenario/:id/pleasewait"} element={<TestRunWaitPage/>}/>
                 </Route>
                 <Route path={"/*"} element={<Navigate to={"/"}/>}/>
             </Routes>

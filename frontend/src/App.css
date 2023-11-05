@@ -154,3 +154,9 @@ textarea {
     text-decoration: none;
     color: var(--text-color-biglabel)
 }
+.SimpleCard {
+    border: 1px solid var(--border-color, #707070);
+    border-radius: 4px;
+    padding: 0.2em;
+    background: var(--background-color);
+}

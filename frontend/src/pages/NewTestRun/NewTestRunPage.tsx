@@ -65,7 +65,8 @@ export default function NewTestRunPage() {
                 testcases: getTestcases()
             },
             "NewTestRunPanel",
-            () => navigate("/scenario/" + scenarioId))
+            () => navigate("/scenario/" + scenarioId));
+        navigate("/scenario/"+ scenarioId +"/pleasewait")
     }
 
     function getVarColor(index: number): string {

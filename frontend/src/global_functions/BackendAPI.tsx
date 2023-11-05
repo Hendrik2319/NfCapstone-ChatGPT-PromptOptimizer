@@ -1,5 +1,6 @@
 import {Scenario} from "../models/ScenarioTypes.tsx";
-import {convertNewTestRunIntoDTO, convertTestRunsFromDTOs, NewTestRun, TestRun} from "../models/TestRunTypes.tsx";
+import {NewTestRun, RunningTestRun, TestRun} from "../models/TestRunTypes.tsx";
+import {convertNewTestRunIntoDTO, convertTestRunsFromDTOs} from "./TestRunFunctions.tsx";
 import axios from "axios";
 
 export function loadScenario( scenarioId: string, callerLabel: string, callback: (scenario: Scenario)=>void ){
@@ -36,5 +37,17 @@ export function performTestRun( newTestRun: NewTestRun, callerLabel: string, onS
         })
         .catch((error) => {
             console.error("ERROR["+callerLabel+"->BackendAPI.performTestRun]", error);
+        })
+}
+
+export function loadRunningTestRuns( scenarioId: string, callerLabel: string, callback: (runningTestRuns: RunningTestRun[])=>void ){
+    axios.get(`/api/scenario/${scenarioId}/testrunstate`)
+        .then((response) => {
+            if (response.status!==200)
+                throw new Error(`Get wrong response status, when loading RunningTestRuns of scenario (id:${scenarioId}): ${response.status}`);
+            callback(response.data)
+        })
+        .catch((error)=>{
+            console.error("ERROR["+callerLabel+"->BackendAPI.loadRunningTestRuns]", error);
         })
 }

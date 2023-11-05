@@ -25,8 +25,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class TestRunServiceTest {
 
@@ -34,6 +33,8 @@ class TestRunServiceTest {
 	@Mock private ScenarioService scenarioService;
 	@Mock private ChatGptService chatGptService;
 	@Mock private TimeService timeService;
+	@Mock private RunningTestRunsList runningTestRunsList;
+	@Mock private RunningTestRunsList.ListEntry runningTestRunsListEntry;
 	@InjectMocks private TestRunService testRunService;
 
 	@BeforeEach
@@ -270,6 +271,8 @@ class TestRunServiceTest {
 		ZonedDateTime now = ZonedDateTime.now();
 		when(timeService.getNow()).thenReturn(now);
 
+		when(runningTestRunsList.createNewEntry("scenarioId1")).thenReturn(runningTestRunsListEntry);
+
 		// When
 		testRunService.performTestRun(new NewTestRun(
 				"scenarioId1", "TestPrompt/{var1}/{var2}",
@@ -287,6 +290,20 @@ class TestRunServiceTest {
 		));
 
 		// Then
+		verify(scenarioService).getScenarioById("scenarioId1");
+		verify(timeService).getNow();
+
+		verify(runningTestRunsList).createNewEntry("scenarioId1");
+		verify(runningTestRunsListEntry).setValues(0,8, "TestPrompt/value1.1/value2.1","TestCase 1 { var1:\"value1.1\" var2:\"value2.1\" }");
+		verify(runningTestRunsListEntry).setValues(1,8, "TestPrompt/value1.1/value2.2","TestCase 1 { var1:\"value1.1\" var2:\"value2.2\" }");
+		verify(runningTestRunsListEntry).setValues(2,8, "TestPrompt/value1.2/value2.1","TestCase 1 { var1:\"value1.2\" var2:\"value2.1\" }");
+		verify(runningTestRunsListEntry).setValues(3,8, "TestPrompt/value1.2/value2.2","TestCase 1 { var1:\"value1.2\" var2:\"value2.2\" }");
+		verify(runningTestRunsListEntry).setValues(4,8, "TestPrompt/value1.3/value2.1","TestCase 1 { var1:\"value1.3\" var2:\"value2.1\" }");
+		verify(runningTestRunsListEntry).setValues(5,8, "TestPrompt/value1.3/value2.2","TestCase 1 { var1:\"value1.3\" var2:\"value2.2\" }");
+		verify(runningTestRunsListEntry).setValues(6,8, "TestPrompt/value1.4/value2.3","TestCase 2 { var1:\"value1.4\" var2:\"value2.3\" }");
+		verify(runningTestRunsListEntry).setValues(7,8, "TestPrompt/value1.4/value2.4","TestCase 2 { var1:\"value1.4\" var2:\"value2.4\" }");
+		verify(runningTestRunsList).removeEntry("scenarioId1", runningTestRunsListEntry);
+
 		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.1/value2.1"));
 		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.1/value2.2"));
 		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.2/value2.1"));
@@ -295,6 +312,7 @@ class TestRunServiceTest {
 		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.3/value2.2"));
 		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.4/value2.3"));
 		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.4/value2.4"));
+
 		verify(testRunRepository).save(new TestRun(
 				null, "scenarioId1", now,
 				"TestPrompt/{var1}/{var2}",

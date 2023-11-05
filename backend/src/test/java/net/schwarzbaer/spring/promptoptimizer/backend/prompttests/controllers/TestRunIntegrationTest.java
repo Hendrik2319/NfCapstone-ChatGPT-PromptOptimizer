@@ -5,6 +5,7 @@ import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenari
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.RunningTestRunsList;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
 import okhttp3.mockwebserver.MockWebServer;
@@ -42,6 +43,7 @@ class TestRunIntegrationTest {
 	@Autowired private MockMvc mockMvc;
 	@Autowired private ScenarioRepository scenarioRepository;
 	@Autowired private TestRunRepository testRunRepository;
+	@Autowired private RunningTestRunsList runningTestRunsList;
 
 	private static MockWebServer mockWebServer;
 
@@ -338,7 +340,7 @@ class TestRunIntegrationTest {
 	}
 
 //	####################################################################################
-//				addTestRun
+//				performTestRun
 //	####################################################################################
 
 	@Test @DirtiesContext
@@ -451,5 +453,62 @@ class TestRunIntegrationTest {
 
 				// Then
 				.andExpect(status().isOk());
+	}
+
+//	####################################################################################
+//				getCurrentTestRunsOfScenario
+//	####################################################################################
+
+	@Test @DirtiesContext
+	void whenGetCurrentTestRunsOfScenario_isCalledWithoutRunningTests_returnsEmptyList() throws Exception {
+		whenGetCurrentTestRunsOfScenario_returnsEmptyList("scenarioId1", ()->{});
+	}
+	@Test @DirtiesContext
+	void whenGetCurrentTestRunsOfScenario_isCalledWithoutRunningTestsOfGivenScenario_returnsEmptyList() throws Exception {
+		whenGetCurrentTestRunsOfScenario_returnsEmptyList("scenarioId2", () ->
+				runningTestRunsList.createNewEntry("scenarioId1")
+		);
+	}
+	private void whenGetCurrentTestRunsOfScenario_returnsEmptyList(String scenarioId, Runnable configure) throws Exception {
+		// Given
+		configure.run();
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.get("/api/scenario/%s/testrunstate".formatted(scenarioId))
+						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+				)
+
+				// Then
+				.andExpect(status().isOk())
+				.andExpect(content().string("[]"));
+	}
+
+	@Test @DirtiesContext
+	void whenGetCurrentTestRunsOfScenario_isCalled_returnsList() throws Exception {
+		// Given
+		RunningTestRunsList.ListEntry entry1 = runningTestRunsList.createNewEntry("scenarioId1");
+		entry1.setValues(3, 4, "prompt1", "label1");
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.get("/api/scenario/%s/testrunstate".formatted("scenarioId1"))
+						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+				)
+
+				// Then
+				.andExpect(status().isOk())
+				.andExpect(content().json("""
+						[
+							{
+								"promptIndex": 3,
+								"totalAmountOfPrompts": 4,
+								"prompt": "prompt1",
+								"label": "label1"
+							}
+						]
+				"""));
 	}
 }

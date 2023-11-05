@@ -7,18 +7,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 
-import java.io.PrintStream;
 import java.util.Objects;
 
 @Service
 public class UserService {
-	@SuppressWarnings("java:S106")
-	private static final PrintStream DEBUG_OUT = System.out;
+//	@SuppressWarnings("java:S106")
+//	private static final PrintStream DEBUG_OUT = System.out;
 
 	public @NonNull UserInfos getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Object principal = authentication!=null ? authentication.getPrincipal() : null;
-		if (principal!=null) DEBUG_OUT.println("Principal: "+principal.getClass()+" -> "+principal);
+//		if (principal!=null) DEBUG_OUT.println("Principal: "+principal.getClass()+" -> "+principal);
 
 		if (principal instanceof OAuth2AuthenticatedPrincipal user) {
 //			DEBUG_OUT.println("User Attributes:");
