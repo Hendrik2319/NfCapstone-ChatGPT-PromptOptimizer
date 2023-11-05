@@ -64,8 +64,11 @@ export default function TestRunsPage(props:Readonly<Props> ) {
         <>
             <BreadCrumbs scenarioId={scenarioId}/>
             {
-                userCanStartNewTestRun && currentNewTestRunIsStored &&
-                <button onClick={()=>navigate("/scenario/"+scenarioId+"/newtestrun")}>New TestRun</button>
+                userCanStartNewTestRun && (currentNewTestRunIsStored || testruns.length===0) &&
+                <>
+                    <button onClick={()=>navigate("/scenario/"+scenarioId+"/newtestrun")}>New TestRun</button>
+                    <br/>
+                </>
             }
             <TestRunsList
                 scenarioId={scenarioId}
