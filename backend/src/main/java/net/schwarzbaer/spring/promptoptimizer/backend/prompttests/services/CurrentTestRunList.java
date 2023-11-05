@@ -3,15 +3,20 @@ package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CurrentTestRunList {
 
 	private final Map<String, List<ListEntry>> currentTestRuns = new HashMap<>();
+
+	Map<String, List<ListEntry>> getCurrentTestRunsForUnitTest() {
+		return currentTestRuns;
+	}
+
+	ListEntry createNewEntryForUnitTest(int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
+		return new ListEntry(promptIndex, totalAmountOfPrompts, prompt, label);
+	}
 
 	public synchronized ListEntry createNewEntry(String scenarioId) {
 		List<ListEntry> entries = currentTestRuns.computeIfAbsent(scenarioId, key->new ArrayList<>());
@@ -27,17 +32,30 @@ public class CurrentTestRunList {
 
 	public synchronized void removeEntry(String scenarioId, ListEntry listEntry) {
 		List<ListEntry> entries = currentTestRuns.get(scenarioId);
-		if (entries!=null)
+		if (entries!=null) {
 			entries.remove(listEntry);
+			if (entries.isEmpty())
+				currentTestRuns.remove(scenarioId);
+		}
 	}
 
 	@Getter
 	public class ListEntry {
 
-		private int promptIndex = -1;
-		private int totalAmountOfPrompts = -1;
-		private String prompt = null;
-		private String label = null;
+		private int promptIndex;
+		private int totalAmountOfPrompts;
+		private String prompt;
+		private String label;
+
+		private ListEntry() {
+			this(-1, -1, null, null);
+		}
+		private ListEntry(int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
+			this.promptIndex = promptIndex;
+			this.totalAmountOfPrompts = totalAmountOfPrompts;
+			this.prompt = prompt;
+			this.label = label;
+		}
 
 		public void setValues(int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
 			synchronized (CurrentTestRunList.this) {
