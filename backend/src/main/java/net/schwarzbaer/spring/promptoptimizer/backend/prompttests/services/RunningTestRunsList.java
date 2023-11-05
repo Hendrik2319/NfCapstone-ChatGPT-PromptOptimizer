@@ -21,9 +21,9 @@ public class RunningTestRunsList {
 		return listEntry;
 	}
 
-	public synchronized List<ListEntry> getEntries(String scenarioId) {
+	public synchronized List<ListEntryDTO> getEntries(String scenarioId) {
 		List<ListEntry> entries = runningTestRuns.get(scenarioId);
-		return entries==null ? new ArrayList<>() : entries;
+		return entries==null ? List.of() : entries.stream().map(ListEntry::getDTO).toList();
 	}
 
 	public synchronized void removeEntry(String scenarioId, ListEntry listEntry) {
@@ -63,5 +63,21 @@ public class RunningTestRunsList {
 				this.label = label;
 			}
 		}
+
+		private ListEntryDTO getDTO() {
+			return new ListEntryDTO(
+					promptIndex,
+					totalAmountOfPrompts,
+					prompt,
+					label
+			);
+		}
 	}
+
+	public record ListEntryDTO(
+			int promptIndex,
+			int totalAmountOfPrompts,
+			String prompt,
+			String label
+	) {}
 }

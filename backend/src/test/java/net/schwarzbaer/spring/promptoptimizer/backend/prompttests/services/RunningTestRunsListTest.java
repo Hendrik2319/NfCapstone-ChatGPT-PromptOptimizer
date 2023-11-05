@@ -33,6 +33,14 @@ class RunningTestRunsListTest {
 		assertEquals(label               , entry.getLabel               (), "label"               );
 	}
 
+	private void assertEntryEquals(RunningTestRunsList.ListEntryDTO entry, int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
+		assertNotNull(entry);
+		assertEquals(promptIndex         , entry.promptIndex         (), "promptIndex"         );
+		assertEquals(totalAmountOfPrompts, entry.totalAmountOfPrompts(), "totalAmountOfPrompts");
+		assertEquals(prompt              , entry.prompt              (), "prompt"              );
+		assertEquals(label               , entry.label               (), "label"               );
+	}
+
 	@Test
 	void whenCreateNewEntry() {
 		// Given
@@ -78,14 +86,14 @@ class RunningTestRunsListTest {
 		addEntry("scenarioId2", 5, 5, "prompt2" , "label2" );
 
 		// When
-		List<RunningTestRunsList.ListEntry> actual = runningTestRunsList.getEntries("scenarioId1");
+		List<RunningTestRunsList.ListEntryDTO> actual = runningTestRunsList.getEntries("scenarioId1");
 
 		// Then
 		assertNotNull(actual);
 		assertEquals(2, actual.size());
 
-		RunningTestRunsList.ListEntry entry0 = actual.get(0);
-		RunningTestRunsList.ListEntry entry1 = actual.get(1);
+		RunningTestRunsList.ListEntryDTO entry0 = actual.get(0);
+		RunningTestRunsList.ListEntryDTO entry1 = actual.get(1);
 		assertEntryEquals(entry0,2, 5, "prompt1a", "label1a");
 		assertEntryEquals(entry1,3, 4, "prompt1b", "label1b");
 	}
@@ -95,10 +103,10 @@ class RunningTestRunsListTest {
 		// Given
 
 		// When
-		List<RunningTestRunsList.ListEntry> actual = runningTestRunsList.getEntries("scenarioId1");
+		List<RunningTestRunsList.ListEntryDTO> actual = runningTestRunsList.getEntries("scenarioId1");
 
 		// Then
-		List<RunningTestRunsList.ListEntry> expected = List.of();
+		List<RunningTestRunsList.ListEntryDTO> expected = List.of();
 		assertEquals(expected, actual);
 	}
 

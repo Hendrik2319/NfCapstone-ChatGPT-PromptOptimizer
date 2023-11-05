@@ -33,7 +33,7 @@ public class TestRunController {
 	}
 
 	@GetMapping("/api/scenario/{scenarioId}/testrunstate")
-	public List<RunningTestRunsList.ListEntry> getRunningTestRunsOfScenario(@PathVariable String scenarioId) {
+	public List<RunningTestRunsList.ListEntryDTO> getRunningTestRunsOfScenario(@PathVariable String scenarioId) {
 		return runningTestRunsList.getEntries(scenarioId);
 	}
 
