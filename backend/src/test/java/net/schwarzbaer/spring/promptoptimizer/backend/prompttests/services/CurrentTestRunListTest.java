@@ -73,9 +73,9 @@ class CurrentTestRunListTest {
 	@Test
 	void whenGetEntries_isCalledWithFilledList_returnsList() {
 		// Given
-		CurrentTestRunList.ListEntry entry1a = addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
-		CurrentTestRunList.ListEntry entry1b = addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
-		CurrentTestRunList.ListEntry entry2  = addEntry("scenarioId2", 5, 5, "prompt2" , "label2" );
+		addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
+		addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
+		addEntry("scenarioId2", 5, 5, "prompt2" , "label2" );
 
 		// When
 		List<CurrentTestRunList.ListEntry> actual = currentTestRunList.getEntries("scenarioId1");
@@ -105,8 +105,9 @@ class CurrentTestRunListTest {
 	@Test
 	void whenRemoveEntry_isCalledWithCorrespondingEntry() {
 		// Given
-		CurrentTestRunList.ListEntry entry1a = addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
-		CurrentTestRunList.ListEntry entry1b = addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
+		CurrentTestRunList.ListEntry entry1a =
+				addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
+		addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
 
 		// When
 		currentTestRunList.removeEntry("scenarioId1", entry1a);
@@ -136,12 +137,13 @@ class CurrentTestRunListTest {
 	@Test
 	void whenRemoveEntry_isCalledWithUnknownEntry() {
 		// Given
-		CurrentTestRunList.ListEntry entry1a = addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
-		CurrentTestRunList.ListEntry entry1b = addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
-		CurrentTestRunList.ListEntry entry1c = currentTestRunList.createNewEntryForUnitTest(2, 5, "prompt1a", "label1a");
+		addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
+		addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
+		CurrentTestRunList.ListEntry unknownEntry =
+				currentTestRunList.createNewEntryForUnitTest(2, 5, "prompt1a", "label1a");
 
 		// When
-		currentTestRunList.removeEntry("scenarioId1", entry1c);
+		currentTestRunList.removeEntry("scenarioId1", unknownEntry);
 
 		// Then
 		List<CurrentTestRunList.ListEntry> entries = currentTestRuns.get("scenarioId1");
