@@ -26,6 +26,7 @@ public class TestRunService {
 	private final ScenarioService scenarioService;
 	private final ChatGptService chatGptService;
 	private final TimeService timeService;
+	private final CurrentTestRunList currentTestRunList;
 
 	public List<TestRun> getTestRunsOfScenario(@NonNull String scenarioId)
 			throws UserIsNotAllowedException
@@ -70,8 +71,10 @@ public class TestRunService {
 				newTestRun.variables(),
 				newTestRun.testcases()
 		);
+		CurrentTestRunList.ListEntry listEntry = currentTestRunList.createNewEntry(newTestRun.scenarioId());
 		generator.foreachPrompt(
-				(prompt, indexOfTestCase, label) -> {
+				(prompt, indexOfTestCase, totalAmountOfPrompts, label) -> {
+					listEntry.setValues(answers.size(), totalAmountOfPrompts, prompt, label);
 					Answer answer = chatGptService.askChatGPT(new Prompt(prompt));
 					answers.add(new TestRun.TestAnswer(
 							indexOfTestCase,
@@ -83,6 +86,7 @@ public class TestRunService {
 					));
 				}
 		);
+		currentTestRunList.removeEntry(newTestRun.scenarioId(), listEntry);
 
 		testRunRepository.save(new TestRun(
 				null, newTestRun.scenarioId(), now,
