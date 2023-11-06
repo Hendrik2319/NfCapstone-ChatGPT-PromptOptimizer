@@ -1,5 +1,6 @@
-import BreadCrumbs from "../components/BreadCrumbs.tsx";
-import {useParams} from "react-router-dom";
+import {useEffect, useState} from "react";
+import {DarkModeState, getCurrentDarkModeState} from "../../Main/components/DarkModeSwitch.Functions.tsx";
+import {addAppThemeListener, removeAppThemeListener} from "../../../global_functions/AppThemeListener.tsx";
 import {Chart} from "react-chartjs-2";
 import {
     BarController,
@@ -15,11 +16,6 @@ import {
     Title,
     Tooltip
 } from "chart.js";
-import {SHOW_RENDERING_HINTS} from "../models/BaseTypes.tsx";
-import styled from "styled-components";
-import {useEffect, useState} from "react";
-import {addAppThemeListener, removeAppThemeListener} from "../global_functions/AppThemeListener.tsx";
-import {DarkModeState, getCurrentDarkModeState} from "./Main/components/DarkModeSwitch.Functions.tsx";
 
 ChartJS.register(
     CategoryScale,
@@ -34,13 +30,6 @@ ChartJS.register(
     Legend
 );
 
-const SimpleCard = styled.div`
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
-`;
-
 type TType = "line" | "bar";
 type TOptions = any;
 // type TOptions = (
@@ -51,19 +40,13 @@ type TOptions = any;
 //     & ScaleChartOptions<TType>
 // )
 
-
-export default function TestRunsChartPage() {
+export default function TestRunsChart() {
     const [ appTheme, setAppTheme ] = useState<DarkModeState>( getCurrentDarkModeState() )
-    const { id: scenarioId } = useParams();
-    if (SHOW_RENDERING_HINTS) console.debug("Rendering TestRunsChartPage", { scenarioId });
 
     useEffect(() => {
         addAppThemeListener(setAppTheme);
         return ()=> removeAppThemeListener(setAppTheme)
     }, []);
-
-    if (!scenarioId)
-        return <>No scenario choosen.</>
 
     function select<T>( valueDark: T, valueLight: T) {
         switch (appTheme) {
@@ -132,7 +115,7 @@ export default function TestRunsChartPage() {
         },
         scales: {
             x: {
-            //     display: true,
+                //     display: true,
                 axis: "x",
                 type: 'category' as const,
                 position: 'bottom' as const,
@@ -234,12 +217,8 @@ export default function TestRunsChartPage() {
             },
         ],
     };
+
     return (
-        <>
-            <BreadCrumbs scenarioId={scenarioId} extraLabel={"Chart"}/>
-            <SimpleCard>
-                <Chart type='bar' data={data} options={options}/>
-            </SimpleCard>
-        </>
+        <Chart type='bar' data={data} options={options}/>
     )
 }

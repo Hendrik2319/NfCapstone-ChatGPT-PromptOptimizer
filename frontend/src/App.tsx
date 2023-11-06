@@ -13,7 +13,7 @@ import TestRunsPage from "./pages/TestRuns/TestRunsPage.tsx";
 import NewTestRunPage from "./pages/NewTestRun/NewTestRunPage.tsx";
 import TestRunWaitPage from "./pages/TestRunWaitPage.tsx";
 import {determineCurrentUser, logout} from "./global_functions/BackendAPI.tsx";
-import TestRunsChartPage from "./pages/TestRunsChartPage.tsx";
+import TestRunsChartPage from "./pages/TestRunsChart/TestRunsChartPage.tsx";
 import {notifyAppThemeListener} from "./global_functions/AppThemeListener.tsx";
 
 export default function App() {
