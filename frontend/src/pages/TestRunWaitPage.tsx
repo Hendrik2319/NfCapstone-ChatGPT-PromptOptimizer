@@ -50,23 +50,22 @@ export default function TestRunWaitPage() {
         return index +"_"+ rtr.promptIndex +"_"+ rtr.totalAmountOfPrompts +"_"+ rtr.label +"_"+ rtr.prompt;
     }
 
+    function getFirstPart(length: number) {
+        if (length == 0) return "No TestRuns are ";
+        if (length == 1) return "A TestRun is ";
+        return "Some TestRuns are ";
+    }
+
     return (
         <>
             <BreadCrumbs scenarioId={scenarioId} isNewTestRun={true}/>
             <p className={"SimpleCard"}>
                 Please wait.<br/>
-                {
-                    runningTestRuns.length==0
-                        ? "No TestRuns are " :
-                    runningTestRuns.length==1
-                        ? "A TestRun is "
-                        : "Some TestRuns are "
-                }
-                in progress ...
+                { getFirstPart(runningTestRuns.length) } in progress ...
             </p>
             {
                 runningTestRuns.map( (rtr, index) =>
-                    <p key={generateKey(rtr, index)} className="SimpleCard">
+                    <div key={generateKey(rtr, index)} className="SimpleCard">
                         TestRun {rtr.promptIndex+1}/{rtr.totalAmountOfPrompts}<br/>
                         <progress value={rtr.promptIndex} max={rtr.totalAmountOfPrompts} >
                             {rtr.promptIndex+1}/{rtr.totalAmountOfPrompts}
@@ -75,7 +74,7 @@ export default function TestRunWaitPage() {
                         <div className="SimpleCard">{rtr.label}</div>
                         <BigLabel>Prompt : </BigLabel>
                         <div className="SimpleCard">{rtr.prompt}</div>
-                    </p>
+                    </div>
                 )
             }
         </>
