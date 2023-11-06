@@ -7,3 +7,8 @@ export function compareStringsIgnoringCase(str1: string, str2: string): number {
     if (str1 > str2) return +1;
     return 0;
 }
+
+export function getWordCount(answer: string) {
+    const words = answer.split(/\s+/);
+    return words.length;
+}

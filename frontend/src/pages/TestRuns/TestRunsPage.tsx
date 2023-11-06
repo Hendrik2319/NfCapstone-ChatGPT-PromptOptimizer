@@ -13,7 +13,7 @@ type Props = {
     user?: UserInfos
 }
 
-export default function TestRunsPage(props:Readonly<Props> ) {
+export default function TestRunsPage( props:Readonly<Props> ) {
     const [ scenario, setScenario ] = useState<Scenario>();
     const [ testruns, setTestruns ] = useState<TestRun[]>([]);
     const { id: scenarioId } = useParams();

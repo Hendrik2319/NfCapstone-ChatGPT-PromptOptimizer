@@ -16,6 +16,7 @@ import {
     Title,
     Tooltip
 } from "chart.js";
+import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 
 ChartJS.register(
     CategoryScale,
@@ -40,8 +41,15 @@ type TOptions = any;
 //     & ScaleChartOptions<TType>
 // )
 
-export default function TestRunsChart() {
+type Props = {
+    labels: string[]
+    averageTokensPerRequest: number[]
+    amountOfAnswersMeetMaxWordCount: number[]
+}
+
+export default function TestRunsChart( props:Readonly<Props> ) {
     const [ appTheme, setAppTheme ] = useState<DarkModeState>( getCurrentDarkModeState() )
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering TestRunsChart", { appTheme });
 
     useEffect(() => {
         addAppThemeListener(setAppTheme);
@@ -57,7 +65,9 @@ export default function TestRunsChart() {
 
     const colorChartTitle = select( "#d0d0d0", "#000000");
     const colorTickLabels = select( "#d0d0d0", "#000000");
-    const colorAxisLabel = "#e87500";
+    const colorAxisLabelLineset = "#e87500";
+    const colorAxisLabelBarset = select( "#80b0FF", "#5080FF");
+    const colorAxisLabelX = select( "#d0d0d0", "#000000");
     const colorLegendText = select( "#d0d0d0", "#000000");
     const colorGrid = select( "#606060", "#a0a0a0");
     const colorAxisLine = select( "#d0d0d0", "#000000");
@@ -66,17 +76,17 @@ export default function TestRunsChart() {
     const colorBarsetOutline = select( "#d0d0d0", "#000000");
     const colorBarsetFill = select( "#80b0FF", "#5080FF");
 
-    const textChartTitle = 'Chart.js Line Chart - Multi Axis';
-    const labelLineset = 'Dataset 1';
-    const labelBarset = 'Dataset 2';
-    const labelAxisX = "x-axis";
-    const labelAxisYLeft = "y-axis";
-    const textLabelAxisYRight = "y1-axis";
+    const textChartTitle = 'Values of Answers in TestRun';
+    const labelLineset = 'Average Tokens per Request';
+    const labelBarset = 'Answer meets Max. Word Count';
+    const labelAxisX = "TestRuns";
+    const labelAxisLineset = "Tokens per Request";
+    const labelAxisBarset = "Amount of Answers, that meet Max. Word Count (%)";
 
-    const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+    const labels = props.labels // ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
 
-    const dataLineset = labels.map(() => Math.random()*20 -10);
-    const dataBarset = labels.map(() => Math.random()*2000 -1000);
+    const dataLineset = props.averageTokensPerRequest; // labels.map(() => Math.random()*20 -10);
+    const dataBarset = props.amountOfAnswersMeetMaxWordCount; // labels.map(() => Math.random()*2000 -1000);
 
     const lineWidthLineset = 4;
     const borderWidthBarset = 2;
@@ -123,7 +133,7 @@ export default function TestRunsChart() {
                     text: labelAxisX,
                     display: true,
                     align: "start",
-                    color: colorAxisLabel,
+                    color: colorAxisLabelX,
                     padding: 0,
                     font: {
                         // size: 20
@@ -140,16 +150,16 @@ export default function TestRunsChart() {
                     color: colorAxisLine
                 }
             },
-            yAxisLeft: {
+            yAxisLineset: {
                 display: true,
                 axis: "y",
                 type: 'linear' as const,
                 position: 'left' as const,
                 title: {
-                    text: labelAxisYLeft,
+                    text: labelAxisLineset,
                     display: true,
                     align: "end",
-                    color: colorAxisLabel,
+                    color: colorAxisLabelLineset,
                     padding: 0,
                     font: {
                         // size: 20
@@ -166,7 +176,7 @@ export default function TestRunsChart() {
                     color: colorAxisLine
                 }
             },
-            yAxisRight: {
+            yAxisBarset: {
                 display: true,
                 axis: "y",
                 type: 'linear' as const,
@@ -176,10 +186,10 @@ export default function TestRunsChart() {
                     color: colorGrid,
                 },
                 title: {
-                    text: textLabelAxisYRight,
+                    text: labelAxisBarset,
                     display: true,
                     align: "end",
-                    color: colorAxisLabel,
+                    color: colorAxisLabelBarset,
                     padding: 0,
                     font: {}
                 },
@@ -203,8 +213,8 @@ export default function TestRunsChart() {
                 borderColor: colorLinesetLine,
                 backgroundColor: colorLinesetFill,
                 borderWidth: lineWidthLineset,
-                fill: true,
-                yAxisID: 'yAxisLeft',
+                fill: false,
+                yAxisID: 'yAxisLineset',
             },
             {
                 type: 'bar' as const,
@@ -213,7 +223,7 @@ export default function TestRunsChart() {
                 borderColor: colorBarsetOutline,
                 backgroundColor: colorBarsetFill,
                 borderWidth: borderWidthBarset,
-                yAxisID: 'yAxisRight',
+                yAxisID: 'yAxisBarset',
             },
         ],
     };

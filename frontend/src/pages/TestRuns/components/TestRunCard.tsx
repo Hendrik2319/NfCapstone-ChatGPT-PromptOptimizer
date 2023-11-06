@@ -3,6 +3,7 @@ import styled from "styled-components";
 import {BigLabel, Id, Label} from "../../../components/StandardStyledComponents.tsx";
 import TestCasesView from "../../NewTestRun/components/TestCasesView.tsx";
 import {ChangeEvent, useState} from "react";
+import {getWordCount} from "../../../global_functions/Tools.tsx";
 
 const BaseCard = styled.div`
   padding: 1em;
@@ -61,11 +62,6 @@ export default function TestRunCard( props:Readonly<Props> ) {
             typeof answer.completionTokens == "number" ||
             typeof answer.totalTokens      == "number"
         );
-    }
-
-    function getWordCount(answer: string) {
-        const words = answer.split(/\s+/);
-        return words.length;
     }
 
     function getBgColorOfAnswer(answer: TestAnswer) {
