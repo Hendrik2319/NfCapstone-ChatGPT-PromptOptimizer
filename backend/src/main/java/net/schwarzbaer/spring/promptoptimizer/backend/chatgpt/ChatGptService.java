@@ -96,7 +96,7 @@ public class ChatGptService {
 
 		Mono<ResponseEntity<ChatGptResponse>> mono = responseSpec1
 				.toEntity(ChatGptResponse.class);
-		log.info("##### ChatGpt.execRequest: got Mono");
+		log.info("##### ChatGpt.execRequest: got Mono: %s".formatted(mono));
 
 		ResponseEntity<ChatGptResponse> responseEntity = mono
 				.block();
