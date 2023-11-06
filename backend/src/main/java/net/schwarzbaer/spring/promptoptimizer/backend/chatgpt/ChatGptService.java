@@ -10,6 +10,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.io.PrintStream;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Slf4j
@@ -53,7 +55,7 @@ public class ChatGptService {
 		log.info("##### ChatGpt.Request: %s".formatted(request));
 
 		ChatGptResponse response = execRequest(request);
-		log.info("##### ChatGpt.Response: %s".formatted(request));
+		log.info("##### ChatGpt.Response: %s".formatted(response));
 		if (response == null) {/*DEBUG_OUT.println("response: <null>");*/ return null; }
 
 //		response.showContent(DEBUG_OUT, "response");
@@ -92,14 +94,14 @@ public class ChatGptService {
 		WebClient.ResponseSpec responseSpec1 = responseSpec
 				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.empty())
 				.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.empty());
-		log.info("##### ChatGpt.execRequest: error status codes (4xx, 5xx) checked");
+		log.info("##### ChatGpt.execRequest: checked error status codes (4xx, 5xx)");
 
 		Mono<ResponseEntity<ChatGptResponse>> mono = responseSpec1
 				.toEntity(ChatGptResponse.class);
 		log.info("##### ChatGpt.execRequest: got Mono: %s".formatted(mono));
 
 		ResponseEntity<ChatGptResponse> responseEntity = mono
-				.block();
+				.block(Duration.of(3, ChronoUnit.MINUTES));
 		log.info("##### ChatGpt.execRequest got responseEntity -> END");
 
 		if (responseEntity == null) return null;
