@@ -77,7 +77,7 @@ public class TestRunService {
 		generator.foreachPrompt(
 				(prompt, indexOfTestCase, totalAmountOfPrompts, label) -> {
 					listEntry.setValues(answers.size(), totalAmountOfPrompts, prompt, label);
-					log.debug("+++++ TestRunService.performTestRun: Next API call: [%d/%d] \"%s\"".formatted(
+					log.info("+++++ TestRunService.performTestRun: Next API call: [%d/%d] \"%s\"".formatted(
 							listEntry.getPromptIndex(),
 							listEntry.getTotalAmountOfPrompts(),
 							listEntry.getLabel()
@@ -99,7 +99,7 @@ public class TestRunService {
 								answer.completionTokens(),
 								answer.totalTokens()
 						));
-						log.debug("+++++ TestRunService.performTestRun: answer added");
+						log.info("+++++ TestRunService.performTestRun: answer added");
 					}
 				}
 		);

@@ -50,10 +50,10 @@ public class ChatGptService {
 		);
 
 //		request.showContent(DEBUG_OUT, "request");
-		log.debug("##### ChatGpt.Request: %s".formatted(request));
+		log.info("##### ChatGpt.Request: %s".formatted(request));
 
 		ChatGptResponse response = execRequest(request);
-		log.debug("##### ChatGpt.Response: %s".formatted(request));
+		log.info("##### ChatGpt.Response: %s".formatted(request));
 		if (response == null) {/*DEBUG_OUT.println("response: <null>");*/ return null; }
 
 //		response.showContent(DEBUG_OUT, "response");
@@ -83,24 +83,24 @@ public class ChatGptService {
 	}
 
 	private ChatGptResponse execRequest(ChatGptRequest request) {
-		log.debug("##### ChatGpt.execRequest: START -> make POST request");
+		log.info("##### ChatGpt.execRequest: START -> make POST request");
 		WebClient.ResponseSpec responseSpec = webClient.post()
 				.bodyValue(request)
 				.retrieve();
-		log.debug("##### ChatGpt.execRequest: got ResponseSpec");
+		log.info("##### ChatGpt.execRequest: got ResponseSpec");
 
 		WebClient.ResponseSpec responseSpec1 = responseSpec
 				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.empty())
 				.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.empty());
-		log.debug("##### ChatGpt.execRequest: error status codes (4xx, 5xx) checked");
+		log.info("##### ChatGpt.execRequest: error status codes (4xx, 5xx) checked");
 
 		Mono<ResponseEntity<ChatGptResponse>> mono = responseSpec1
 				.toEntity(ChatGptResponse.class);
-		log.debug("##### ChatGpt.execRequest: got Mono");
+		log.info("##### ChatGpt.execRequest: got Mono");
 
 		ResponseEntity<ChatGptResponse> responseEntity = mono
 				.block();
-		log.debug("##### ChatGpt.execRequest got responseEntity -> END");
+		log.info("##### ChatGpt.execRequest got responseEntity -> END");
 
 		if (responseEntity == null) return null;
 
