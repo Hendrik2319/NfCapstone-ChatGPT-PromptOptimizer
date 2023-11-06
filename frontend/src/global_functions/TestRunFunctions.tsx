@@ -24,7 +24,8 @@ export function convertTestRunFromDTO( testRunDTO: TestRunDTO ): TestRun {
         prompt    : testRunDTO.prompt,
         variables : testRunDTO.variables.map(s=>s),
         testcases : testRunDTO.testcases.map(convertObjectIntoMap),
-        answers   : testRunDTO.answers.map(value=>{ return {...value}; })
+        answers   : testRunDTO.answers.map(value=>{ return {...value}; }),
+        averageTokensPerRequest: testRunDTO.averageTokensPerRequest
     };
 }
 
@@ -38,6 +39,7 @@ export function convertNewTestRunIntoDTO( newTestRun: NewTestRun ): NewTestRunDT
         variables : newTestRun.variables.map(s=>s),
         testcases : newTestRun.testcases.map(convertMapIntoObject),
         //  answers   : newTestRun.answers
+        //  averageTokensPerRequest: newTestRun.averageTokensPerRequest
     };
 }
 export function convertNewTestRunFromDTO( newTestRun: NewTestRunDTO ): NewTestRun {
@@ -49,5 +51,6 @@ export function convertNewTestRunFromDTO( newTestRun: NewTestRunDTO ): NewTestRu
         variables : newTestRun.variables.map(s=>s),
         testcases : newTestRun.testcases.map(convertObjectIntoMap),
         //  answers   : newTestRun.answers
+        //  averageTokensPerRequest: newTestRun.averageTokensPerRequest
     };
 }
