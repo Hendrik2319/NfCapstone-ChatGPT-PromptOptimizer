@@ -5,7 +5,7 @@ import {Scenario} from "../models/ScenarioTypes.tsx";
 
 type Props = {
     scenarioId?: string
-    isNewTestRun?: boolean
+    extraLabel?: string
 }
 
 export default function BreadCrumbs( props:Readonly<Props> ) {
@@ -36,14 +36,13 @@ export default function BreadCrumbs( props:Readonly<Props> ) {
                 props.scenarioId && <>
                     {" > "}
                     {
-                        !props.isNewTestRun
+                        !props.extraLabel
                             ? scenarioLabel
                             : <Link to={"/scenario/"+props.scenarioId}>{scenarioLabel}</Link>
                     }
                     {
-                        props.isNewTestRun &&
-                        " > New TestRun"
-
+                        props.extraLabel &&
+                        " > "+props.extraLabel
                     }
                 </>
             }

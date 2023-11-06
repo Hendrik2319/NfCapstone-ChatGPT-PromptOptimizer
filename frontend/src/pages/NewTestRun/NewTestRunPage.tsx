@@ -120,7 +120,7 @@ export default function NewTestRunPage() {
 
     return (
         <>
-            <BreadCrumbs scenarioId={scenarioId} isNewTestRun={true}/>
+            <BreadCrumbs scenarioId={scenarioId} extraLabel={"New TestRun"}/>
             <BigLabel>Prompt :</BigLabel>
             <PromptEditAndView
                 prompt={storedNewTestRun.prompt}

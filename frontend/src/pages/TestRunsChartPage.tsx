@@ -9,7 +9,7 @@ export default function TestRunsChartPage() {
 
     return (
         <>
-            <BreadCrumbs scenarioId={scenarioId}/>
+            <BreadCrumbs scenarioId={scenarioId} extraLabel={"Chart"}/>
             Content
         </>
     )
