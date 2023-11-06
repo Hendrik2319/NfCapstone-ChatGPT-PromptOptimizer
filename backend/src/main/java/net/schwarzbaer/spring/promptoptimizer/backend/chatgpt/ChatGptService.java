@@ -53,6 +53,7 @@ public class ChatGptService {
 
 //		request.showContent(DEBUG_OUT, "request");
 		log.info("##### ChatGpt.Request: %s".formatted(request));
+		log.debug("##### ChatGpt.Request: %s".formatted(request));
 
 		ChatGptResponse response = execRequest(request);
 		log.info("##### ChatGpt.Response: %s".formatted(response));
