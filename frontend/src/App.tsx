@@ -13,6 +13,7 @@ import TestRunsPage from "./pages/TestRuns/TestRunsPage.tsx";
 import NewTestRunPage from "./pages/NewTestRun/NewTestRunPage.tsx";
 import TestRunWaitPage from "./pages/TestRunWaitPage.tsx";
 import {determineCurrentUser, logout} from "./global_functions/BackendAPI.tsx";
+import TestRunsChartPage from "./pages/TestRunsChartPage.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
@@ -87,6 +88,7 @@ export default function App() {
                     <Route path={"/scenario/:id"} element={<TestRunsPage user={user}/>}/>
                     <Route path={"/scenario/:id/newtestrun"} element={<NewTestRunPage/>}/>
                     <Route path={"/scenario/:id/pleasewait"} element={<TestRunWaitPage/>}/>
+                    <Route path={"/scenario/:id/chart"} element={<TestRunsChartPage/>}/>
                 </Route>
                 <Route path={"/*"} element={<Navigate to={"/"}/>}/>
             </Routes>
