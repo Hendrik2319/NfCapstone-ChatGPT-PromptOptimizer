@@ -1,5 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Mono;
 import java.io.PrintStream;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ChatGptService {
 
@@ -47,12 +49,14 @@ public class ChatGptService {
 				)
 		);
 
-		request.showContent(DEBUG_OUT, "request");
+//		request.showContent(DEBUG_OUT, "request");
+		log.debug("##### ChatGpt.Request: %s".formatted(request));
 
 		ChatGptResponse response = execRequest(request);
-		if (response == null) { DEBUG_OUT.println("response: <null>"); return null; }
+		log.debug("##### ChatGpt.Response: %s".formatted(request));
+		if (response == null) {/*DEBUG_OUT.println("response: <null>");*/ return null; }
 
-		response.showContent(DEBUG_OUT, "response");
+//		response.showContent(DEBUG_OUT, "response");
 
 		List<ChatGptResponse.Choice> choices = response.choices();
 		if (choices == null || choices.isEmpty()) return null;
@@ -79,13 +83,24 @@ public class ChatGptService {
 	}
 
 	private ChatGptResponse execRequest(ChatGptRequest request) {
-		ResponseEntity<ChatGptResponse> responseEntity = webClient.post()
+		log.debug("##### ChatGpt.execRequest: START -> make POST request");
+		WebClient.ResponseSpec responseSpec = webClient.post()
 				.bodyValue(request)
-				.retrieve()
+				.retrieve();
+		log.debug("##### ChatGpt.execRequest: got ResponseSpec");
+
+		WebClient.ResponseSpec responseSpec1 = responseSpec
 				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.empty())
-				.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.empty())
-				.toEntity(ChatGptResponse.class)
+				.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.empty());
+		log.debug("##### ChatGpt.execRequest: error status codes (4xx, 5xx) checked");
+
+		Mono<ResponseEntity<ChatGptResponse>> mono = responseSpec1
+				.toEntity(ChatGptResponse.class);
+		log.debug("##### ChatGpt.execRequest: got Mono");
+
+		ResponseEntity<ChatGptResponse> responseEntity = mono
 				.block();
+		log.debug("##### ChatGpt.execRequest got responseEntity -> END");
 
 		if (responseEntity == null) return null;
 
