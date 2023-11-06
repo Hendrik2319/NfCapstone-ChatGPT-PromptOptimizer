@@ -58,7 +58,7 @@ export default function TestRunWaitPage() {
 
     return (
         <>
-            <BreadCrumbs scenarioId={scenarioId} isNewTestRun={true}/>
+            <BreadCrumbs scenarioId={scenarioId} extraLabel={"New TestRun"}/>
             <p className={"SimpleCard"}>
                 Please wait.<br/>
                 { getFirstPart(runningTestRuns.length) } in progress ...

@@ -103,7 +103,7 @@ export default function TestRunsChartPage() {
     };
     return (
         <>
-            <BreadCrumbs scenarioId={scenarioId}/>
+            <BreadCrumbs scenarioId={scenarioId} extraLabel={"Chart"}/>
             <SimpleCard>
                 <Chart type='bar' data={data} options={options}/>
             </SimpleCard>
