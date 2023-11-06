@@ -23,8 +23,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,7 +49,8 @@ class TestRunServiceTest {
 				ZonedDateTime.of(2023, 10, 29, 14, 30, 0, 0, ZoneId.systemDefault()),
 				"prompt", List.of("var1", "var2"),
 				List.of(Map.of("var1", List.of("value1"), "var2", List.of("value2"))),
-				List.of(new TestRun.TestAnswer(1, "label", "answer", 12, 23, 35))
+				List.of(new TestRun.TestAnswer(1, "label", "answer", 12, 23, 35)),
+				35.0
 		);
 	}
 
@@ -338,10 +338,43 @@ class TestRunServiceTest {
 						new TestRun.TestAnswer(0, "TestCase 1 { var1:\"value1.3\" var2:\"value2.2\" }","TestAnswer/value1.3/value2.2",12,23,35),
 						new TestRun.TestAnswer(1, "TestCase 2 { var1:\"value1.4\" var2:\"value2.3\" }","TestAnswer/value1.4/value2.3",12,23,35),
 						new TestRun.TestAnswer(1, "TestCase 2 { var1:\"value1.4\" var2:\"value2.4\" }","TestAnswer/value1.4/value2.4",12,23,35)
-				)
+				),
+				35.d
 		));
 	}
 
 
+	@Test
+	void whenComputeAverageTokensPerRequest_isCalledWithEmptyList_returnsNull() {
+		// Given
 
+		// When
+		Double actual = testRunService.computeAverageTokensPerRequest(List.of());
+
+		// Then
+		assertNull(actual);
+	}
+
+	@Test
+	void whenComputeAverageTokensPerRequest_isCalledWithList_returnsACorrectResult() {
+		// Given
+
+		// When
+		Double actual = testRunService.computeAverageTokensPerRequest(List.of(
+				new TestRun.TestAnswer(0, "label1","answer1",null,null,null), // --
+				new TestRun.TestAnswer(0, "label1","answer1",null,   1,null), // 1
+				new TestRun.TestAnswer(0, "label1","answer1",   2,null,null), // 2
+				new TestRun.TestAnswer(0, "label1","answer1",   3,   4,null), // 7
+				new TestRun.TestAnswer(0, "label1","answer1",null,null,   5), // 5
+				new TestRun.TestAnswer(0, "label1","answer1",null,   6,   6), // 6
+				new TestRun.TestAnswer(0, "label1","answer1",   7,null,   7), // 7
+				new TestRun.TestAnswer(0, "label1","answer1",   8,   9,  17)  // 17
+		));
+
+		// Then
+		double expected = (1 + 2 + 7 + 5 + 6 + 7 + 17) / 7.0;
+		assertNotNull(actual);
+		assertTrue(Math.abs((actual/expected)-1) < 0.000001);
+		// actual is inside of a range of +/-1ppm around expected
+	}
 }
