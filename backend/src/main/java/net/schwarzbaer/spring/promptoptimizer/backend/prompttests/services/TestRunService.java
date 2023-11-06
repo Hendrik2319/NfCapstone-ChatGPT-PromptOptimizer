@@ -77,15 +77,18 @@ public class TestRunService {
 		generator.foreachPrompt(
 				(prompt, indexOfTestCase, totalAmountOfPrompts, label) -> {
 					listEntry.setValues(answers.size(), totalAmountOfPrompts, prompt, label);
+					log.info("+++++ performTestRun(): Next API request: [%d/%d] \"%s\"".formatted(
+							listEntry.getPromptIndex(),
+							listEntry.getTotalAmountOfPrompts(),
+							listEntry.getLabel()
+					));
 					Answer answer = null;
 					try {
 						answer = chatGptService.askChatGPT(new Prompt(prompt));
 					} catch (Exception e) {
-						String message = "%s while requesting ChatGPT API: %s".formatted(e.getClass().getSimpleName(), e.getMessage());
-						System.err.println(message);
-						log.error(message);
+						log.error("+++++ %s while requesting ChatGPT API. [ Message: %s ]".formatted(e.getClass().getSimpleName(), e.getMessage()));
 					}
-					if (answer!=null)
+					if (answer!=null) {
 						answers.add(new TestRun.TestAnswer(
 								indexOfTestCase,
 								label,
@@ -94,6 +97,8 @@ public class TestRunService {
 								answer.completionTokens(),
 								answer.totalTokens()
 						));
+						log.info("+++++ performTestRun(): answer added");
+					}
 				}
 		);
 		runningTestRunsList.removeEntry(newTestRun.scenarioId(), listEntry);

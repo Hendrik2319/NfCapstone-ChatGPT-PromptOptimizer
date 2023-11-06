@@ -1,8 +1,5 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
-import java.io.PrintStream;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.List;
 
 public record ChatGptResponse(
@@ -13,6 +10,7 @@ public record ChatGptResponse(
         Usage usage,
         List<Choice> choices
 ) {
+/*
     public void showContent(PrintStream out, String label) {
         out.printf("%s: ChatGPTResponse%n", label);
         out.printf("    id: %s%n", id);
@@ -39,6 +37,7 @@ public record ChatGptResponse(
             }
         }
     }
+*/
 
     public record Choice(
             int index,

@@ -1,5 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -8,15 +9,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.io.PrintStream;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+@Slf4j
 @Service
 public class ChatGptService {
 
 	private final WebClient webClient;
-	@SuppressWarnings("java:S106")
-	private static final PrintStream DEBUG_OUT = System.out;
+//	@SuppressWarnings("java:S106")
+//	private static final PrintStream DEBUG_OUT = System.out;
 
 	public ChatGptService(
 			@Value("${app.openai-api-key}") String openaiApiKey,
@@ -47,12 +50,14 @@ public class ChatGptService {
 				)
 		);
 
-		request.showContent(DEBUG_OUT, "request");
+//		request.showContent(DEBUG_OUT, "request");
+		log.info("##### Request: %s".formatted(request));
 
 		ChatGptResponse response = execRequest(request);
-		if (response == null) { DEBUG_OUT.println("response: <null>"); return null; }
+		log.info("##### Response: %s".formatted(response));
+		if (response == null) {/*DEBUG_OUT.println("response: <null>");*/ return null; }
 
-		response.showContent(DEBUG_OUT, "response");
+//		response.showContent(DEBUG_OUT, "response");
 
 		List<ChatGptResponse.Choice> choices = response.choices();
 		if (choices == null || choices.isEmpty()) return null;
@@ -79,13 +84,24 @@ public class ChatGptService {
 	}
 
 	private ChatGptResponse execRequest(ChatGptRequest request) {
-		ResponseEntity<ChatGptResponse> responseEntity = webClient.post()
+		log.info("##### execRequest(): START -> make POST request");
+		WebClient.ResponseSpec responseSpec = webClient.post()
 				.bodyValue(request)
-				.retrieve()
+				.retrieve();
+		log.info("##### execRequest(): got ResponseSpec");
+
+		WebClient.ResponseSpec responseSpec1 = responseSpec
 				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.empty())
-				.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.empty())
-				.toEntity(ChatGptResponse.class)
-				.block();
+				.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.empty());
+		log.info("##### execRequest(): checked error status codes (4xx, 5xx)");
+
+		Mono<ResponseEntity<ChatGptResponse>> mono = responseSpec1
+				.toEntity(ChatGptResponse.class);
+		log.info("##### execRequest(): got Mono: %s".formatted(mono));
+
+		ResponseEntity<ChatGptResponse> responseEntity = mono
+				.block(Duration.of(3, ChronoUnit.MINUTES));
+		log.info("##### execRequest(): got responseEntity -> END");
 
 		if (responseEntity == null) return null;
 
