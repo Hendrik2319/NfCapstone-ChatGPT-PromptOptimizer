@@ -161,6 +161,12 @@ export default function TestRunCard( props:Readonly<Props> ) {
                         }
                     </SimpleCard>
                 }
+                {
+                    typeof props.testRun.averageTokensPerRequest==="number" &&
+                    <SimpleCard>
+                        Average cost: {props.testRun.averageTokensPerRequest.toLocaleString(undefined, {maximumFractionDigits:2})} tokens per request
+                    </SimpleCard>
+                }
             </ValueBlock>
 
         </BaseCard>

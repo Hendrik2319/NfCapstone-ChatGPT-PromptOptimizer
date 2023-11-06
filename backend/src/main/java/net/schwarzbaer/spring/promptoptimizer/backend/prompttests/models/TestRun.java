@@ -11,7 +11,8 @@ public record TestRun(
 		String prompt,
 		List<String> variables,
 		List<Map<String,List<String>>> testcases,
-		List<TestAnswer> answers
+		List<TestAnswer> answers,
+		Double averageTokensPerRequest
 ) {
 	public record TestAnswer(
 			int indexOfTestCase,

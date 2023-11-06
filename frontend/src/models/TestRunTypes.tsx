@@ -11,6 +11,7 @@ type TestRunBase<TestCaseType> = {
     variables : string[]
     testcases : TestCaseType[]
     answers   : TestAnswer[]
+    averageTokensPerRequest?: number
 }
 
 type NewTestRunBase<TestCaseType> = {
@@ -21,6 +22,7 @@ type NewTestRunBase<TestCaseType> = {
     variables : string[]
     testcases : TestCaseType[]
 //  answers   : TestAnswer[]  - defined by backend as results from external API
+//  averageTokensPerRequest?: number  - computed by backend
 }
 
 export type TestCase = Map<string, string[]>
