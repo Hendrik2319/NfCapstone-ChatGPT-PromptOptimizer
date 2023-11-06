@@ -81,7 +81,9 @@ public class TestRunService {
 					try {
 						answer = chatGptService.askChatGPT(new Prompt(prompt));
 					} catch (Exception e) {
-						log.error("%s while requesting ChatGPT API: %s".formatted(e.getClass().getSimpleName(), e.getMessage()));
+						String message = "%s while requesting ChatGPT API: %s".formatted(e.getClass().getSimpleName(), e.getMessage());
+						System.err.println(message);
+						log.error(message);
 					}
 					if (answer!=null)
 						answers.add(new TestRun.TestAnswer(
