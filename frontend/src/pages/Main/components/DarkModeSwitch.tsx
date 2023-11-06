@@ -50,12 +50,12 @@ export default function DarkModeSwitch( props: Readonly<Props> ) {
         const newSwitchState = event.target.value;
         switch (newSwitchState) {
             case "system":
-                props.onChange( getSystemDarkModeState() );
+                globalOnChangeState( getSystemDarkModeState() );
                 setSwitchAndStoredSwitchState(newSwitchState);
                 break;
             case "light":
             case "dark":
-                props.onChange( newSwitchState );
+                globalOnChangeState( newSwitchState );
                 setSwitchAndStoredSwitchState(newSwitchState);
                 break;
         }

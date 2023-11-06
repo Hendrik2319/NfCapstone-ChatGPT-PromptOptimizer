@@ -14,6 +14,7 @@ import NewTestRunPage from "./pages/NewTestRun/NewTestRunPage.tsx";
 import TestRunWaitPage from "./pages/TestRunWaitPage.tsx";
 import {determineCurrentUser, logout} from "./global_functions/BackendAPI.tsx";
 import TestRunsChartPage from "./pages/TestRunsChartPage.tsx";
+import {notifyAppThemeListener} from "./global_functions/AppThemeListener.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
@@ -27,6 +28,7 @@ export default function App() {
     useEffect(determineCurrentUser_, [ location.pathname ]);
 
     function setAppTheme(state: DarkModeState) {
+        notifyAppThemeListener(state);
         document.body.classList.remove( state === "dark" ? "light" : "dark" );
         document.body.classList.add(state);
     }
