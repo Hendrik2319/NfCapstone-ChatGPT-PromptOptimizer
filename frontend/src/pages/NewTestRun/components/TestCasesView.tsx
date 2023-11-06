@@ -11,6 +11,13 @@ const SimpleCard = styled.div`
   background: var(--background-color);
 `;
 
+const TestCasesList = styled.div`
+  border: 1px solid var(--border-color, #707070);
+  border-radius: 4px;
+  padding: 0.5em;
+  background: var(--background-color);
+`;
+
 type Props = {
     testcases: TestCase[]
     getVariables?: () => string[]
@@ -34,7 +41,7 @@ export default function TestCasesView( props: Readonly<Props> ) {
     }
 
     return (
-        <SimpleCard className="FlexRow">
+        <TestCasesList className="FlexRow">
             {
                 props.testcases.length===0 && <>Currently are no Test Cases defined.</>
             }
@@ -53,6 +60,6 @@ export default function TestCasesView( props: Readonly<Props> ) {
                     </SimpleCard>
                 ))
             }
-        </SimpleCard>
+        </TestCasesList>
     )
 }
