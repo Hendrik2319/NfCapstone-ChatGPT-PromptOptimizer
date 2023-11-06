@@ -9,9 +9,11 @@ import {useNavigate, useParams} from "react-router-dom";
 import {performTestRun} from "../../global_functions/BackendAPI.tsx";
 import BreadCrumbs from "../../components/BreadCrumbs.tsx";
 
-const Label = styled.label`
-  margin-top: 0.5em;
+export const BigLabel = styled.label`
   display: block;
+  color: var(--text-color-biglabel);
+  font-size: 1em;
+  margin-top: 0.5em;
 `;
 
 const BigButton = styled.button`
@@ -119,7 +121,7 @@ export default function NewTestRunPage() {
     return (
         <>
             <BreadCrumbs scenarioId={scenarioId} isNewTestRun={true}/>
-            <Label>Prompt :</Label>
+            <BigLabel>Prompt :</BigLabel>
             <PromptEditAndView
                 prompt={storedNewTestRun.prompt}
                 getVariables={getVariables}
@@ -129,7 +131,7 @@ export default function NewTestRunPage() {
                 setGetter={fcn => promptCompGetter = fcn}
                 setVarChangeNotifier={fcn => promptVarChangeNotifier = fcn}
             />
-            <Label>Variables :</Label>
+            <BigLabel>Variables :</BigLabel>
             <VariablesEdit
                 variables={storedNewTestRun.variables}
                 isAllowedToDelete={isAllowedToDeleteVar}
@@ -138,7 +140,7 @@ export default function NewTestRunPage() {
                 onVariablesChange={variables => onVariablesChange(scenarioId, variables)}
                 setGetter={fcn => variablesCompGetter = fcn}
             />
-            <Label>Test Cases :</Label>
+            <BigLabel>Test Cases :</BigLabel>
             <TestCasesEditAndView
                 testcases={cleanupTestcases(storedNewTestRun.testcases, storedNewTestRun.variables)}
                 getVariables={getVariables}

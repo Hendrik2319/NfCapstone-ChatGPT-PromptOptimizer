@@ -81,29 +81,29 @@ export default function TestRunCard( props:Readonly<Props> ) {
             <Id>scenarioId : {props.testRun.scenarioId}</Id>
 
             <ValueBlock>
-                <BigLabel>timestamp : </BigLabel>
+                <BigLabel>Timestamp : </BigLabel>
                 <SimpleCard>{props.testRun.timestamp }</SimpleCard>
             </ValueBlock>
 
             <ValueBlock>
-                <BigLabel>prompt    : </BigLabel>
+                <BigLabel>Prompt    : </BigLabel>
                 <SimpleCard>{props.testRun.prompt    }</SimpleCard>
             </ValueBlock>
 
             <ValueBlock>
-                <BigLabel>variables : </BigLabel>
+                <BigLabel>Variables : </BigLabel>
                 <div className="FlexRow">{
                     props.testRun.variables.map(varName=> <SimpleCard key={varName}>{varName}</SimpleCard>)
                 }</div>
             </ValueBlock>
 
             <ValueBlock>
-                <BigLabel>testcases : </BigLabel>
+                <BigLabel>TestCases : </BigLabel>
                 <TestCasesView testcases={props.testRun.testcases}/>
             </ValueBlock>
 
             <ValueBlock>
-                <BigLabel>answers   : </BigLabel>
+                <BigLabel>Answers   : </BigLabel>
                 <select value={answerValueToShow} onChange={onChangeAnswerValueToShow}>
                     <option value={"answer"}>Answers</option>
                     <option value={"tokens"}>Used ChatGPT Tokens</option>
@@ -123,9 +123,9 @@ export default function TestRunCard( props:Readonly<Props> ) {
                                     hasAtLeastOneTokenValue(answer)
                                         ? <table>
                                             <tbody>
-                                            <tr><td><Label>prompt     : </Label></td><td>{answer.promptTokens    } tokens</td></tr>
-                                            <tr><td><Label>completion : </Label></td><td>{answer.completionTokens} tokens</td></tr>
-                                            <tr><td><Label>total      : </Label></td><td>{answer.totalTokens     } tokens</td></tr>
+                                            <tr><td><Label>Prompt     : </Label></td><td>{answer.promptTokens    } tokens</td></tr>
+                                            <tr><td><Label>Completion : </Label></td><td>{answer.completionTokens} tokens</td></tr>
+                                            <tr><td><Label>Total      : </Label></td><td>{answer.totalTokens     } tokens</td></tr>
                                             </tbody>
                                         </table>
                                         : <>No Token values</>
