@@ -19,8 +19,8 @@ import java.util.List;
 public class ChatGptService {
 
 	private final WebClient webClient;
-	@SuppressWarnings("java:S106")
-	private static final PrintStream DEBUG_OUT = System.out;
+//	@SuppressWarnings("java:S106")
+//	private static final PrintStream DEBUG_OUT = System.out;
 
 	public ChatGptService(
 			@Value("${app.openai-api-key}") String openaiApiKey,
