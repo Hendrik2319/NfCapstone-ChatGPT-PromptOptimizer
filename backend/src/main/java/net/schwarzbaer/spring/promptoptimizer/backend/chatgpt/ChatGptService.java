@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.io.PrintStream;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -52,11 +51,10 @@ public class ChatGptService {
 		);
 
 //		request.showContent(DEBUG_OUT, "request");
-		log.info("##### ChatGpt.Request: %s".formatted(request));
-		log.debug("##### ChatGpt.Request: %s".formatted(request));
+		log.info("##### Request: %s".formatted(request));
 
 		ChatGptResponse response = execRequest(request);
-		log.info("##### ChatGpt.Response: %s".formatted(response));
+		log.info("##### Response: %s".formatted(response));
 		if (response == null) {/*DEBUG_OUT.println("response: <null>");*/ return null; }
 
 //		response.showContent(DEBUG_OUT, "response");
@@ -86,24 +84,24 @@ public class ChatGptService {
 	}
 
 	private ChatGptResponse execRequest(ChatGptRequest request) {
-		log.info("##### ChatGpt.execRequest: START -> make POST request");
+		log.info("##### execRequest(): START -> make POST request");
 		WebClient.ResponseSpec responseSpec = webClient.post()
 				.bodyValue(request)
 				.retrieve();
-		log.info("##### ChatGpt.execRequest: got ResponseSpec");
+		log.info("##### execRequest(): got ResponseSpec");
 
 		WebClient.ResponseSpec responseSpec1 = responseSpec
 				.onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.empty())
 				.onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.empty());
-		log.info("##### ChatGpt.execRequest: checked error status codes (4xx, 5xx)");
+		log.info("##### execRequest(): checked error status codes (4xx, 5xx)");
 
 		Mono<ResponseEntity<ChatGptResponse>> mono = responseSpec1
 				.toEntity(ChatGptResponse.class);
-		log.info("##### ChatGpt.execRequest: got Mono: %s".formatted(mono));
+		log.info("##### execRequest(): got Mono: %s".formatted(mono));
 
 		ResponseEntity<ChatGptResponse> responseEntity = mono
 				.block(Duration.of(3, ChronoUnit.MINUTES));
-		log.info("##### ChatGpt.execRequest got responseEntity -> END");
+		log.info("##### execRequest(): got responseEntity -> END");
 
 		if (responseEntity == null) return null;
 
