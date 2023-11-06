@@ -17,6 +17,11 @@ const SimpleCard = styled.div`
     border-radius: 4px;
     padding: 0.2em;
 `;
+const SimpleCard05 = styled.div`
+    border: 1px solid var(--border-color, #707070);
+    border-radius: 4px;
+    padding: 0.5em;
+`;
 
 const AnswerCard = styled.div<{ $bgcolor: string }>`
   background: ${props => props.$bgcolor};
@@ -92,9 +97,16 @@ export default function TestRunCard( props:Readonly<Props> ) {
 
             <ValueBlock>
                 <BigLabel>Variables : </BigLabel>
-                <div className="FlexRow">{
-                    props.testRun.variables.map(varName=> <SimpleCard key={varName}>{varName}</SimpleCard>)
-                }</div>
+                {
+                    props.testRun.variables.length===0 &&
+                    <SimpleCard05>Currently are no Variables defined.</SimpleCard05>
+                }
+                {
+                    props.testRun.variables.length!==0 &&
+                    <SimpleCard05 className="FlexRow">{
+                        props.testRun.variables.map(varName=> <SimpleCard key={varName}>{varName}</SimpleCard>)
+                    }</SimpleCard05>
+                }
             </ValueBlock>
 
             <ValueBlock>
