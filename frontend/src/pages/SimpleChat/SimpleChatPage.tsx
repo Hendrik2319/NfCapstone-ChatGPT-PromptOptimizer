@@ -1,7 +1,7 @@
 import './SimpleChatPage.css';
 import {ChangeEvent, FormEvent, useState} from "react";
-import axios from "axios";
 import {Answer, DEBUG, Prompt, SHOW_RENDERING_HINTS} from "../../models/BaseTypes.tsx";
+import {askChatGPT} from "../../global_functions/BackendAPI.tsx";
 
 export default function SimpleChatPage() {
     const [ prompt, setPrompt ] = useState<Prompt>({ prompt:"" });
@@ -17,15 +17,14 @@ export default function SimpleChatPage() {
     function onSubmitForm( event:FormEvent<HTMLFormElement> ) {
         event.preventDefault();
         if (DEBUG) console.debug(`SimpleChatView: prompt ->`, prompt);
-        axios
-            .post("/api/ask", prompt)
-            .then(response => {
-                if (DEBUG) console.debug(`SimpleChatView: answer ->`, response.data);
-                setAnswer( response.data );
-            })
-            .catch(reason => {
-                console.error("Error in SimpleChatView.onSubmitForm", reason);
-            });
+        askChatGPT(
+            prompt,
+            "SimpleChatView.onSubmitForm",
+            answer => {
+                if (DEBUG) console.debug(`SimpleChatView: answer ->`, answer);
+                setAnswer( answer );
+            }
+        );
     }
 
     return (
