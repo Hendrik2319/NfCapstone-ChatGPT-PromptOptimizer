@@ -111,7 +111,7 @@ class SecurityConfigTest {
 	@NotNull
 	private static StoredUserInfo createStoredUserInfo(Role role) {
 		return new StoredUserInfo(
-				"RegistrationIduserID","RegistrationId", "userID", role,
+				"RegistrationIduserID", role, "RegistrationId", "userID",
 				"login", null, null, null, null
 		);
 	}

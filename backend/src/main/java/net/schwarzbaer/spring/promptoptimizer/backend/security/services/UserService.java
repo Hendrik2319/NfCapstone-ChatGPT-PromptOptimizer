@@ -21,7 +21,15 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
-//	@SuppressWarnings("java:S106")
+
+	private static final String ATTR_AVATAR_URL = "avatar_url";
+	private static final String ATTR_URL = "html_url";
+	private static final String ATTR_LOCATION = "location";
+	private static final String ATTR_NAME = "name";
+	private static final String ATTR_LOGIN = "login";
+	public static final String ATTR_USER_DB_ID = "UserDbId";
+	public static final String ATTR_ORIGINAL_ID = "id";
+	//	@SuppressWarnings("java:S106")
 //	private static final PrintStream DEBUG_OUT = System.out;
 
 	private final UserRepository userRepository;
@@ -41,13 +49,13 @@ public class UserService {
 					true,
 					hasRole(user, Role.USER),
 					hasRole(user, Role.ADMIN),
-					Objects.toString( user.getAttribute("id"), null ),
-					Objects.toString( user.getAttribute("UserDbId"), null ),
-					Objects.toString( user.getAttribute("login"), null ),
-					Objects.toString( user.getAttribute("name"), null ),
-					Objects.toString( user.getAttribute("location"), null ),
-					Objects.toString( user.getAttribute("html_url"), null ),
-					Objects.toString( user.getAttribute("avatar_url"), null )
+					Objects.toString( user.getAttribute(ATTR_ORIGINAL_ID), null ),
+					Objects.toString( user.getAttribute(ATTR_USER_DB_ID ), null ),
+					Objects.toString( user.getAttribute(ATTR_LOGIN      ), null ),
+					Objects.toString( user.getAttribute(ATTR_NAME       ), null ),
+					Objects.toString( user.getAttribute(ATTR_LOCATION   ), null ),
+					Objects.toString( user.getAttribute(ATTR_URL        ), null ),
+					Objects.toString( user.getAttribute(ATTR_AVATAR_URL ), null )
 			);
 		}
 
@@ -67,7 +75,17 @@ public class UserService {
 	}
 
 	public void addUser(Role role, String registrationId, Map<String, Object> newAttributes) {
-		// TODO
+		userRepository.save(new StoredUserInfo(
+				Objects.toString(newAttributes.get(ATTR_USER_DB_ID ), null),
+				role,
+				registrationId,
+				Objects.toString(newAttributes.get(ATTR_ORIGINAL_ID), null),
+				Objects.toString(newAttributes.get(ATTR_LOGIN      ), null),
+				Objects.toString(newAttributes.get(ATTR_NAME       ), null),
+				Objects.toString(newAttributes.get(ATTR_LOCATION   ), null),
+				Objects.toString(newAttributes.get(ATTR_URL        ), null),
+				Objects.toString(newAttributes.get(ATTR_AVATAR_URL ), null)
+		));
 	}
 
 	public void updateUserIfNeeded(StoredUserInfo storedUserInfo, Map<String, Object> newAttributes) {
@@ -77,11 +95,20 @@ public class UserService {
 	}
 
 	private StoredUserInfo updateUserObject(StoredUserInfo storedUserInfo, Map<String, Object> newAttributes) {
-		// TODO
-		return storedUserInfo;
+		return new StoredUserInfo(
+				storedUserInfo.id(),
+				storedUserInfo.role(),
+				storedUserInfo.registrationId(),
+				Objects.toString(newAttributes.get(ATTR_ORIGINAL_ID), storedUserInfo.originalId()),
+				Objects.toString(newAttributes.get(ATTR_LOGIN      ), storedUserInfo.login     ()),
+				Objects.toString(newAttributes.get(ATTR_NAME       ), storedUserInfo.name      ()),
+				Objects.toString(newAttributes.get(ATTR_LOCATION   ), storedUserInfo.location  ()),
+				Objects.toString(newAttributes.get(ATTR_URL        ), storedUserInfo.url       ()),
+				Objects.toString(newAttributes.get(ATTR_AVATAR_URL ), storedUserInfo.avatar_url())
+		);
 	}
 
 	private void saveUser(StoredUserInfo updatedUserInfo) {
-		// TODO
+		userRepository.save(updatedUserInfo);
 	}
 }
