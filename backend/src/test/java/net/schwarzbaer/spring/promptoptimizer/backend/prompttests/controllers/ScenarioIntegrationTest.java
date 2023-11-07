@@ -45,6 +45,13 @@ class ScenarioIntegrationTest {
 		reg.add("app.openai-api-url", ()->"dummy_url");
 	}
 
+	private void fillScenarioRepository() {
+		scenarioRepository.save(new Scenario("id1", "author1", "label1", 1));
+		scenarioRepository.save(new Scenario("id2", "author2", "label2", 1));
+		scenarioRepository.save(new Scenario("id3", "author2", "label3", 1));
+		scenarioRepository.save(new Scenario("id4", "author2", "label4", 1));
+	}
+
 // ####################################################################################
 //               getAllScenariosOfUser
 // ####################################################################################
@@ -102,9 +109,9 @@ class ScenarioIntegrationTest {
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
 						[
-							{ "id": "id2", "authorID": "author2", "label": "label2" },
-							{ "id": "id3", "authorID": "author2", "label": "label3" },
-							{ "id": "id4", "authorID": "author2", "label": "label4" }
+							{ "id": "id2", "authorID": "author2", "label": "label2", "maxWantedWordCount": 1 },
+							{ "id": "id3", "authorID": "author2", "label": "label3", "maxWantedWordCount": 1 },
+							{ "id": "id4", "authorID": "author2", "label": "label4", "maxWantedWordCount": 1 }
 						]
 				"""));
 	}
@@ -164,19 +171,12 @@ class ScenarioIntegrationTest {
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
 						[
-							{ "id": "id1", "authorID": "author1", "label": "label1" },
-							{ "id": "id2", "authorID": "author2", "label": "label2" },
-							{ "id": "id3", "authorID": "author2", "label": "label3" },
-							{ "id": "id4", "authorID": "author2", "label": "label4" }
+							{ "id": "id1", "authorID": "author1", "label": "label1", "maxWantedWordCount":  1 },
+							{ "id": "id2", "authorID": "author2", "label": "label2", "maxWantedWordCount":  1 },
+							{ "id": "id3", "authorID": "author2", "label": "label3", "maxWantedWordCount":  1 },
+							{ "id": "id4", "authorID": "author2", "label": "label4", "maxWantedWordCount":  1 }
 						]
 				"""));
-	}
-
-	private void fillScenarioRepository() {
-		scenarioRepository.save(new Scenario("id1", "author1", "label1"));
-		scenarioRepository.save(new Scenario("id2", "author2", "label2"));
-		scenarioRepository.save(new Scenario("id3", "author2", "label3"));
-		scenarioRepository.save(new Scenario("id4", "author2", "label4"));
 	}
 
 // ####################################################################################
@@ -295,7 +295,7 @@ class ScenarioIntegrationTest {
 	@DirtiesContext
 	void whenUpdateScenario_getsScenarioWithUnknownId_returnsStatus404NotFound() throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id2", "author1", "label1"));
+		scenarioRepository.save(new Scenario("id2", "author1", "label1", 1));
 
 		// When
 		mockMvc
@@ -313,7 +313,7 @@ class ScenarioIntegrationTest {
 	@Test @DirtiesContext
 	void whenUpdateScenario_isCalledByUnauthorized_returnsStatus401Unauthorized() throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id1", "author1", "labelOld"));
+		scenarioRepository.save(new Scenario("id1", "author1", "labelOld", 1));
 
 		// When
 		mockMvc
@@ -353,12 +353,11 @@ class ScenarioIntegrationTest {
 				Role.USER,"author1", "author2", "author1"
 		);
 	}
-
 	private void whenUpdateScenario_isCalled_returnsStatus403Forbidden(
 			Role role, String userDbId, String authorOfStored, String authorOfGiven
 	) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id1", authorOfStored, "labelOld"));
+		scenarioRepository.save(new Scenario("id1", authorOfStored, "labelOld", 1));
 
 		// When
 		mockMvc
@@ -367,7 +366,7 @@ class ScenarioIntegrationTest {
 						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
-								{ "id": "id1", "authorID": "%s", "label": "labelNew" }
+								{ "id": "id1", "authorID": "%s", "label": "labelNew", "maxWantedWordCount": 1 }
 						""".formatted(authorOfGiven))
 				)
 
@@ -377,59 +376,37 @@ class ScenarioIntegrationTest {
 
 	@Test @DirtiesContext
 	void whenUpdateScenario_isCalledByAdmin_returnsUpdatedValue() throws Exception {
-		// Given
-		scenarioRepository.save(new Scenario("id1", "author2", "labelOld"));
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.put("/api/scenario/%s".formatted("id1"))
-						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "authorAdmin", "login"))
-						.contentType(MediaType.APPLICATION_JSON)
-						.content("""
-								{ "id": "id1", "authorID": "author1", "label": "labelNew" }
-						""")
-				)
-
-				// Then
-				.andExpect(status().isOk())
-				.andExpect(content().json("""
-						{ "id": "id1", "authorID": "author1", "label": "labelNew" }
-				"""));
-
-		Optional<Scenario> actual = scenarioRepository.findById("id1");
-		assertNotNull(actual);
-		assertTrue(actual.isPresent());
-		Scenario expected = new Scenario("id1", "author1", "labelNew");
-		assertEquals(expected, actual.get());
+		whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue("author2", Role.ADMIN, "authorAdmin");
 	}
-
 	@Test @DirtiesContext
 	void whenUpdateScenario_isCalledByUser_returnsUpdatedValue() throws Exception {
+		whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue("author1", Role.USER, "author1");
+	}
+	private void whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue(String storedAuthorId, Role role, String userDbId) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id1", "author1", "labelOld"));
+		scenarioRepository.save(new Scenario("id1", storedAuthorId, "labelOld", 1));
 
 		// When
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.put("/api/scenario/%s".formatted("id1"))
-						.with(SecurityTestTools.buildUser(Role.USER, "userId1", "author1", "login"))
+						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
-								{ "id": "id1", "authorID": "author1", "label": "labelNew" }
-						""")
+								{ "id": "id1", "authorID": "%s", "label": "labelNew", "maxWantedWordCount": 1 }
+						""".formatted(storedAuthorId))
 				)
 
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
-						{ "id": "id1", "authorID": "author1", "label": "labelNew" }
-				"""));
+						{ "id": "id1", "authorID": "%s", "label": "labelNew", "maxWantedWordCount": 1 }
+				""".formatted(storedAuthorId)));
 
 		Optional<Scenario> actual = scenarioRepository.findById("id1");
 		assertNotNull(actual);
 		assertTrue(actual.isPresent());
-		Scenario expected = new Scenario("id1", "author1", "labelNew");
+		Scenario expected = new Scenario("id1", storedAuthorId, "labelNew", 1);
 		assertEquals(expected, actual.get());
 	}
 
@@ -443,12 +420,11 @@ class ScenarioIntegrationTest {
 	@Test @DirtiesContext void whenDeleteScenario_isCalledByUser() throws Exception {
 		whenDeleteScenario_isCalledByAllowedUser(Role.USER, "author1", "author1");
 	}
-
 	private void whenDeleteScenario_isCalledByAllowedUser(
 			Role role, String userDbId, String storedAuthorID
 	) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1"));
+		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
 
 		// When
 		mockMvc
@@ -468,7 +444,7 @@ class ScenarioIntegrationTest {
 	@Test @DirtiesContext
 	void whenDeleteScenario_isCalledWithUnknownId_returnsStatus404Notfound() throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id2", "author1", "label1"));
+		scenarioRepository.save(new Scenario("id2", "author1", "label1", 1));
 
 		// When
 		mockMvc
@@ -484,7 +460,7 @@ class ScenarioIntegrationTest {
 	@Test @DirtiesContext
 	void whenDeleteScenario_isCalledUnauthorized_returnStatus401Unauthorized() throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id1", "author1", "label1"));
+		scenarioRepository.save(new Scenario("id1", "author1", "label1", 1));
 
 		// When
 		mockMvc
@@ -510,7 +486,7 @@ class ScenarioIntegrationTest {
 			Role role, String userDbId, String storedAuthorID
 	) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1"));
+		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
 
 		// When
 		mockMvc
@@ -538,7 +514,7 @@ class ScenarioIntegrationTest {
 			Role role, String userDbId, String storedAuthorID
 	) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1"));
+		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
 
 		// When
 		mockMvc
@@ -550,14 +526,14 @@ class ScenarioIntegrationTest {
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
-						{ "id": "id1", "authorID": "%s", "label": "label1" }
+						{ "id": "id1", "authorID": "%s", "label": "label1", "maxWantedWordCount": 1 }
 				""".formatted(storedAuthorID)));
 	}
 
 	@Test @DirtiesContext
 	void whenGetScenarioById_isCalledWithUnknownId_returnsStatus404NotFound() throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id2", "author1", "label1"));
+		scenarioRepository.save(new Scenario("id2", "author1", "label1", 1));
 
 		// When
 		mockMvc
@@ -573,7 +549,7 @@ class ScenarioIntegrationTest {
 	@Test @DirtiesContext
 	void whenGetScenarioById_isCalledUnauthorized_returnsStatus401Unauthorized() throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id1", "author1", "label1"));
+		scenarioRepository.save(new Scenario("id1", "author1", "label1", 1));
 
 		// When
 		mockMvc
@@ -599,7 +575,7 @@ class ScenarioIntegrationTest {
 			Role role, String userDbId, String storedAuthorID
 	) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1"));
+		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
 
 		// When
 		mockMvc

@@ -89,7 +89,7 @@ class TestRunServiceTest {
 	void whenGetTestRunsOfScenario_isCalledByAllowedUser_returnsList1() throws UserIsNotAllowedException {
 		// Given
 		when(scenarioService.getScenarioById("scenarioId1")).thenReturn(
-			Optional.of(new Scenario("scenarioId1", "author1", "label1"))
+			Optional.of(new Scenario("scenarioId1", "author1", "label1", 1))
 		);
 		when(testRunRepository.findAllByScenarioId("scenarioId1")).thenReturn(
 				List.of()
@@ -107,7 +107,7 @@ class TestRunServiceTest {
 	void whenGetTestRunsOfScenario_isCalledByAllowedUser_returnsList2() throws UserIsNotAllowedException {
 		// Given
 		when(scenarioService.getScenarioById("scenarioId1")).thenReturn(
-				Optional.of(new Scenario("scenarioId1", "author1", "label1"))
+				Optional.of(new Scenario("scenarioId1", "author1", "label1", 1))
 		);
 		when(testRunRepository.findAllByScenarioId("scenarioId1")).thenReturn(
 				List.of(createTestRun("id1", "scenarioId1"))
@@ -189,7 +189,7 @@ class TestRunServiceTest {
 	void whenAddTestRun_isCalledNormal_returnsStoredTestRun() throws UserIsNotAllowedException {
 		// Given
 		when(scenarioService.getScenarioById("scenarioId1")).thenReturn(
-				Optional.of(new Scenario("scenarioId1", "author1", "label1"))
+				Optional.of(new Scenario("scenarioId1", "author1", "label1", 1))
 		);
 		when(testRunRepository.save(createTestRun(null, "scenarioId1"))).thenReturn(
 				createTestRun("id1", "scenarioId1")
@@ -258,7 +258,7 @@ class TestRunServiceTest {
 	void whenPerformTestRun_isCalledNormal_returnsNothing() throws UserIsNotAllowedException {
 		// Given
 		when(scenarioService.getScenarioById("scenarioId1")).thenReturn(
-				Optional.of(new Scenario("scenarioId1", "author1", "label1"))
+				Optional.of(new Scenario("scenarioId1", "author1", "label1", 1))
 		);
 		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.1/value2.1"))).thenReturn( new Answer("TestAnswer/value1.1/value2.1", 12,23,35) );
 		when(chatGptService.askChatGPT(new Prompt("TestPrompt/value1.1/value2.2"))).thenReturn( new Answer("TestAnswer/value1.1/value2.2", 12,23,35) );
