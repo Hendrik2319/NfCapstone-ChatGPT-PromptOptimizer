@@ -1,7 +1,7 @@
 import "./ApiStateIndicator.css"
-import axios from "axios";
 import {useEffect, useState} from "react";
 import {ApiState, DEBUG, SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
+import {getApiState} from "../../../global_functions/BackendAPI.tsx";
 
 export default function ApiStateIndicator() {
     const [ state, setState ] = useState<ApiState>()
@@ -10,15 +10,10 @@ export default function ApiStateIndicator() {
     useEffect( getState, [] )
 
     function getState() {
-        axios
-            .get("/api/apistate")
-            .then(response => {
-                if (DEBUG) console.debug(`ApiState: getState() ->`, response.data);
-                setState(response.data)
-            })
-            .catch(reason => {
-                console.error("Error in ApiState.getState", reason);
-            });
+        getApiState("ApiStateIndicator.getState", state => {
+            if (DEBUG) console.debug(`ApiState: getState() ->`, state);
+            setState(state)
+        })
     }
 
     const isEnabled = state?.enabled;

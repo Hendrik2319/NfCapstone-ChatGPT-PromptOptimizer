@@ -1,5 +1,4 @@
 import './App.css'
-import axios from "axios";
 import {useEffect, useState} from "react";
 import {Link, Navigate, Route, Routes, useLocation} from "react-router-dom";
 import {DarkModeState, getCurrentDarkModeState} from "./pages/Main/components/DarkModeSwitch.Functions.tsx";
@@ -13,6 +12,9 @@ import SimpleChatPage from "./pages/SimpleChat/SimpleChatPage.tsx";
 import TestRunsPage from "./pages/TestRuns/TestRunsPage.tsx";
 import NewTestRunPage from "./pages/NewTestRun/NewTestRunPage.tsx";
 import TestRunWaitPage from "./pages/TestRunWaitPage.tsx";
+import {determineCurrentUser, logout} from "./global_functions/BackendAPI.tsx";
+import TestRunsChartPage from "./pages/TestRunsChart/TestRunsChartPage.tsx";
+import {notifyAppThemeListener} from "./global_functions/AppThemeListener.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfos>();
@@ -23,9 +25,10 @@ export default function App() {
         setAppTheme( getCurrentDarkModeState() );
     }, []);
 
-    useEffect(determineCurrentUser, [ location.pathname ]);
+    useEffect(determineCurrentUser_, [ location.pathname ]);
 
     function setAppTheme(state: DarkModeState) {
+        notifyAppThemeListener(state);
         document.body.classList.remove( state === "dark" ? "light" : "dark" );
         document.body.classList.add(state);
     }
@@ -35,22 +38,18 @@ export default function App() {
         window.open(host + '/oauth2/authorization/github', '_self');
     }
 
-    function logout() {
-        axios.post("/api/logout")
-            .then(() => {
-                setUser(undefined)
-            })
-            .catch(error => {
-                console.error("ERROR[TestRunsView.loadTestRuns]", error)
-            })
+    function logout_() {
+        logout("App.logout_()", ()=>setUser(undefined));
     }
 
-    function determineCurrentUser() {
-        axios.get("/api/users/me")
-            .then(response => {
-                if (DEBUG) console.debug("determineCurrentUser", response.data);
-                setUser(response.data);
-            })
+    function determineCurrentUser_() {
+        determineCurrentUser(
+            "App.determineCurrentUser_()",
+            user => {
+                if (DEBUG) console.debug("determineCurrentUser", user);
+                setUser(user);
+            }
+        )
     }
 
     return (
@@ -60,8 +59,8 @@ export default function App() {
                 <DarkModeSwitch onChange={setAppTheme}/>
                 <hr/>
                 {!user?.isAuthenticated && <button onClick={login}>Login</button>}
-                { user?.isAuthenticated && <button onClick={logout}>Logout</button>}
-                <button onClick={determineCurrentUser}>me</button>
+                { user?.isAuthenticated && <button onClick={logout_}>Logout</button>}
+                <button onClick={determineCurrentUser_}>me</button>
                 {
                     user?.isAuthenticated &&
                     <div className={"CurrentUser"}>
@@ -91,6 +90,7 @@ export default function App() {
                     <Route path={"/scenario/:id"} element={<TestRunsPage user={user}/>}/>
                     <Route path={"/scenario/:id/newtestrun"} element={<NewTestRunPage/>}/>
                     <Route path={"/scenario/:id/pleasewait"} element={<TestRunWaitPage/>}/>
+                    <Route path={"/scenario/:id/chart"} element={<TestRunsChartPage/>}/>
                 </Route>
                 <Route path={"/*"} element={<Navigate to={"/"}/>}/>
             </Routes>

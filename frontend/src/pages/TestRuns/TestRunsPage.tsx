@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {SHOW_RENDERING_HINTS, UserInfos} from "../../models/BaseTypes.tsx";
 import {isCurrentNewTestRunStored, saveCurrentNewTestRun} from "../../global_functions/NewTestRunStoarage.tsx";
-import {loadScenario, loadTestRuns} from "../../global_functions/BackendAPI.tsx";
+import {loadScenarioById, loadTestRunsOfScenario} from "../../global_functions/BackendAPI.tsx";
 import TestRunsList from "./components/TestRunsList.tsx";
 import BreadCrumbs from "../../components/BreadCrumbs.tsx";
 import {Scenario} from "../../models/ScenarioTypes.tsx";
@@ -13,7 +13,7 @@ type Props = {
     user?: UserInfos
 }
 
-export default function TestRunsPage(props:Readonly<Props> ) {
+export default function TestRunsPage( props:Readonly<Props> ) {
     const [ scenario, setScenario ] = useState<Scenario>();
     const [ testruns, setTestruns ] = useState<TestRun[]>([]);
     const { id: scenarioId } = useParams();
@@ -22,8 +22,8 @@ export default function TestRunsPage(props:Readonly<Props> ) {
 
     useEffect(()=>{
         if (scenarioId) {
-            loadScenario(scenarioId, "TestRunsView", scenario=> {
-                loadTestRuns(scenarioId, "TestRunsView",testruns => {
+            loadScenarioById(scenarioId, "TestRunsView", scenario=> {
+                loadTestRunsOfScenario(scenarioId, "TestRunsView", testruns => {
                     setScenario(scenario);
                     setTestruns(testruns);
                 });
@@ -63,13 +63,12 @@ export default function TestRunsPage(props:Readonly<Props> ) {
     return (
         <>
             <BreadCrumbs scenarioId={scenarioId}/>
+            <button onClick={()=>navigate("/scenario/"+scenarioId+"/chart")}>Chart</button>
             {
                 userCanStartNewTestRun && (currentNewTestRunIsStored || testruns.length===0) &&
-                <>
-                    <button onClick={()=>navigate("/scenario/"+scenarioId+"/newtestrun")}>New TestRun</button>
-                    <br/>
-                </>
+                <button onClick={()=>navigate("/scenario/"+scenarioId+"/newtestrun")}>New TestRun</button>
             }
+            <br/>
             <TestRunsList
                 scenarioId={scenarioId}
                 testruns={testruns}

@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import BreadCrumbs from "../components/BreadCrumbs.tsx";
-import {loadRunningTestRuns} from "../global_functions/BackendAPI.tsx";
+import {loadRunningTestRunsOfScenario} from "../global_functions/BackendAPI.tsx";
 import {RunningTestRun} from "../models/TestRunTypes.tsx";
 import {BigLabel} from "../components/StandardStyledComponents.tsx";
 
@@ -26,7 +26,7 @@ export default function TestRunWaitPage() {
             console.debug("TestRunWaitPage.interval: call "+(counter++)+" ( scenarioId:"+scenarioId+" )");
 
             if (scenarioId)
-                loadRunningTestRuns(scenarioId, "TestRunWaitPage", setResponseData);
+                loadRunningTestRunsOfScenario(scenarioId, "TestRunWaitPage", setResponseData);
         }
 
         loop();
@@ -58,7 +58,7 @@ export default function TestRunWaitPage() {
 
     return (
         <>
-            <BreadCrumbs scenarioId={scenarioId} isNewTestRun={true}/>
+            <BreadCrumbs scenarioId={scenarioId} extraLabel={"New TestRun"}/>
             <p className={"SimpleCard"}>
                 Please wait.<br/>
                 { getFirstPart(runningTestRuns.length) } in progress ...

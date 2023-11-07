@@ -1,11 +1,11 @@
 import {Link} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {loadScenario} from "../global_functions/BackendAPI.tsx";
+import {loadScenarioById} from "../global_functions/BackendAPI.tsx";
 import {Scenario} from "../models/ScenarioTypes.tsx";
 
 type Props = {
     scenarioId?: string
-    isNewTestRun?: boolean
+    extraLabel?: string
 }
 
 export default function BreadCrumbs( props:Readonly<Props> ) {
@@ -13,7 +13,7 @@ export default function BreadCrumbs( props:Readonly<Props> ) {
 
     useEffect(()=>{
         if (props.scenarioId) {
-            loadScenario(props.scenarioId, "BreadCrumbs",scenario=> {
+            loadScenarioById(props.scenarioId, "BreadCrumbs", scenario=> {
                 setScenario(scenario);
             });
         } else
@@ -36,14 +36,13 @@ export default function BreadCrumbs( props:Readonly<Props> ) {
                 props.scenarioId && <>
                     {" > "}
                     {
-                        !props.isNewTestRun
+                        !props.extraLabel
                             ? scenarioLabel
                             : <Link to={"/scenario/"+props.scenarioId}>{scenarioLabel}</Link>
                     }
                     {
-                        props.isNewTestRun &&
-                        " > New TestRun"
-
+                        props.extraLabel &&
+                        " > "+props.extraLabel
                     }
                 </>
             }
