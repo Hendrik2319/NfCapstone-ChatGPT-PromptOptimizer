@@ -33,16 +33,25 @@ export default function TestRunsList( props:Readonly<Props> ) {
     const [maxWordCount, setMaxWordCount] = useState<number>();
 
     function onChange_RateAnswers_WordCount_Active( event: ChangeEvent<HTMLInputElement> ) {
-        if (event.target.checked)
-            setMaxWordCount(1);
-        else
-            setMaxWordCount(undefined);
+        const newValue = event.target.checked ? 1 : undefined;
+        setMaxWordCount(newValue);
+        props.saveChangedScenario({
+            ...props.scenario,
+            maxWantedWordCount: newValue
+        });
     }
 
     function onChange_RateAnswers_WordCount_Value( event: ChangeEvent<HTMLInputElement> ) {
         let n = parseInt(event.target.value);
         if (isNaN(n)) n = 0;
         setMaxWordCount(n);
+    }
+
+    function save_WordCount_Value() {
+        props.saveChangedScenario({
+            ...props.scenario,
+            maxWantedWordCount: maxWordCount
+        });
     }
 
     function createStartNewTestRunCallback( testRun: TestRun ) {
@@ -75,6 +84,10 @@ export default function TestRunsList( props:Readonly<Props> ) {
                                 size={2}
                                 onChange={onChange_RateAnswers_WordCount_Value}
                             />
+                            {
+                                maxWordCount !== props.scenario.maxWantedWordCount &&
+                                <button onClick={save_WordCount_Value}>Save</button>
+                            }
                         </>
                     }
                 </RateLabel>
