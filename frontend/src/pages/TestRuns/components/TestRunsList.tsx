@@ -1,8 +1,9 @@
 import {TestRun} from "../../../models/TestRunTypes.tsx";
 import TestRunCard from "./TestRunCard.tsx";
-import {ChangeEvent, useState} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {Scenario} from "../../../models/ScenarioTypes.tsx";
+import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 
 const MainPanel = styled.div`
     margin-top: 0.5em;
@@ -30,7 +31,12 @@ type Props = {
 }
 
 export default function TestRunsList( props:Readonly<Props> ) {
-    const [maxWordCount, setMaxWordCount] = useState<number>();
+    const [maxWordCount, setMaxWordCount] = useState<number | undefined>(props.scenario.maxWantedWordCount);
+    if (SHOW_RENDERING_HINTS) console.debug("Rendering TestRunsList", { maxWordCount });
+
+    useEffect(() => {
+        setMaxWordCount( props.scenario.maxWantedWordCount );
+    }, [ props.scenario.maxWantedWordCount ]);
 
     function onChange_RateAnswers_WordCount_Active( event: ChangeEvent<HTMLInputElement> ) {
         const newValue = event.target.checked ? 1 : undefined;
@@ -71,12 +77,12 @@ export default function TestRunsList( props:Readonly<Props> ) {
                 <RateLabel className="ButtonLike">
                     <input
                         type={"checkbox"}
-                        checked={maxWordCount!==undefined}
+                        checked={typeof maxWordCount === "number"}
                         onChange={onChange_RateAnswers_WordCount_Active}
                     />
                     {" max. Word Count"}
                     {
-                        maxWordCount!==undefined &&
+                        typeof maxWordCount === "number" &&
                         <>
                             {" : "}
                             <InputField
