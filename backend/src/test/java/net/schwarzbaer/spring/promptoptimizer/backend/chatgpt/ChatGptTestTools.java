@@ -1,6 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.security.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
 import okhttp3.mockwebserver.MockResponse;
 import org.springframework.http.MediaType;

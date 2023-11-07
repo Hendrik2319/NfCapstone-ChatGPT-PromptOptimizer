@@ -1,4 +1,4 @@
-package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.controllers;
+package net.schwarzbaer.spring.promptoptimizer.backend.prompttests;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptTestTools;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
@@ -6,7 +6,7 @@ import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.RunningTestRunsList;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;

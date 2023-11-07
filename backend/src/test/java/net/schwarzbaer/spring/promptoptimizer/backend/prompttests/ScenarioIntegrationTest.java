@@ -1,8 +1,8 @@
-package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.controllers;
+package net.schwarzbaer.spring.promptoptimizer.backend.prompttests;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

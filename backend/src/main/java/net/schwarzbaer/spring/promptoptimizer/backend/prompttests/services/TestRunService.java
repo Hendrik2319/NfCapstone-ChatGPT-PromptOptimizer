@@ -2,14 +2,14 @@ package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Answer;
-import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptService;
-import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.Prompt;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models.Answer;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.services.ChatGptService;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models.Prompt;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewTestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedException;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 

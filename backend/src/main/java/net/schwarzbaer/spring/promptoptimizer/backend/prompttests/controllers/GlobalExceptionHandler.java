@@ -2,7 +2,7 @@ package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import net.schwarzbaer.spring.promptoptimizer.backend.ErrorMessage;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedException;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
