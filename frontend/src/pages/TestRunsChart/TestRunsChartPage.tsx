@@ -104,8 +104,8 @@ export default function TestRunsChartPage() {
                         scenario.maxWantedWordCount
                             ? {
                                 data: amountOfAnswersMeetMaxWordCount,
-                                label: "Answer meets Max. Word Count",
-                                axisLabel: "Amount of Answers, that meet Max. Word Count (%)",
+                                label: "Answers meet Max. Word Count (%)",
+                                axisLabel: [ "Amount of Answers, that", "meet Max. Word Count (%)" ],
                             }
                             : undefined
                     }
