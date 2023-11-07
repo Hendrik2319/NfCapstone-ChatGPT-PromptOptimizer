@@ -1,4 +1,4 @@
-import {ChangeEvent, useEffect, useState} from "react";
+import {ChangeEvent, ReactElement, useEffect, useState} from "react";
 import styled from "styled-components";
 
 const InputField = styled.input<{ $bgcolor: string }>`
@@ -11,7 +11,7 @@ const InputField = styled.input<{ $bgcolor: string }>`
 `;
 
 type Props = {
-    labelComp?: JSX.Element
+    labelComp?: ReactElement
     values: string[]
     fieldSize: number
     allowAddValue   : (value: string, index: number) => boolean
