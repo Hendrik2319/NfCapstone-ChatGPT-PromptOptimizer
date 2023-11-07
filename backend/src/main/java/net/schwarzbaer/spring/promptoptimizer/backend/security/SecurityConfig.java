@@ -2,7 +2,7 @@ package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserService;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.StoredUserInfoService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -80,12 +80,12 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(UserService userService) {
+	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(StoredUserInfoService storedUserInfoService) {
 		DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-		return request -> configureUserData(userService, delegate, request);
+		return request -> configureUserData(storedUserInfoService, delegate, request);
 	}
 
-	DefaultOAuth2User configureUserData(UserService userService, DefaultOAuth2UserService delegate, OAuth2UserRequest request) {
+	DefaultOAuth2User configureUserData(StoredUserInfoService storedUserInfoService, DefaultOAuth2UserService delegate, OAuth2UserRequest request) {
 		OAuth2User user = delegate.loadUser(request);
 		Collection<GrantedAuthority> newAuthorities = new ArrayList<>(user.getAuthorities());
 		Map<String, Object> newAttributes = new HashMap<>(user.getAttributes());
@@ -95,11 +95,11 @@ public class SecurityConfig {
 		newAttributes.put("UserDbId", userDbId);
 		Role role = null;
 
-		final Optional<StoredUserInfo> storedUserInfoOpt = userService.getUserById(userDbId);
+		final Optional<StoredUserInfo> storedUserInfoOpt = storedUserInfoService.getUserById(userDbId);
 		if (storedUserInfoOpt.isPresent()) {
 			final StoredUserInfo storedUserInfo = storedUserInfoOpt.get();
 			role = storedUserInfo.role();
-			userService.updateUserIfNeeded(storedUserInfo, newAttributes);
+			storedUserInfoService.updateUserIfNeeded(storedUserInfo, newAttributes);
 		}
 
 		if (role==null && initialAdmin.equals(userDbId))
@@ -109,7 +109,7 @@ public class SecurityConfig {
 			role = Role.UNKNOWN_ACCOUNT;
 
 		if (storedUserInfoOpt.isEmpty())
-			userService.addUser(role, registrationId, newAttributes);
+			storedUserInfoService.addUser(role, registrationId, newAttributes);
 
 		newAuthorities.add(new SimpleGrantedAuthority(role.getLong()));
 		return new DefaultOAuth2User(newAuthorities, newAttributes, "id");

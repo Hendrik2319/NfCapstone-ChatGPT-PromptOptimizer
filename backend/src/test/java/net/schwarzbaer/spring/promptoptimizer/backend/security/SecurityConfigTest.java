@@ -2,7 +2,7 @@ package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserService;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.StoredUserInfoService;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,8 +28,7 @@ class SecurityConfigTest {
 	private SecurityConfig securityConfig;
 	@Mock private DefaultOAuth2UserService delegate;
 	@Mock private OAuth2UserRequest oAuth2UserRequest;
-	@Mock private UserService userService;
-
+	@Mock private StoredUserInfoService storedUserInfoService;
 
 	@BeforeEach
 	void setup() {
@@ -52,21 +51,21 @@ class SecurityConfigTest {
 		when(delegate.loadUser(oAuth2UserRequest)).thenReturn(new DefaultOAuth2User(
 				List.of(), Map.of("id", userID), "id"
 		));
-		when(userService.getUserById("RegistrationId" + userID)).thenReturn(
+		when(storedUserInfoService.getUserById("RegistrationId" + userID)).thenReturn(
 				Optional.empty()
 		);
 
 		//When
-		DefaultOAuth2User actual = securityConfig.configureUserData(userService, delegate, oAuth2UserRequest);
+		DefaultOAuth2User actual = securityConfig.configureUserData(storedUserInfoService, delegate, oAuth2UserRequest);
 
 		//Then
 		Map<String, Object> newAttributes = Map.of(
 				"id", userID,
 				"UserDbId", "RegistrationId" + userID
 		);
-		verify(userService).getUserById("RegistrationId" + userID);
-		verify(userService, times(0)).updateUserIfNeeded(any(),any());
-		verify(userService).addUser(expectedRole, "RegistrationId", newAttributes);
+		verify(storedUserInfoService).getUserById("RegistrationId" + userID);
+		verify(storedUserInfoService, times(0)).updateUserIfNeeded(any(),any());
+		verify(storedUserInfoService).addUser(expectedRole, "RegistrationId", newAttributes);
 		DefaultOAuth2User expected = new DefaultOAuth2User(
 				List.of(new SimpleGrantedAuthority(expectedRole.getLong())),
 				newAttributes,
@@ -82,24 +81,24 @@ class SecurityConfigTest {
 		when(delegate.loadUser(oAuth2UserRequest)).thenReturn(new DefaultOAuth2User(
 				List.of(), Map.of("id", "userID"), "id"
 		));
-		when(userService.getUserById("RegistrationId" + "userID")).thenReturn(
+		when(storedUserInfoService.getUserById("RegistrationId" + "userID")).thenReturn(
 				Optional.of(createStoredUserInfo(expectedRole))
 		);
 
 		//When
-		DefaultOAuth2User actual = securityConfig.configureUserData(userService, delegate, oAuth2UserRequest);
+		DefaultOAuth2User actual = securityConfig.configureUserData(storedUserInfoService, delegate, oAuth2UserRequest);
 
 		//Then
 		Map<String, Object> newAttributes = Map.of(
 				"id", "userID",
 				"UserDbId", "RegistrationId" + "userID"
 		);
-		verify(userService).getUserById("RegistrationId" + "userID");
-		verify(userService).updateUserIfNeeded(
+		verify(storedUserInfoService).getUserById("RegistrationId" + "userID");
+		verify(storedUserInfoService).updateUserIfNeeded(
 				createStoredUserInfo(expectedRole),
 				newAttributes
 		);
-		verify(userService, times(0)).addUser(any(),any(),any());
+		verify(storedUserInfoService, times(0)).addUser(any(),any(),any());
 		DefaultOAuth2User expected = new DefaultOAuth2User(
 				List.of(new SimpleGrantedAuthority(expectedRole.getLong())),
 				newAttributes,
