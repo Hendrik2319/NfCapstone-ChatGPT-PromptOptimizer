@@ -8,7 +8,7 @@ import EditScenario from "./components/EditScenario.tsx";
 import DeleteScenario from "./components/DeleteScenario.tsx";
 import BreadCrumbs from "../../components/BreadCrumbs.tsx";
 import {Scenario, ScenarioDialogOptions} from "../../models/ScenarioTypes.tsx";
-import {addScenario, deleteScenario, editScenario, loadAllScenarios} from "../../global_functions/BackendAPI.tsx";
+import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
 
 type Props = {
     user: UserInfos
@@ -20,19 +20,19 @@ export default function ScenariosPage(props:Readonly<Props> ) {
     const { user } = props;
     if (SHOW_RENDERING_HINTS) console.debug("Rendering ScenarioList", { scenarios: scenarios.length });
 
-    useEffect(loadAllScenarios_, [ showFromAllUsers ]);
+    useEffect(loadAllScenarios, [ showFromAllUsers ]);
 
-    function loadAllScenarios_() { loadAllScenarios( showFromAllUsers, "ScenarioList.loadAllScenarios_()", setScenarios ); }
-    function addScenario_   ( label   : string   ) { addScenario   ( label   , "ScenarioList.addScenario_()"   , loadAllScenarios_ ); }
-    function editScenario_  ( scenario: Scenario ) { editScenario  ( scenario, "ScenarioList.editScenario_()"  , loadAllScenarios_ ); }
-    function deleteScenario_( id      : string   ) { deleteScenario( id      , "ScenarioList.deleteScenario_()", loadAllScenarios_ ); }
+    function loadAllScenarios() { BackendAPI.loadAllScenarios( showFromAllUsers, "ScenarioList.loadAllScenarios()", setScenarios ); }
+    function addScenario   ( label   : string   ) { BackendAPI.addScenario   ( label   , "ScenarioList.addScenario()"   , loadAllScenarios ); }
+    function updateScenario( scenario: Scenario ) { BackendAPI.updateScenario( scenario, "ScenarioList.updateScenario()", loadAllScenarios ); }
+    function deleteScenario( id      : string   ) { BackendAPI.deleteScenario( id      , "ScenarioList.deleteScenario()", loadAllScenarios ); }
 
     const addDialog =
         createDialog<undefined>(
             'AddScenarioDialog',
             dialogControl =>
                 <AddScenario
-                    addScenario={addScenario_}
+                    addScenario={addScenario}
                     closeDialog={dialogControl.closeDialog}
                 />
         )
@@ -42,7 +42,7 @@ export default function ScenariosPage(props:Readonly<Props> ) {
             'EditScenarioDialog',
             dialogControl =>
                 <EditScenario
-                    saveChanges={editScenario_}
+                    saveChanges={updateScenario}
                     setInitFunction={dialogControl.setInitFunction}
                     closeDialog={dialogControl.closeDialog}
                 />
@@ -53,7 +53,7 @@ export default function ScenariosPage(props:Readonly<Props> ) {
             'DeleteScenarioDialog',
             dialogControl =>
                 <DeleteScenario
-                    deleteScenario={deleteScenario_}
+                    deleteScenario={deleteScenario}
                     setInitFunction={dialogControl.setInitFunction}
                     closeDialog={dialogControl.closeDialog}
                 />

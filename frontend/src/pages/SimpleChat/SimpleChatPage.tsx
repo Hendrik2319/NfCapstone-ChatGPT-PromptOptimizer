@@ -1,7 +1,7 @@
 import './SimpleChatPage.css';
 import {ChangeEvent, FormEvent, useState} from "react";
 import {Answer, DEBUG, Prompt, SHOW_RENDERING_HINTS} from "../../models/BaseTypes.tsx";
-import {askChatGPT} from "../../global_functions/BackendAPI.tsx";
+import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
 
 export default function SimpleChatPage() {
     const [ prompt, setPrompt ] = useState<Prompt>({ prompt:"" });
@@ -17,7 +17,7 @@ export default function SimpleChatPage() {
     function onSubmitForm( event:FormEvent<HTMLFormElement> ) {
         event.preventDefault();
         if (DEBUG) console.debug(`SimpleChatView: prompt ->`, prompt);
-        askChatGPT(
+        BackendAPI.askChatGPT(
             prompt,
             "SimpleChatView.onSubmitForm",
             answer => {

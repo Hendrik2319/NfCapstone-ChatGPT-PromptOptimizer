@@ -12,7 +12,7 @@ import SimpleChatPage from "./pages/SimpleChat/SimpleChatPage.tsx";
 import TestRunsPage from "./pages/TestRuns/TestRunsPage.tsx";
 import NewTestRunPage from "./pages/NewTestRun/NewTestRunPage.tsx";
 import TestRunWaitPage from "./pages/TestRunWaitPage.tsx";
-import {determineCurrentUser, logout} from "./global_functions/BackendAPI.tsx";
+import {BackendAPI} from "./global_functions/BackendAPI.tsx";
 import TestRunsChartPage from "./pages/TestRunsChart/TestRunsChartPage.tsx";
 import {notifyAppThemeListener} from "./global_functions/AppThemeListener.tsx";
 
@@ -25,7 +25,7 @@ export default function App() {
         setAppTheme( getCurrentDarkModeState() );
     }, []);
 
-    useEffect(determineCurrentUser_, [ location.pathname ]);
+    useEffect(determineCurrentUser, [ location.pathname ]);
 
     function setAppTheme(state: DarkModeState) {
         notifyAppThemeListener(state);
@@ -38,13 +38,13 @@ export default function App() {
         window.open(host + '/oauth2/authorization/github', '_self');
     }
 
-    function logout_() {
-        logout("App.logout_()", ()=>setUser(undefined));
+    function logout() {
+        BackendAPI.logout("App.logout()", ()=>setUser(undefined));
     }
 
-    function determineCurrentUser_() {
-        determineCurrentUser(
-            "App.determineCurrentUser_()",
+    function determineCurrentUser() {
+        BackendAPI.determineCurrentUser(
+            "App.determineCurrentUser()",
             user => {
                 if (DEBUG) console.debug("determineCurrentUser", user);
                 setUser(user);
@@ -59,8 +59,8 @@ export default function App() {
                 <DarkModeSwitch onChange={setAppTheme}/>
                 <hr/>
                 {!user?.isAuthenticated && <button onClick={login}>Login</button>}
-                { user?.isAuthenticated && <button onClick={logout_}>Logout</button>}
-                <button onClick={determineCurrentUser_}>me</button>
+                { user?.isAuthenticated && <button onClick={logout}>Logout</button>}
+                <button onClick={determineCurrentUser}>me</button>
                 {
                     user?.isAuthenticated &&
                     <div className={"CurrentUser"}>

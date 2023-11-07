@@ -6,7 +6,7 @@ import TestCasesEditAndView from "./components/TestCasesEditAndView.tsx";
 import VariablesEdit from "./components/VariablesEdit.tsx";
 import {loadCurrentNewTestRun, saveCurrentNewTestRun} from "../../global_functions/NewTestRunStoarage.tsx";
 import {useNavigate, useParams} from "react-router-dom";
-import {performTestRun} from "../../global_functions/BackendAPI.tsx";
+import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
 import BreadCrumbs from "../../components/BreadCrumbs.tsx";
 
 export const BigLabel = styled.label`
@@ -59,8 +59,8 @@ export default function NewTestRunPage() {
         saveCurrentNewTestRun(scenarioId, storedNewTestRun)
     }
 
-    function performTestRun_intern(scenarioId: string) {
-        performTestRun({
+    function performTestRun(scenarioId: string) {
+        BackendAPI.performTestRun({
                 prompt: getPrompt(),
                 scenarioId: scenarioId,
                 variables: getVariables(),
@@ -150,7 +150,7 @@ export default function NewTestRunPage() {
                 setGetter={fcn => testcasesCompGetter = fcn}
                 setVarChangeNotifier={fcn => testcasesVarChangeNotifier = fcn}
             />
-            <BigButton onClick={()=>performTestRun_intern(scenarioId)}>Start Test Run</BigButton>
+            <BigButton onClick={()=>performTestRun(scenarioId)}>Start Test Run</BigButton>
         </>
     )
 }
