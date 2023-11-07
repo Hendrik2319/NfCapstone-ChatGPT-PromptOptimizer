@@ -71,8 +71,6 @@ export default function TestRunsChartPage() {
     }
 
     const labels = entries.map( entry => entry.label );
-    // const averageTokensPerRequest = labels.map(() => Math.random()*20 -10);
-    // const amountOfAnswersMeetMaxWordCount = labels.map(() => Math.random()*2000 -1000);
     const averageTokensPerRequest         = entries.map( entry => getValue( 0, entry.averageTokensPerRequest ) );
     const amountOfAnswersMeetMaxWordCount = entries.map( entry => getValue( 0, entry.amountOfAnswersMeetMaxWordCount )*100 );
     return (
@@ -80,9 +78,22 @@ export default function TestRunsChartPage() {
             <BreadCrumbs scenarioId={scenarioId} extraLabel={"Chart"}/>
             <SimpleCard>
                 <TestRunsChart
-                    labels={labels}
-                    averageTokensPerRequest={averageTokensPerRequest}
-                    amountOfAnswersMeetMaxWordCount={amountOfAnswersMeetMaxWordCount}
+                    chartTitle={"Values of Answers in TestRun"}
+
+                    xData={labels}
+                    axisXLabel={"TestRuns"}
+
+                    lineSet={{
+                        data: averageTokensPerRequest,
+                        label: "Average Tokens per Request",
+                        axisLabel: "Tokens per Request",
+                    }}
+
+                    barSet={{
+                        data: amountOfAnswersMeetMaxWordCount,
+                        label: "Answer meets Max. Word Count",
+                        axisLabel: "Amount of Answers, that meet Max. Word Count (%)",
+                    }}
                 />
             </SimpleCard>
         </>

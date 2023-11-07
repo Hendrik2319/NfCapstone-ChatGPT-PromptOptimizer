@@ -1,6 +1,8 @@
 import {useEffect, useState} from "react";
 import {DarkModeState, getCurrentDarkModeState} from "../../Main/components/DarkModeSwitch.Functions.tsx";
 import {addAppThemeListener, removeAppThemeListener} from "../../../global_functions/AppThemeListener.tsx";
+import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
+import {ChartDataSet} from "../../../models/TestRunsChartTypes.tsx";
 import {Chart} from "react-chartjs-2";
 import {
     BarController,
@@ -16,7 +18,6 @@ import {
     Title,
     Tooltip
 } from "chart.js";
-import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 
 ChartJS.register(
     CategoryScale,
@@ -42,9 +43,13 @@ type TOptions = any;
 // )
 
 type Props = {
-    labels: string[]
-    averageTokensPerRequest: number[]
-    amountOfAnswersMeetMaxWordCount: number[]
+    chartTitle: string
+
+    axisXLabel: string
+    xData: string[]
+
+    lineSet?: ChartDataSet
+    barSet?: ChartDataSet
 }
 
 export default function TestRunsChart( props:Readonly<Props> ) {
@@ -63,33 +68,25 @@ export default function TestRunsChart( props:Readonly<Props> ) {
         }
     }
 
-    const colorChartTitle = select( "#d0d0d0", "#000000");
-    const colorTickLabels = select( "#d0d0d0", "#000000");
-    const colorAxisLabelLineset = "#e87500";
-    const colorAxisLabelBarset = select( "#80b0FF", "#5080FF");
-    const colorAxisLabelX = select( "#d0d0d0", "#000000");
-    const colorLegendText = select( "#d0d0d0", "#000000");
+    const colorText = select( "#d0d0d0", "#000000");
+    const colorOrange = "#e87500";
+    const colorBlue = select( "#80b0FF", "#5080FF");
+
+    const colorChartTitle = colorText;
+    const colorTickLabels = colorText;
+    const colorAxisLabelLineSet = colorOrange;
+    const colorAxisLabelBarSet = colorBlue;
+    const colorAxisLabelX = colorText;
+    const colorLegendText = colorText;
     const colorGrid = select( "#606060", "#a0a0a0");
-    const colorAxisLine = select( "#d0d0d0", "#000000");
-    const colorLinesetLine = '#e87500';
-    const colorLinesetFill = '#e87500';
-    const colorBarsetOutline = select( "#d0d0d0", "#000000");
-    const colorBarsetFill = select( "#80b0FF", "#5080FF");
+    const colorAxisLine = select("#d0d0d0", "#000000");
+    const colorLineSetLine = colorOrange;
+    const colorLineSetFill = colorOrange;
+    const colorBarSetOutline = select("#d0d0d0", "#000000");
+    const colorBarSetFill = colorBlue;
 
-    const textChartTitle = 'Values of Answers in TestRun';
-    const labelLineset = 'Average Tokens per Request';
-    const labelBarset = 'Answer meets Max. Word Count';
-    const labelAxisX = "TestRuns";
-    const labelAxisLineset = "Tokens per Request";
-    const labelAxisBarset = "Amount of Answers, that meet Max. Word Count (%)";
-
-    const labels = props.labels // ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-
-    const dataLineset = props.averageTokensPerRequest; // labels.map(() => Math.random()*20 -10);
-    const dataBarset = props.amountOfAnswersMeetMaxWordCount; // labels.map(() => Math.random()*2000 -1000);
-
-    const lineWidthLineset = 4;
-    const borderWidthBarset = 2;
+    const lineWidthLineSet = 4;
+    const borderWidthBarSet = 2;
 
     const options: TOptions = {
         responsive: true,
@@ -104,7 +101,7 @@ export default function TestRunsChart( props:Readonly<Props> ) {
         plugins: {
             title: {
                 display: true,
-                text: textChartTitle,
+                text: props.chartTitle,
                 position: "top",
                 color: colorChartTitle,
                 align: "start",
@@ -125,12 +122,12 @@ export default function TestRunsChart( props:Readonly<Props> ) {
         },
         scales: {
             x: {
-                //     display: true,
+                display: true,
                 axis: "x",
                 type: 'category' as const,
                 position: 'bottom' as const,
                 title: {
-                    text: labelAxisX,
+                    text: props.axisXLabel,
                     display: true,
                     align: "start",
                     color: colorAxisLabelX,
@@ -150,16 +147,16 @@ export default function TestRunsChart( props:Readonly<Props> ) {
                     color: colorAxisLine
                 }
             },
-            yAxisLineset: {
-                display: true,
+            yAxisLineSet: {
+                display: !(!props.lineSet),
                 axis: "y",
                 type: 'linear' as const,
                 position: 'left' as const,
                 title: {
-                    text: labelAxisLineset,
+                    text: props.lineSet?.axisLabel ?? "Y-Axis (LineSet)",
                     display: true,
                     align: "end",
-                    color: colorAxisLabelLineset,
+                    color: colorAxisLabelLineSet,
                     padding: 0,
                     font: {
                         // size: 20
@@ -176,8 +173,8 @@ export default function TestRunsChart( props:Readonly<Props> ) {
                     color: colorAxisLine
                 }
             },
-            yAxisBarset: {
-                display: true,
+            yAxisBarSet: {
+                display: !(!props.barSet),
                 axis: "y",
                 type: 'linear' as const,
                 position: 'right' as const,
@@ -186,10 +183,10 @@ export default function TestRunsChart( props:Readonly<Props> ) {
                     color: colorGrid,
                 },
                 title: {
-                    text: labelAxisBarset,
+                    text: props.barSet?.axisLabel ?? "Y-Axis (BarSet)",
                     display: true,
                     align: "end",
-                    color: colorAxisLabelBarset,
+                    color: colorAxisLabelBarSet,
                     padding: 0,
                     font: {}
                 },
@@ -204,29 +201,31 @@ export default function TestRunsChart( props:Readonly<Props> ) {
     };
 
     const data: ChartData<TType, number[], string> = {
-        labels: labels,
-        datasets: [
-            {
-                type: 'line' as const,
-                label: labelLineset,
-                data: dataLineset,
-                borderColor: colorLinesetLine,
-                backgroundColor: colorLinesetFill,
-                borderWidth: lineWidthLineset,
-                fill: false,
-                yAxisID: 'yAxisLineset',
-            },
-            {
-                type: 'bar' as const,
-                label: labelBarset,
-                data: dataBarset,
-                borderColor: colorBarsetOutline,
-                backgroundColor: colorBarsetFill,
-                borderWidth: borderWidthBarset,
-                yAxisID: 'yAxisBarset',
-            },
-        ],
+        labels: props.xData,
+        datasets: [],
     };
+    if (props.lineSet)
+        data.datasets.push({
+            type: 'line' as const,
+            label: props.lineSet.label,
+            data: props.lineSet.data,
+            borderColor: colorLineSetLine,
+            backgroundColor: colorLineSetFill,
+            borderWidth: lineWidthLineSet,
+            fill: false,
+            yAxisID: 'yAxisLineSet',
+        });
+    if (props.barSet)
+        data.datasets.push({
+            type: 'bar' as const,
+            label: props.barSet.label,
+            data: props.barSet.data,
+            borderColor: colorBarSetOutline,
+            backgroundColor: colorBarSetFill,
+            borderWidth: borderWidthBarSet,
+            yAxisID: 'yAxisBarSet',
+        });
+
 
     return (
         <Chart type='bar' data={data} options={options}/>
