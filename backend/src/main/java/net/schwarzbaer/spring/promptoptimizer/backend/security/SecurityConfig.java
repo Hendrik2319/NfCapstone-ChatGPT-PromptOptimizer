@@ -49,17 +49,15 @@ public class SecurityConfig {
 								"/api/users/me", "/api/apistate"
 						).permitAll()
 
-						.requestMatchers(
-								"/api/testrunexample"
-						).permitAll()
-
-						.requestMatchers(
-								"/api/logout"
+						.requestMatchers( HttpMethod.GET,
+								"/api/logout",
+								"/api/users/reason"
 						).authenticated()
 
-						.requestMatchers(HttpMethod.GET,
+						.requestMatchers(
 								"/api/scenario/all",
-								"/api/users/restricted"
+								"/api/users",
+								"/api/users/**"
 						).hasRole(Role.ADMIN.getShort())
 
 						.anyRequest().hasAnyRole(Role.ADMIN.getShort(), Role.USER.getShort())
