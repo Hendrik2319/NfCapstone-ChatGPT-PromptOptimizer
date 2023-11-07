@@ -1,7 +1,7 @@
 import "./ApiStateIndicator.css"
 import {useEffect, useState} from "react";
 import {ApiState, DEBUG, SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
-import {getApiState} from "../../../global_functions/BackendAPI.tsx";
+import {BackendAPI} from "../../../global_functions/BackendAPI.tsx";
 
 export default function ApiStateIndicator() {
     const [ state, setState ] = useState<ApiState>()
@@ -10,7 +10,7 @@ export default function ApiStateIndicator() {
     useEffect( getState, [] )
 
     function getState() {
-        getApiState("ApiStateIndicator.getState", state => {
+        BackendAPI.getApiState("ApiStateIndicator.getState", state => {
             if (DEBUG) console.debug(`ApiState: getState() ->`, state);
             setState(state)
         })

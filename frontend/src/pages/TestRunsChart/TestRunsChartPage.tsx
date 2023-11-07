@@ -5,7 +5,7 @@ import styled from "styled-components";
 import TestRunsChart from "./components/TestRunsChart.tsx";
 import {useEffect, useState} from "react";
 import {TestRun} from "../../models/TestRunTypes.tsx";
-import {loadScenarioById, loadTestRunsOfScenario} from "../../global_functions/BackendAPI.tsx";
+import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
 import {getWordCount} from "../../global_functions/Tools.tsx";
 import {Scenario} from "../../models/ScenarioTypes.tsx";
 
@@ -30,8 +30,8 @@ export default function TestRunsChartPage() {
 
     useEffect(()=>{
         if (scenarioId) {
-            loadScenarioById(scenarioId, "TestRunsChartPage.useEffect", scenario=> {
-                loadTestRunsOfScenario(scenarioId, "TestRunsChartPage.useEffect", testruns => {
+            BackendAPI.loadScenarioById(scenarioId, "TestRunsChartPage.useEffect", scenario=> {
+                BackendAPI.loadTestRunsOfScenario(scenarioId, "TestRunsChartPage.useEffect", testruns => {
                     setScenario(scenario);
                     setTestruns(testruns);
                 });
@@ -47,7 +47,7 @@ export default function TestRunsChartPage() {
     const entries = testruns
         .map( (testrun, index) => {
             const entry: ChartEntry = {
-                label: `[${index}] ${testrun.timestamp}`,
+                label: "["+index+"] "+testrun.timestamp.toLocaleString(),
                 averageTokensPerRequest: testrun.averageTokensPerRequest,
                 amountOfAnswersMeetMaxWordCount: testrun.answers.length === 0 || !scenario.maxWantedWordCount
                     ? undefined

@@ -1,12 +1,12 @@
-export type TestRun    = TestRunBase<TestCase>
-export type TestRunDTO = TestRunBase<{ [ key: string ]: string[] }>
+export type TestRun    = TestRunBase<TestCase, Date>
+export type TestRunDTO = TestRunBase<{ [ key: string ]: string[] }, string>
 export type NewTestRun    = NewTestRunBase<TestCase>
 export type NewTestRunDTO = NewTestRunBase<{ [ key: string ]: string[] }>
 
-type TestRunBase<TestCaseType> = {
+type TestRunBase<TestCaseType,TimeStampType> = {
     id        : string
     scenarioId: string
-    timestamp : string
+    timestamp : TimeStampType
     prompt    : string
     variables : string[]
     testcases : TestCaseType[]
@@ -17,7 +17,7 @@ type TestRunBase<TestCaseType> = {
 type NewTestRunBase<TestCaseType> = {
 //  id        : string  - defined by database
     scenarioId: string
-//  timestamp : string  - defined by backend
+//  timestamp : TimeStampType  - defined by backend
     prompt    : string
     variables : string[]
     testcases : TestCaseType[]

@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import BreadCrumbs from "../components/BreadCrumbs.tsx";
-import {loadRunningTestRunsOfScenario} from "../global_functions/BackendAPI.tsx";
+import {BackendAPI} from "../global_functions/BackendAPI.tsx";
 import {RunningTestRun} from "../models/TestRunTypes.tsx";
 import {BigLabel} from "../components/StandardStyledComponents.tsx";
 
@@ -26,7 +26,7 @@ export default function TestRunWaitPage() {
             console.debug("TestRunWaitPage.interval: call "+(counter++)+" ( scenarioId:"+scenarioId+" )");
 
             if (scenarioId)
-                loadRunningTestRunsOfScenario(scenarioId, "TestRunWaitPage", setResponseData);
+                BackendAPI.loadRunningTestRunsOfScenario(scenarioId, "TestRunWaitPage", setResponseData);
         }
 
         loop();

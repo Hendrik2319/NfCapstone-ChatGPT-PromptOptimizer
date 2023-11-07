@@ -1,6 +1,6 @@
 import {Link} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {loadScenarioById} from "../global_functions/BackendAPI.tsx";
+import {BackendAPI} from "../global_functions/BackendAPI.tsx";
 import {Scenario} from "../models/ScenarioTypes.tsx";
 
 type Props = {
@@ -13,7 +13,7 @@ export default function BreadCrumbs( props:Readonly<Props> ) {
 
     useEffect(()=>{
         if (props.scenarioId) {
-            loadScenarioById(props.scenarioId, "BreadCrumbs", scenario=> {
+            BackendAPI.loadScenarioById(props.scenarioId, "BreadCrumbs", scenario=> {
                 setScenario(scenario);
             });
         } else
