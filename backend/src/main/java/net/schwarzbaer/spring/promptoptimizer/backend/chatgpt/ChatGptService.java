@@ -18,8 +18,6 @@ import java.util.List;
 public class ChatGptService {
 
 	private final WebClient webClient;
-//	@SuppressWarnings("java:S106")
-//	private static final PrintStream DEBUG_OUT = System.out;
 
 	public ChatGptService(
 			@Value("${app.openai-api-key}") String openaiApiKey,
@@ -50,14 +48,11 @@ public class ChatGptService {
 				)
 		);
 
-//		request.showContent(DEBUG_OUT, "request");
 		log.info("##### Request: %s".formatted(request));
 
 		ChatGptResponse response = execRequest(request);
 		log.info("##### Response: %s".formatted(response));
-		if (response == null) {/*DEBUG_OUT.println("response: <null>");*/ return null; }
-
-//		response.showContent(DEBUG_OUT, "response");
+		if (response == null) return null;
 
 		List<ChatGptResponse.Choice> choices = response.choices();
 		if (choices == null || choices.isEmpty()) return null;
