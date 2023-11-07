@@ -2,6 +2,7 @@ import {TestRun} from "../../../models/TestRunTypes.tsx";
 import TestRunCard from "./TestRunCard.tsx";
 import {ChangeEvent, useState} from "react";
 import styled from "styled-components";
+import {Scenario} from "../../../models/ScenarioTypes.tsx";
 
 const MainPanel = styled.div`
     margin-top: 0.5em;
@@ -23,8 +24,9 @@ const InputField = styled.input`
 
 type Props = {
     testruns: TestRun[]
-    scenarioId: string
+    scenario: Scenario
     startNewTestRun?: (base: TestRun)=>void
+    saveChangedScenario: (scenario: Scenario)=>void
 }
 
 export default function TestRunsList( props:Readonly<Props> ) {

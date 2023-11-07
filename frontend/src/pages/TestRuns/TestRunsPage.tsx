@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {SHOW_RENDERING_HINTS, UserInfos} from "../../models/BaseTypes.tsx";
 import {isCurrentNewTestRunStored, saveCurrentNewTestRun} from "../../global_functions/NewTestRunStoarage.tsx";
-import {loadScenarioById, loadTestRunsOfScenario} from "../../global_functions/BackendAPI.tsx";
+import {editScenario, loadScenarioById, loadTestRunsOfScenario} from "../../global_functions/BackendAPI.tsx";
 import TestRunsList from "./components/TestRunsList.tsx";
 import BreadCrumbs from "../../components/BreadCrumbs.tsx";
 import {Scenario} from "../../models/ScenarioTypes.tsx";
@@ -22,8 +22,8 @@ export default function TestRunsPage( props:Readonly<Props> ) {
 
     useEffect(()=>{
         if (scenarioId) {
-            loadScenarioById(scenarioId, "TestRunsView", scenario=> {
-                loadTestRunsOfScenario(scenarioId, "TestRunsView", testruns => {
+            loadScenarioById(scenarioId, "TestRunsView.useEffect", scenario=> {
+                loadTestRunsOfScenario(scenarioId, "TestRunsView.useEffect", testruns => {
                     setScenario(scenario);
                     setTestruns(testruns);
                 });
@@ -31,9 +31,13 @@ export default function TestRunsPage( props:Readonly<Props> ) {
         }
     }, [ scenarioId ]);
 
-    if (!scenarioId) {
-        navigate("/");
+    if (!scenarioId || !scenario) {
+        if (!scenarioId) navigate("/");
         return <>No Scenario found</>
+    }
+
+    function saveChangedScenario( newData: Scenario ) {
+        editScenario(newData, "TestRunsView.saveChangedScenario", setScenario);
     }
 
     const userCanStartNewTestRun =
@@ -70,13 +74,14 @@ export default function TestRunsPage( props:Readonly<Props> ) {
             }
             <br/>
             <TestRunsList
-                scenarioId={scenarioId}
+                scenario={scenario}
                 testruns={testruns}
                 startNewTestRun={
                     userCanStartNewTestRun
                         ? base => startNewTestRunFromList( base, scenarioId )
                         : undefined
                 }
+                saveChangedScenario={saveChangedScenario}
             />
         </>
     )
