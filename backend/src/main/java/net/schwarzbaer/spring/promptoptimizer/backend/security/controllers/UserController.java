@@ -17,35 +17,35 @@ public class UserController {
 
 	private final UserService userService;
 
-	@GetMapping("me")
+	@GetMapping("me") // allowed: all
 	public UserInfos getCurrentUser() {
 		return userService.getCurrentUser();
 	}
 
-	@GetMapping()
+	@GetMapping() // allowed: admin
 	public List<StoredUserInfo> getAllStoredUsers()
 			throws UserIsNotAllowedException
 	{
 		return userService.getAllStoredUsers();
 	}
 
-	@PutMapping("{id}")
+	@PutMapping("{id}") // allowed: admin
 	public ResponseEntity<StoredUserInfo> updateStoredUser(@PathVariable String id, @RequestBody StoredUserInfo storedUserInfo)
 			throws UserIsNotAllowedException
 	{
 		return ResponseEntity.of(userService.updateStoredUser(id, storedUserInfo));
 	}
 
-	@DeleteMapping("{id}")
+	@DeleteMapping("{id}") // allowed: admin
 	public void deleteStoredUser(@PathVariable String id)
 			throws UserIsNotAllowedException
 	{
 		userService.deleteStoredUser(id);
 	}
 
-	@GetMapping("{id}/reason")
-	public String getDenialReason(@PathVariable String id)
+	@GetMapping("reason") // allowed: authorized   | called by: unknown accounts
+	public String getDenialReasonForCurrentUser()
 	{
-		return userService.getDenialReason(id);
+		return userService.getDenialReasonForCurrentUser();
 	}
 }

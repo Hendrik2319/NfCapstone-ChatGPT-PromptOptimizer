@@ -143,7 +143,7 @@ public class UserService {
 //               Called by and allowed for authorized users
 // ####################################################################################
 
-	public String getDenialReason(String id) {
+	public String getDenialReasonForCurrentUser() {
 		// TODO
 		return null;
 	}
