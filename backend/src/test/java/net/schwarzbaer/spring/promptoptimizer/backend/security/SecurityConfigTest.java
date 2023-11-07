@@ -1,5 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

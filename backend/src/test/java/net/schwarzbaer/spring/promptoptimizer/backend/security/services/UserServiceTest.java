@@ -1,5 +1,7 @@
-package net.schwarzbaer.spring.promptoptimizer.backend.security;
+package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfos;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

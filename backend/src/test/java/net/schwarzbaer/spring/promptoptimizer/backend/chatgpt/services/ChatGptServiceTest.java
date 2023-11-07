@@ -1,5 +1,8 @@
-package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
+package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.services;
 
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models.Answer;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models.ApiState;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models.Prompt;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;

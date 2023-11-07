@@ -1,6 +1,9 @@
-package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
+package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.controllers;
 
 import lombok.RequiredArgsConstructor;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.services.ChatGptService;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models.Answer;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models.Prompt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

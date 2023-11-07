@@ -1,5 +1,7 @@
-package net.schwarzbaer.spring.promptoptimizer.backend.security;
+package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfos;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

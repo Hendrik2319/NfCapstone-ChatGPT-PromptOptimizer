@@ -1,4 +1,4 @@
-package net.schwarzbaer.spring.promptoptimizer.backend.security;
+package net.schwarzbaer.spring.promptoptimizer.backend.security.models;
 
 public record UserInfos(
 		boolean isAuthenticated,

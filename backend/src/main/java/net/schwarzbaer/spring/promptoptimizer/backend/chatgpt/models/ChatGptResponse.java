@@ -1,4 +1,4 @@
-package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
+package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models;
 
 import java.util.List;
 

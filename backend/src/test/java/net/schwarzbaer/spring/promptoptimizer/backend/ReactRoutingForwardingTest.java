@@ -1,7 +1,7 @@
 package net.schwarzbaer.spring.promptoptimizer.backend;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

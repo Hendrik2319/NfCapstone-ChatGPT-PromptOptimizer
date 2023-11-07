@@ -1,5 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

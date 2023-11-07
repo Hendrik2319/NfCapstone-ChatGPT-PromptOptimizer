@@ -1,6 +1,7 @@
-package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
+package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.services;
 
 import lombok.extern.slf4j.Slf4j;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;

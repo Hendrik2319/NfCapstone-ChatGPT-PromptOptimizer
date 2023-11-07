@@ -5,7 +5,7 @@ import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewTest
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.RunningTestRunsList;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.TestRunService;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.UserIsNotAllowedException;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
