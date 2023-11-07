@@ -5,13 +5,15 @@ import org.springframework.lang.NonNull;
 public record Scenario(
 		String id,
 		String authorID,
-		String label
+		String label,
+		Integer maxWantedWordCount
 ) {
 	public Scenario(@NonNull String authorID, @NonNull NewScenario newScenario) {
 		this(
 				null,
 				authorID,
-				newScenario.label()
+				newScenario.label(),
+				null
 		);
 	}
 }

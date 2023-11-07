@@ -1,5 +1,5 @@
 export type ChartDataSet = {
     data: number[]
     label: string
-    axisLabel: string
+    axisLabel: string | string[]
 }

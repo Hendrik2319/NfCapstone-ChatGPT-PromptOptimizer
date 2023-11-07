@@ -65,7 +65,7 @@ export function addScenario( label: string, callerLabel: string, callback: ()=>v
     );
 }
 
-export function editScenario( scenario: Scenario, callerLabel: string, callback: ()=>void ) {
+export function editScenario( scenario: Scenario, callerLabel: string, callback: (updatedScenario: Scenario)=>void ) {
     processPromise(
         axios.put(`/api/scenario/${scenario.id}`, scenario),
         "editScenario",

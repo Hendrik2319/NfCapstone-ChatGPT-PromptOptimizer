@@ -149,7 +149,7 @@ class TestRunIntegrationTest {
 
 	private void whenGetTestRunsOfScenario_isCalled_returnsStatus403Forbidden(String storedAuthorID, String currentUserDbId, Role role) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("scenarioId1", storedAuthorID, "label1"));
+		scenarioRepository.save(new Scenario("scenarioId1", storedAuthorID, "label1", 1));
 
 		// When
 		mockMvc
@@ -176,7 +176,7 @@ class TestRunIntegrationTest {
 	private void whenGetTestRunsOfScenario_isCalledByAllowedUser_returnsList(String scenarioAuthorId, Role role, String userDbId) throws Exception {
 		// Given
 		String scenarioId = "scenarioId1";
-		scenarioRepository.save(new Scenario(scenarioId, scenarioAuthorId, "label1"));
+		scenarioRepository.save(new Scenario(scenarioId, scenarioAuthorId, "label1", 1));
 		testRunRepository.save(createTestRun("id1", scenarioId));
 		testRunRepository.save(createTestRun("id2", scenarioId));
 		testRunRepository.save(createTestRun("id3", scenarioId));
@@ -209,7 +209,7 @@ class TestRunIntegrationTest {
 	private void whenGetTestRunsOfScenario_returnsEmptyList(String storedScenarioId, String requestedScenarioId) throws Exception {
 		// Given
 		if (storedScenarioId!=null)
-			scenarioRepository.save(new Scenario(storedScenarioId, "author1", "label1"));
+			scenarioRepository.save(new Scenario(storedScenarioId, "author1", "label1", 1));
 
 		// When
 		mockMvc
@@ -236,7 +236,7 @@ class TestRunIntegrationTest {
 
 	private void whenAddTestRun_isCalledByAllowedUser_returnsStoredTestRun(String storedAuthorID, Role role, String userDbId) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("scenarioId1", storedAuthorID, "label1"));
+		scenarioRepository.save(new Scenario("scenarioId1", storedAuthorID, "label1", 1));
 
 		// When
 		mockMvc
@@ -326,7 +326,7 @@ class TestRunIntegrationTest {
 
 	private void whenAddTestRun_returnsStatus403Forbidden(String storedAuthorID, Role role, String userDbId) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("scenarioId1", storedAuthorID, "label1"));
+		scenarioRepository.save(new Scenario("scenarioId1", storedAuthorID, "label1", 1));
 
 		// When
 		mockMvc
@@ -365,7 +365,7 @@ class TestRunIntegrationTest {
 	@Test @DirtiesContext
 	void whenPerformTestRun_isCalledByUnauthorized_returnsStatus401Unauthorized() throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("scenarioId1", "author1", "label1"));
+		scenarioRepository.save(new Scenario("scenarioId1", "author1", "label1", 1));
 
 		// When
 		mockMvc
@@ -397,7 +397,7 @@ class TestRunIntegrationTest {
 
 	private void whenPerformTestRun_isCalledByNotAllowedUser_returnsStatus403Forbidden(String scenarioAuthorID, Role role, String userDbId) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("scenarioId1", scenarioAuthorID, "label1"));
+		scenarioRepository.save(new Scenario("scenarioId1", scenarioAuthorID, "label1", 1));
 
 		// When
 		mockMvc
@@ -415,7 +415,7 @@ class TestRunIntegrationTest {
 	@Test @DirtiesContext
 	void whenPerformTestRun_isCalledWithUnknownScenarioID_returnsStatus404NotFound() throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("scenarioId1", "author1", "label1"));
+		scenarioRepository.save(new Scenario("scenarioId1", "author1", "label1", 1));
 
 		// When
 		mockMvc
@@ -439,7 +439,7 @@ class TestRunIntegrationTest {
 
 	private void whenPerformTestRun_isCalledByAllowedUser(String scenarioAuthorID, Role role, String userDbId) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("scenarioId1", scenarioAuthorID, "label1"));
+		scenarioRepository.save(new Scenario("scenarioId1", scenarioAuthorID, "label1", 1));
 		mockWebServer.enqueue(
 				ChatGptTestTools.buildApiResponse("TestAnswer", 12, 23, 35)
 		);

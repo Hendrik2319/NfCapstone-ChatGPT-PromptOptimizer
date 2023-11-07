@@ -40,10 +40,10 @@ class ScenarioServiceTest {
 	void whenGetAllScenarios_isCalled_returnsListOfScenarios() {
 		// Given
 		when(scenarioRepository.findAll()).thenReturn(List.of(
-				new Scenario("id1", "author1", "label1"),
-				new Scenario("id2", "author2", "label2"),
-				new Scenario("id3", "author2", "label3"),
-				new Scenario("id4", "author2", "label4")
+				new Scenario("id1", "author1", "label1", 1),
+				new Scenario("id2", "author2", "label2", 1),
+				new Scenario("id3", "author2", "label3", 1),
+				new Scenario("id4", "author2", "label4", 1)
 		));
 
 		// When
@@ -52,10 +52,10 @@ class ScenarioServiceTest {
 		// Then
 		verify(scenarioRepository).findAll();
 		List<Scenario> expected = List.of(
-				new Scenario("id1", "author1", "label1"),
-				new Scenario("id2", "author2", "label2"),
-				new Scenario("id3", "author2", "label3"),
-				new Scenario("id4", "author2", "label4")
+				new Scenario("id1", "author1", "label1", 1),
+				new Scenario("id2", "author2", "label2", 1),
+				new Scenario("id3", "author2", "label3", 1),
+				new Scenario("id4", "author2", "label4", 1)
 		);
 		assertEquals(expected, actual);
 	}
@@ -89,9 +89,9 @@ class ScenarioServiceTest {
 				"id1", "author2", "login1", null, null, null, null
 		));
 		when(scenarioRepository.findByAuthorID("author2")).thenReturn(List.of(
-				new Scenario("id2", "author2", "label2"),
-				new Scenario("id3", "author2", "label3"),
-				new Scenario("id4", "author2", "label4")
+				new Scenario("id2", "author2", "label2", 1),
+				new Scenario("id3", "author2", "label3", 1),
+				new Scenario("id4", "author2", "label4", 1)
 		));
 
 		// When
@@ -101,9 +101,9 @@ class ScenarioServiceTest {
 		verify(userService).getCurrentUser();
 		verify(scenarioRepository).findByAuthorID("author2");
 		List<Scenario> expected = List.of(
-				new Scenario("id2", "author2", "label2"),
-				new Scenario("id3", "author2", "label3"),
-				new Scenario("id4", "author2", "label4")
+				new Scenario("id2", "author2", "label2", 1),
+				new Scenario("id3", "author2", "label3", 1),
+				new Scenario("id4", "author2", "label4", 1)
 		);
 		assertEquals(expected, actual);
 	}
@@ -137,9 +137,9 @@ class ScenarioServiceTest {
 				"id1", "author1", "login1", null, null, null, null
 		));
 		when(scenarioRepository.save(
-				new Scenario(null, "author1", "label")
+				new Scenario(null, "author1", "label", null)
 		)).thenReturn(
-				new Scenario("id2", "author1", "label")
+				new Scenario("id2", "author1", "label", null)
 		);
 
 		// When
@@ -147,10 +147,10 @@ class ScenarioServiceTest {
 
 		// Then
 		verify(userService).getCurrentUser();
-		verify(scenarioRepository).save(new Scenario(null, "author1", "label"));
+		verify(scenarioRepository).save(new Scenario(null, "author1", "label", null));
 		assertNotNull(actual);
 		assertTrue(actual.isPresent());
-		Scenario expected = new Scenario("id2", "author1", "label");
+		Scenario expected = new Scenario("id2", "author1", "label", null);
 		assertEquals(expected, actual.get());
 	}
 
@@ -166,26 +166,26 @@ class ScenarioServiceTest {
 				"userId1", "author1", null, null, null, null, null
 		));
 		when(scenarioRepository.findById("id1")).thenReturn(Optional.of(
-				new Scenario("id1", "author1", "labelOld")
+				new Scenario("id1", "author1", "labelOld", 1)
 		));
 		when(scenarioRepository.save(
-				new Scenario("id1", "author1", "labelNew")
+				new Scenario("id1", "author1", "labelNew", 1)
 		)).thenReturn(
-				new Scenario("id1", "author1", "labelNew")
+				new Scenario("id1", "author1", "labelNew", 1)
 		);
 
 		// When
 		Optional<Scenario> actual = scenarioService.updateScenario(
-				"id1", new Scenario("id1", "author1", "labelNew")
+				"id1", new Scenario("id1", "author1", "labelNew", 1)
 		);
 
 		// Then
 		verify(userService).getCurrentUser();
 		verify(scenarioRepository).findById("id1");
-		verify(scenarioRepository).save(new Scenario("id1", "author1", "labelNew"));
+		verify(scenarioRepository).save(new Scenario("id1", "author1", "labelNew", 1));
 		assertNotNull(actual);
 		assertTrue(actual.isPresent());
-		Scenario expected = new Scenario("id1", "author1", "labelNew");
+		Scenario expected = new Scenario("id1", "author1", "labelNew", 1);
 		assertEquals(expected, actual.get());
 	}
 
@@ -205,7 +205,7 @@ class ScenarioServiceTest {
 		// Given
 		// When
 		Executable call = () -> scenarioService.updateScenario(
-				pathId, new Scenario(scenId, scenAuthor, "labelNew")
+				pathId, new Scenario(scenId, scenAuthor, "labelNew", 1)
 		);
 		// Then
 		assertThrows(IllegalArgumentException.class, call);
@@ -218,7 +218,7 @@ class ScenarioServiceTest {
 
 		// When
 		Optional<Scenario> actual = scenarioService.updateScenario(
-				"id1", new Scenario("id1", "author1", "labelNew")
+				"id1", new Scenario("id1", "author1", "labelNew", 1)
 		);
 
 		// Then
@@ -235,26 +235,26 @@ class ScenarioServiceTest {
 				"userId1", "authorAdmin", null, null, null, null, null
 		));
 		when(scenarioRepository.findById("id1")).thenReturn(Optional.of(
-				new Scenario("id1", "author2", "labelOld")
+				new Scenario("id1", "author2", "labelOld", 1)
 		));
 		when(scenarioRepository.save(
-				new Scenario("id1", "author1", "labelNew")
+				new Scenario("id1", "author1", "labelNew", 1)
 		)).thenReturn(
-				new Scenario("id1", "author1", "labelNew")
+				new Scenario("id1", "author1", "labelNew", 1)
 		);
 
 		// When
 		Optional<Scenario> actual = scenarioService.updateScenario(
-				"id1", new Scenario("id1", "author1", "labelNew")
+				"id1", new Scenario("id1", "author1", "labelNew", 1)
 		);
 
 		// Then
 		verify(userService).getCurrentUser();
 		verify(scenarioRepository).findById("id1");
-		verify(scenarioRepository).save(new Scenario("id1", "author1", "labelNew"));
+		verify(scenarioRepository).save(new Scenario("id1", "author1", "labelNew", 1));
 		assertNotNull(actual);
 		assertTrue(actual.isPresent());
-		Scenario expected = new Scenario("id1", "author1", "labelNew");
+		Scenario expected = new Scenario("id1", "author1", "labelNew", 1);
 		assertEquals(expected, actual.get());
 	}
 
@@ -277,12 +277,12 @@ class ScenarioServiceTest {
 				"userId1", userDbId, null, null, null, null, null
 		));
 		when(scenarioRepository.findById("id1")).thenReturn(Optional.of(
-				new Scenario("id1", authorOfStored, "labelOld")
+				new Scenario("id1", authorOfStored, "labelOld", 1)
 		));
 
 		// When
 		Executable call = () -> scenarioService.updateScenario(
-				"id1", new Scenario("id1", authorOfGiven, "labelNew")
+				"id1", new Scenario("id1", authorOfGiven, "labelNew", 1)
 		);
 
 		// Then
@@ -309,7 +309,7 @@ class ScenarioServiceTest {
 	) throws UserIsNotAllowedException {
 		// Given
 		when(scenarioRepository.findById("id1")).thenReturn(Optional.of(
-				new Scenario("id1", storedAuthorID, "label1")
+				new Scenario("id1", storedAuthorID, "label1", 1)
 		));
 		when(userService.getCurrentUser()).thenReturn(new UserInfos(
 				true, isUser, isAdmin,
@@ -374,7 +374,7 @@ class ScenarioServiceTest {
 	) {
 		// Given
 		when(scenarioRepository.findById("id1")).thenReturn( Optional.of(
-				new Scenario("id1", storedAuthorID, "label1")
+				new Scenario("id1", storedAuthorID, "label1", 1)
 		));
 		when(userService.getCurrentUser()).thenReturn(new UserInfos(
 				isAuthenticated, isUser, false,
@@ -411,7 +411,7 @@ class ScenarioServiceTest {
 	) throws UserIsNotAllowedException {
 		// Given
 		when(scenarioRepository.findById("id1")).thenReturn(Optional.of(
-				new Scenario("id1", storedAuthorID, "label1")
+				new Scenario("id1", storedAuthorID, "label1", 1)
 		));
 		when(userService.getCurrentUser()).thenReturn(new UserInfos(
 				true, isUser, isAdmin,
@@ -426,7 +426,7 @@ class ScenarioServiceTest {
 		verify(scenarioRepository).findById("id1");
 		assertNotNull(actual);
 		assertTrue(actual.isPresent());
-		Scenario expected = new Scenario("id1", storedAuthorID, "label1");
+		Scenario expected = new Scenario("id1", storedAuthorID, "label1", 1);
 		assertEquals(expected, actual.get());
 	}
 
@@ -479,7 +479,7 @@ class ScenarioServiceTest {
 	) {
 		// Given
 		when(scenarioRepository.findById("id1")).thenReturn( Optional.of(
-				new Scenario("id1", storedAuthorID, "label1")
+				new Scenario("id1", storedAuthorID, "label1", 1)
 		));
 		when(userService.getCurrentUser()).thenReturn(new UserInfos(
 				isAuthenticated, isUser, false,
