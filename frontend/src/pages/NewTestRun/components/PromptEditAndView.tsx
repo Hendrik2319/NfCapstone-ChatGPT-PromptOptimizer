@@ -1,4 +1,4 @@
-import {ChangeEvent, useEffect, useState} from "react";
+import {ChangeEvent, ReactElement, useEffect, useState} from "react";
 import styled from "styled-components";
 import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 import {VariablesChangeMethod} from "../../../models/TestRunTypes.tsx";
@@ -98,7 +98,7 @@ export default function PromptEditAndView( props:Readonly<Props> ) {
         return copy;
     }
 
-    function getParsedPromptOutput(): JSX.Element {
+    function getParsedPromptOutput(): ReactElement {
         const variables = fixVariables(props.getVariables());
         const parts: (string | number)[] = [];
         const usedVars = new Set<number>();
