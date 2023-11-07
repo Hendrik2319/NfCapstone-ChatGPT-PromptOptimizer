@@ -64,4 +64,11 @@ public class SecurityTestTools {
 			return Stream.of(Role.USER, Role.UNKNOWN_ACCOUNT).map(Arguments::of);
 		}
 	}
+
+	public static class AllRoles implements ArgumentsProvider {
+		@Override
+		public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
+			return Stream.of(Role.values()).map(Arguments::of);
+		}
+	}
 }
