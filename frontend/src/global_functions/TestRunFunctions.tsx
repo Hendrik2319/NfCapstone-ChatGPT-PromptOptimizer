@@ -20,7 +20,7 @@ export function convertTestRunFromDTO( testRunDTO: TestRunDTO ): TestRun {
     return {
         id        : testRunDTO.id,
         scenarioId: testRunDTO.scenarioId,
-        timestamp : testRunDTO.timestamp,
+        timestamp : new Date(testRunDTO.timestamp),
         prompt    : testRunDTO.prompt,
         variables : testRunDTO.variables.map(s=>s),
         testcases : testRunDTO.testcases.map(convertObjectIntoMap),

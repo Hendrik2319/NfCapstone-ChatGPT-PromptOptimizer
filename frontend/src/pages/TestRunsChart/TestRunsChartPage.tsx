@@ -47,7 +47,7 @@ export default function TestRunsChartPage() {
     const entries = testruns
         .map( (testrun, index) => {
             const entry: ChartEntry = {
-                label: `[${index}] ${testrun.timestamp}`,
+                label: "["+index+"] "+testrun.timestamp.toLocaleString(),
                 averageTokensPerRequest: testrun.averageTokensPerRequest,
                 amountOfAnswersMeetMaxWordCount: testrun.answers.length === 0 || !scenario.maxWantedWordCount
                     ? undefined
