@@ -1,8 +1,11 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -19,14 +22,14 @@ import static org.mockito.Mockito.when;
 class SecurityConfigTest {
 
 	private SecurityConfig securityConfig;
-	private DefaultOAuth2UserService delegate;
-	private OAuth2UserRequest oAuth2UserRequest;
+	@Mock private DefaultOAuth2UserService delegate;
+	@Mock private OAuth2UserRequest oAuth2UserRequest;
+	@Mock private UserService userService;
 
 
 	@BeforeEach
 	void setup() {
-		delegate = mock(DefaultOAuth2UserService.class);
-		oAuth2UserRequest = mock(OAuth2UserRequest.class);
+		MockitoAnnotations.openMocks(this);
 		securityConfig = new SecurityConfig("RegistrationId" + "InitialAdminID");
 
 		ClientRegistration clientRegistration = mock(ClientRegistration.class);
@@ -44,7 +47,7 @@ class SecurityConfigTest {
 		));
 
 		//When
-		DefaultOAuth2User actual = securityConfig.configureUserData(delegate, oAuth2UserRequest);
+		DefaultOAuth2User actual = securityConfig.configureUserData(userService, delegate, oAuth2UserRequest);
 
 		//Then
 		DefaultOAuth2User expected = new DefaultOAuth2User(
@@ -68,7 +71,7 @@ class SecurityConfigTest {
 		));
 
 		//When
-		DefaultOAuth2User actual = securityConfig.configureUserData(delegate, oAuth2UserRequest);
+		DefaultOAuth2User actual = securityConfig.configureUserData(userService, delegate, oAuth2UserRequest);
 
 		//Then
 		DefaultOAuth2User expected = new DefaultOAuth2User(
