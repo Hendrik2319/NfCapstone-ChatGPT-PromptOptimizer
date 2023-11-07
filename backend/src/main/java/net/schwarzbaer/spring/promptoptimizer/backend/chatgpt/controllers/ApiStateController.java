@@ -14,7 +14,7 @@ public class ApiStateController {
 
 	private final ChatGptService chatGptService;
 
-	@GetMapping
+	@GetMapping // allowed: all
 	public ApiState getApiState(){
 		return chatGptService.getApiState();
 	}

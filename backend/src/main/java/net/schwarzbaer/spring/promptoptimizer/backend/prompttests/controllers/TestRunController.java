@@ -17,22 +17,22 @@ public class TestRunController {
 	private final TestRunService testRunService;
 	private final RunningTestRunsList runningTestRunsList;
 
-	@GetMapping("/api/scenario/{scenarioId}/testrun")
+	@GetMapping("/api/scenario/{scenarioId}/testrun") // allowed: admin & user
 	public List<TestRun> getTestRunsOfScenario(@PathVariable String scenarioId) throws UserIsNotAllowedException {
 		return testRunService.getTestRunsOfScenario(scenarioId);
 	}
 
-	@PostMapping("/api/scenario/{scenarioId}/testrun")
+	@PostMapping("/api/scenario/{scenarioId}/testrun") // allowed: admin & user
 	public TestRun addTestRun(@PathVariable String scenarioId, @RequestBody TestRun testRun) throws UserIsNotAllowedException {
 		return testRunService.addTestRun(scenarioId, testRun);
 	}
 
-	@PostMapping("/api/testrun")
+	@PostMapping("/api/testrun") // allowed: admin & user
 	public void performTestRun(@RequestBody NewTestRun newTestRun) throws UserIsNotAllowedException {
 		testRunService.performTestRun(newTestRun);
 	}
 
-	@GetMapping("/api/scenario/{scenarioId}/testrunstate")
+	@GetMapping("/api/scenario/{scenarioId}/testrunstate") // allowed: admin & user
 	public List<RunningTestRunsList.ListEntryDTO> getRunningTestRunsOfScenario(@PathVariable String scenarioId) {
 		return runningTestRunsList.getEntries(scenarioId);
 	}

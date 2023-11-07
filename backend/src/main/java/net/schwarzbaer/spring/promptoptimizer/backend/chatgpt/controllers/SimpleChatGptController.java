@@ -16,7 +16,7 @@ public class SimpleChatGptController {
 
 	private final ChatGptService chatGptService;
 
-	@PostMapping
+	@PostMapping // allowed: admin & user
 	public Answer aksChatGPT(@RequestBody Prompt prompt){
 		return chatGptService.askChatGPT(prompt);
 	}
