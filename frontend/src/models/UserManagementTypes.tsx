@@ -28,9 +28,14 @@ export type StoredUserInfo = {
 
 export type Role = "ADMIN" | "USER" | "UNKNOWN_ACCOUNT";
 
-export type SetRoleFunction = ( role: Role ) => void;
+export type SaveUserFunction = ( changedUser: StoredUserInfo ) => void;
 export type UserTableRowProps = {
     user: StoredUserInfo
     editRoleCtrl: OnlyOneActiveController
-    setRole: SetRoleFunction
+    saveUser: SaveUserFunction
+    showEditReasonDialog: ( options: EditDenialReasonDialogOptions ) => void
 };
+
+export type EditDenialReasonDialogOptions = {
+    user: StoredUserInfo
+}

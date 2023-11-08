@@ -29,7 +29,7 @@ export default function EditScenario( props: Readonly<Props> ) {
             props.saveChanges(changedScenario);
             closeDialog();
         } else {
-            alert("Please enter a label before adding.");
+            alert("Please enter a label.");
         }
     }
 

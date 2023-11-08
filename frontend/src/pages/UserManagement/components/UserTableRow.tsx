@@ -35,7 +35,8 @@ export default function UserTableRow( props_:Readonly<Props> ) {
     const {
         user,
         editRoleCtrl,
-        setRole
+        saveUser,
+        showEditReasonDialog
     } = props_.props;
 
 
@@ -58,7 +59,7 @@ export default function UserTableRow( props_:Readonly<Props> ) {
             case "USER"           : break;
             case "UNKNOWN_ACCOUNT": selectedRole = "UNKNOWN_ACCOUNT"; break;
         }
-        setRole(selectedRole);
+        saveUser({...user, role: selectedRole});
     }
 
     return (

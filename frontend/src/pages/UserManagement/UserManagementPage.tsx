@@ -1,10 +1,12 @@
 import "./UserManagementPage.css"
 import {useEffect, useState} from "react";
 import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
-import {Role, StoredUserInfo} from "../../models/UserManagementTypes.tsx";
+import {EditDenialReasonDialogOptions, StoredUserInfo} from "../../models/UserManagementTypes.tsx";
 import styled from "styled-components";
 import UserTableRow from "./components/UserTableRow.tsx";
 import {createOnlyOneActiveController} from "../../global_functions/OnlyOneActive.tsx";
+import {createDialog} from "../../components/FloatingDialogs.tsx";
+import EditDenialReasonDialog from "./components/EditDenialReasonDialog.tsx";
 
 const TableCard = styled.div`
   border: 1px solid var(--border-color, #707070);
@@ -26,18 +28,29 @@ export default function UserManagementPage() {
 
     const editRoleCtrl = createOnlyOneActiveController();
 
-    function saveRole( user: StoredUserInfo, role: Role ) {
+    function saveChangedUser( changedUser: StoredUserInfo ) {
         BackendAPI.updateStoredUser(
-            { ...user, role },
-            "UserManagementPage.saveRole",
+            changedUser,
+            "UserManagementPage.saveChangedUser",
             () => {
                 BackendAPI.getAllStoredUsers(
-                    "UserManagementPage.saveRole",
+                    "UserManagementPage.saveChangedUser",
                     setUsers
                 );
             }
         )
     }
+
+    const editDenialReasonDialog =
+        createDialog<EditDenialReasonDialogOptions>(
+            'EditDenialReasonDialog',
+            dialogControl =>
+                <EditDenialReasonDialog
+                    saveChanges={saveChangedUser}
+                    setInitFunction={dialogControl.setInitFunction}
+                    closeDialog={dialogControl.closeDialog}
+                />
+        )
 
     return (
         <>
@@ -51,13 +64,16 @@ export default function UserManagementPage() {
                     {
                         users.map( user =>
                             <UserTableRow key={user.id} props={{
-                                user, editRoleCtrl, setRole: role => saveRole(user, role)
+                                user, editRoleCtrl,
+                                saveUser: saveChangedUser,
+                                showEditReasonDialog: editDenialReasonDialog.showDialog
                             }}/>
                         )
                     }
                     </tbody>
                 </table>
             </TableCard>
+            {editDenialReasonDialog.writeHTML()}
         </>
     )
 }
