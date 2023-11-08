@@ -8,8 +8,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.stream.Stream;
 
@@ -36,19 +34,6 @@ public class SecurityTestTools {
 					token.claim("login", login);
 					if (userDbId!=null) token.claim("UserDbId", userDbId);
 				});
-	}
-
-	@NonNull
-	public static MockHttpServletRequestBuilder buildGetCurrentUserRequest(@Nullable Role role, @NonNull String id, @NonNull String login) {
-		return MockMvcRequestBuilders
-				.get("/api/users/me")
-				.with(buildUser(role, id, login));
-	}
-
-	@NonNull
-	public static MockHttpServletRequestBuilder buildGetCurrentUserRequest() {
-		return MockMvcRequestBuilders
-				.get("/api/users/me");
 	}
 
 	public static class UserAndAdminRoles implements ArgumentsProvider {

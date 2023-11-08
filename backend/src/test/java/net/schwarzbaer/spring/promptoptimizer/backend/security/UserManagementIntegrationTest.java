@@ -13,6 +13,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -62,118 +63,82 @@ class UserManagementIntegrationTest {
 				);
 	}
 
+// ####################################################################################
+//               UserController.getCurrentUser
+// ####################################################################################
+
 	@Test
 	void whenGetCurrentUser_isCalledWithNoUser() throws Exception {
-		// Given
-
-		// When
-		mockMvc
-				.perform(
-						SecurityTestTools.buildGetCurrentUserRequest()
-				)
-
-				// Then
-				.andExpect(status().isOk())
-				.andExpect(content().json(buildCurrentUserResponse(
-						false, false, false,
-						"anonymousUser", null)
-				))
-		;
+		whenGetCurrentUser_isCalledWithUnauthenticatedUser("anonymousUser");
 	}
-
 	@Test
 	@WithMockUser(username="TestUser")
 	void whenGetCurrentUser_isCalledWithMockUser() throws Exception { // to test the test
+		whenGetCurrentUser_isCalledWithUnauthenticatedUser("TestUser");
+	}
+	private void whenGetCurrentUser_isCalledWithUnauthenticatedUser(String id) throws Exception {
 		// Given
 
 		// When
 		mockMvc
-				.perform(
-						SecurityTestTools.buildGetCurrentUserRequest()
+				.perform(MockMvcRequestBuilders
+						.get("/api/users/me")
 				)
 
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().json(buildCurrentUserResponse(
 						false, false, false,
-						"TestUser", null)
+						id, null)
 				))
 		;
 	}
 
-	@Test
-	void whenGetCurrentUser_isCalledWithAuthenticatedUser() throws Exception {
+	@Test void whenGetCurrentUser_isCalledWithAuthenticatedUser() throws Exception {
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(null, false, false);
+	}
+	@Test void whenGetCurrentUser_isCalledWithUnknownAccount() throws Exception {
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.UNKNOWN_ACCOUNT, false, false);
+	}
+	@Test void whenGetCurrentUser_isCalledWithUSER() throws Exception {
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.USER, true, false);
+	}
+	@Test void whenGetCurrentUser_isCalledWithADMIN() throws Exception {
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.ADMIN, false, true);
+	}
+	private void whenGetCurrentUser_isCalledWithAuthenticatedUser(Role role, boolean isUser, boolean isAdmin) throws Exception {
 		// Given
 
 		// When
 		mockMvc
-				.perform(
-						SecurityTestTools.buildGetCurrentUserRequest(null, "TestID", "TestLogin")
+				.perform( MockMvcRequestBuilders
+						.get("/api/users/me")
+						.with(SecurityTestTools.buildUser(role, "TestID", "TestLogin"))
 				)
 
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().json(buildCurrentUserResponse(
-						true, false, false,
+						true, isUser, isAdmin,
 						"TestID", "TestLogin")
 				))
 		;
 	}
 
-	@Test
-	void whenGetCurrentUser_isCalledWithUnknownAccount() throws Exception {
-		// Given
+// ####################################################################################
+//               StoredUserInfoController.getAllStoredUsers
+// ####################################################################################
 
-		// When
-		mockMvc
-				.perform(
-						SecurityTestTools.buildGetCurrentUserRequest(Role.UNKNOWN_ACCOUNT, "TestID", "TestLogin")
-				)
+// ####################################################################################
+//               StoredUserInfoController.updateStoredUser
+// ####################################################################################
 
-				// Then
-				.andExpect(status().isOk())
-				.andExpect(content().json(buildCurrentUserResponse(
-						true, false, false,
-						"TestID", "TestLogin")
-				))
-		;
-	}
+// ####################################################################################
+//               StoredUserInfoController.deleteStoredUser
+// ####################################################################################
 
-	@Test
-	void whenGetCurrentUser_isCalledWithUSER() throws Exception {
-		// Given
+// ####################################################################################
+//               StoredUserInfoController.getDenialReasonForCurrentUser
+// ####################################################################################
 
-		// When
-		mockMvc
-				.perform(
-						SecurityTestTools.buildGetCurrentUserRequest(Role.USER, "TestID", "TestLogin")
-				)
-
-				// Then
-				.andExpect(status().isOk())
-				.andExpect(content().json(buildCurrentUserResponse(
-						true, true, false,
-						"TestID", "TestLogin")
-				))
-		;
-	}
-
-	@Test
-	void whenGetCurrentUser_isCalledWithADMIN() throws Exception {
-		// Given
-
-		// When
-		mockMvc
-				.perform(
-						SecurityTestTools.buildGetCurrentUserRequest(Role.ADMIN, "TestID", "TestLogin")
-				)
-
-				// Then
-				.andExpect(status().isOk())
-				.andExpect(content().json(buildCurrentUserResponse(
-						true, false, true,
-						"TestID", "TestLogin")
-				))
-		;
-	}
 }
