@@ -16,6 +16,7 @@ import TestRunWaitPage from "./pages/TestRunWaitPage.tsx";
 import {BackendAPI} from "./global_functions/BackendAPI.tsx";
 import TestRunsChartPage from "./pages/TestRunsChart/TestRunsChartPage.tsx";
 import {notifyAppThemeListener} from "./global_functions/AppThemeListener.tsx";
+import UserManagementPage from "./pages/UserManagement/UserManagementPage.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfo>();
@@ -82,6 +83,7 @@ export default function App() {
                 <nav>
                     <Link to={"/"    }>Home</Link>
                     <Link to={"/chat"}>Simple Chat View</Link>
+                    { user.isAdmin && <Link to={"/admin"}>User Management</Link> }
                 </nav>
             }
             <Routes>
@@ -92,6 +94,9 @@ export default function App() {
                     <Route path={"/scenario/:id/newtestrun"} element={<NewTestRunPage/>}/>
                     <Route path={"/scenario/:id/pleasewait"} element={<TestRunWaitPage/>}/>
                     <Route path={"/scenario/:id/chart"} element={<TestRunsChartPage/>}/>
+                </Route>
+                <Route element={<RouteProtection backPath="/" condition={user?.isAuthenticated && user.isAdmin}/>}>
+                    <Route path={"/admin"} element={<UserManagementPage/>}/>
                 </Route>
                 <Route path={"/*"} element={<Navigate to={"/"}/>}/>
             </Routes>
