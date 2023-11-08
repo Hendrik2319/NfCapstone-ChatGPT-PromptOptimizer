@@ -3,7 +3,7 @@ import {NewScenario, Scenario} from "../models/ScenarioTypes.tsx";
 import {NewTestRun, RunningTestRun, TestRun, TestRunDTO} from "../models/TestRunTypes.tsx";
 import {convertNewTestRunIntoDTO, convertTestRunsFromDTOs} from "./TestRunFunctions.tsx";
 import {Answer, ApiState, Prompt} from "../models/BaseTypes.tsx";
-import {UserInfo} from "../models/UserManagementTypes.tsx";
+import {StoredUserInfo, UserInfo} from "../models/UserManagementTypes.tsx";
 
 export const BackendAPI = {
 
@@ -120,6 +120,15 @@ export const BackendAPI = {
     getDenialReasonForCurrentUser: (callerLabel: string, callback: (reason: string) => void) =>
         processPromise(
             axios.get("/api/users/reason"),
+            "getDenialReasonForCurrentUser",
+            "getting denial reason for current user",
+            callerLabel,
+            callback
+        ),
+
+    getAllStoredUsers: (callerLabel: string, callback: (users: StoredUserInfo[]) => void) =>
+        processPromise(
+            axios.get("/api/users"),
             "getDenialReasonForCurrentUser",
             "getting denial reason for current user",
             callerLabel,
