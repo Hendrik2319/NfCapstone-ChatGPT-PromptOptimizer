@@ -1,5 +1,6 @@
 import "./ScenariosPage.css";
-import {SHOW_RENDERING_HINTS, UserInfos} from "../../models/BaseTypes.tsx";
+import {SHOW_RENDERING_HINTS} from "../../models/BaseTypes.tsx";
+import {UserInfo} from "../../models/UserManagementTypes.tsx";
 import {ChangeEvent, useEffect, useState} from "react";
 import ScenarioCard from "./components/ScenarioCard.tsx";
 import {createDialog} from "../../components/FloatingDialogs.tsx";
@@ -11,7 +12,7 @@ import {Scenario, ScenarioDialogOptions} from "../../models/ScenarioTypes.tsx";
 import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
 
 type Props = {
-    user: UserInfos
+    user: UserInfo
 }
 
 export default function ScenariosPage(props:Readonly<Props> ) {

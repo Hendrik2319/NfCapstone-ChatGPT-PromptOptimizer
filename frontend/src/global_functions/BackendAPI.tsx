@@ -2,7 +2,8 @@ import axios, {AxiosResponse} from "axios";
 import {NewScenario, Scenario} from "../models/ScenarioTypes.tsx";
 import {NewTestRun, RunningTestRun, TestRun, TestRunDTO} from "../models/TestRunTypes.tsx";
 import {convertNewTestRunIntoDTO, convertTestRunsFromDTOs} from "./TestRunFunctions.tsx";
-import {Answer, ApiState, Prompt, UserInfos} from "../models/BaseTypes.tsx";
+import {Answer, ApiState, Prompt} from "../models/BaseTypes.tsx";
+import {UserInfo} from "../models/UserManagementTypes.tsx";
 
 export const BackendAPI = {
 
@@ -98,7 +99,7 @@ export const BackendAPI = {
             callback
         ),
 
-    determineCurrentUser: (callerLabel: string, callback: (user: UserInfos) => void) =>
+    determineCurrentUser: (callerLabel: string, callback: (user: UserInfo) => void) =>
         processPromise(
             axios.get("/api/users/me"),
             "determineCurrentUser",

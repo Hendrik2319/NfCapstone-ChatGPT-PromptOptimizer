@@ -2,7 +2,8 @@ import './App.css'
 import {useEffect, useState} from "react";
 import {Link, Navigate, Route, Routes, useLocation} from "react-router-dom";
 import {DarkModeState, getCurrentDarkModeState} from "./pages/Main/components/DarkModeSwitch.Functions.tsx";
-import {DEBUG, SHOW_RENDERING_HINTS, UserInfos} from "./models/BaseTypes.tsx";
+import {DEBUG, SHOW_RENDERING_HINTS} from "./models/BaseTypes.tsx";
+import {UserInfo} from "./models/UserManagementTypes.tsx";
 import RouteProtection from "./components/RouteProtection.tsx";
 import ApiStateIndicator from "./pages/Main/components/ApiStateIndicator.tsx";
 import DarkModeSwitch from "./pages/Main/components/DarkModeSwitch.tsx";
@@ -17,7 +18,7 @@ import TestRunsChartPage from "./pages/TestRunsChart/TestRunsChartPage.tsx";
 import {notifyAppThemeListener} from "./global_functions/AppThemeListener.tsx";
 
 export default function App() {
-    const [user, setUser] = useState<UserInfos>();
+    const [user, setUser] = useState<UserInfo>();
     const location = useLocation();
     if (SHOW_RENDERING_HINTS) console.debug("Rendering App");
 

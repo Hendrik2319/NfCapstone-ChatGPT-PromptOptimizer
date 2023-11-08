@@ -1,4 +1,4 @@
-import {UserInfos} from "../../models/BaseTypes.tsx";
+import {UserInfo} from "../../models/UserManagementTypes.tsx";
 import ScenariosPage from "../Scenarios/ScenariosPage.tsx";
 import WaitUntilBecomeUserPage from "./components/WaitUntilBecomeUserPage.tsx";
 import styled from "styled-components";
@@ -11,7 +11,7 @@ const SimpleCard = styled.div`
 `;
 
 type Props = {
-    user?: UserInfos
+    user?: UserInfo
     login: ()=>void
     logout: ()=>void
 }
