@@ -14,6 +14,12 @@ const SimpleCard = styled.div`
   border-radius: 4px;
   padding: 0.2em;
   background: var(--background-color);
+  overflow-x: scroll;
+`;
+
+const ChartMinSizeContainer = styled.div`
+  min-width: 40em;
+  min-height: 20em;
 `;
 
 type ChartEntry = {
@@ -88,28 +94,30 @@ export default function TestRunsChartPage() {
         <>
             <BreadCrumbs scenarioId={scenarioId} extraLabel={"Chart"}/>
             <SimpleCard>
-                <TestRunsChart
-                    chartTitle={"Values of Answers in TestRun"}
+                <ChartMinSizeContainer>
+                    <TestRunsChart
+                        chartTitle={"Values of Answers in TestRun"}
 
-                    xData={labels}
-                    axisXLabel={"TestRuns"}
+                        xData={labels}
+                        axisXLabel={"TestRuns"}
 
-                    lineSet={{
-                        data: averageTokensPerRequest,
-                        label: "Average Tokens per Request",
-                        axisLabel: "Tokens per Request",
-                    }}
+                        lineSet={{
+                            data: averageTokensPerRequest,
+                            label: "Average Tokens per Request",
+                            axisLabel: "Tokens per Request",
+                        }}
 
-                    barSet={
-                        scenario.maxWantedWordCount
-                            ? {
-                                data: amountOfAnswersMeetMaxWordCount,
-                                label: "Answers meet Max. Word Count (%)",
-                                axisLabel: [ "Amount of Answers, that", "meet Max. Word Count (%)" ],
-                            }
-                            : undefined
-                    }
-                />
+                        barSet={
+                            scenario.maxWantedWordCount
+                                ? {
+                                    data: amountOfAnswersMeetMaxWordCount,
+                                    label: "Answers meet Max. Word Count (%)",
+                                    axisLabel: [ "Amount of Answers, that", "meet Max. Word Count (%)" ],
+                                }
+                                : undefined
+                        }
+                    />
+                </ChartMinSizeContainer>
             </SimpleCard>
         </>
     )
