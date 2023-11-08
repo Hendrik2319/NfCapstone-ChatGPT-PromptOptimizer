@@ -1,6 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security.models;
 
-public record UserInfos(
+public record UserInfo(
 		boolean isAuthenticated,
 		boolean isUser,
 		boolean isAdmin,

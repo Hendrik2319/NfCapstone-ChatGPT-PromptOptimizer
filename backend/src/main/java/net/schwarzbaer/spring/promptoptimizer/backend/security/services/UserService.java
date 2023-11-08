@@ -3,7 +3,7 @@ package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfos;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,7 +33,7 @@ public class UserService {
 //               Called by and allowed for all users (authorized or not)
 // ####################################################################################
 
-	public @NonNull UserInfos getCurrentUser() {
+	public @NonNull UserInfo getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Object principal = authentication!=null ? authentication.getPrincipal() : null;
 //		if (principal!=null) DEBUG_OUT.println("Principal: "+principal.getClass()+" -> "+principal);
@@ -44,7 +44,7 @@ public class UserService {
 //					DEBUG_OUT.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
 //			);
 
-			return new UserInfos(
+			return new UserInfo(
 					true,
 					hasRole(user, Role.USER),
 					hasRole(user, Role.ADMIN),
@@ -59,7 +59,7 @@ public class UserService {
 		}
 
 		String name = authentication!=null ? authentication.getName() : "anonymousUser";
-		return new UserInfos(false,false,false, name,null,null, null,null,null,null);
+		return new UserInfo(false,false,false, name,null,null, null,null,null,null);
 	}
 
 	private boolean hasRole(OAuth2AuthenticatedPrincipal user, Role role) {

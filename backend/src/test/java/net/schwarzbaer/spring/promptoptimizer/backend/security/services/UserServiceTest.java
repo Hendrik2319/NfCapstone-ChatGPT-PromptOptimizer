@@ -1,7 +1,7 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfos;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -63,10 +63,10 @@ class UserServiceTest {
 		SecurityContextHolder.setContext(securityContext);
 
 		// When
-		UserInfos actual = userService.getCurrentUser();
+		UserInfo actual = userService.getCurrentUser();
 
 		// Then
-		UserInfos expected = new UserInfos(
+		UserInfo expected = new UserInfo(
 				false, false, false,
 				"anonymousUser", null, null, null, null, null, null
 		);
@@ -82,10 +82,10 @@ class UserServiceTest {
 		SecurityContextHolder.setContext(securityContext);
 
 		// When
-		UserInfos actual = userService.getCurrentUser();
+		UserInfo actual = userService.getCurrentUser();
 
 		// Then
-		UserInfos expected = new UserInfos(
+		UserInfo expected = new UserInfo(
 				false, false, false,
 				"anonymousUser", null, null, null, null, null, null
 		);
@@ -122,10 +122,10 @@ class UserServiceTest {
 		initSecurityContext(loggedUserRole, loggedUserID, loggedUserLogin);
 
 		// When
-		UserInfos actual = userService.getCurrentUser();
+		UserInfo actual = userService.getCurrentUser();
 
 		// Then
-		UserInfos expected = new UserInfos(
+		UserInfo expected = new UserInfo(
 				true, isUser, isAdmin,
 				loggedUserID, null, loggedUserLogin, null, null, null, null
 		);

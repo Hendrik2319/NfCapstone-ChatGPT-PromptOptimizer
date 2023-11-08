@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfos;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.repositories.StoredUserInfoRepository;
 import org.springframework.lang.NonNull;
@@ -67,7 +67,7 @@ public class StoredUserInfoService {
 	public List<StoredUserInfo> getAllStoredUsers()
 			throws UserIsNotAllowedException
 	{
-		UserInfos currentUser = userService.getCurrentUser();
+		UserInfo currentUser = userService.getCurrentUser();
 		if (!currentUser.isAdmin())
 			 throw new UserIsNotAllowedException("Current user is not allowed to get all stored users.");
 
@@ -80,7 +80,7 @@ public class StoredUserInfoService {
 		if ( storedUserInfo.id()==null     ) throw new IllegalArgumentException("StoredUserInfo have no [id]");
 		if (!storedUserInfo.id().equals(id)) throw new IllegalArgumentException("StoredUserInfo have an [id] different to path variable");
 
-		UserInfos currentUser = userService.getCurrentUser();
+		UserInfo currentUser = userService.getCurrentUser();
 		if (!currentUser.isAdmin())
 			throw new UserIsNotAllowedException("Current user is not allowed to update a stored user.");
 
@@ -94,7 +94,7 @@ public class StoredUserInfoService {
 	public void deleteStoredUser(@NonNull String id)
 			throws UserIsNotAllowedException
 	{
-		UserInfos currentUser = userService.getCurrentUser();
+		UserInfo currentUser = userService.getCurrentUser();
 		if (!currentUser.isAdmin())
 			throw new UserIsNotAllowedException("Current user is not allowed to delete a stored user.");
 
@@ -112,7 +112,7 @@ public class StoredUserInfoService {
 	public String getDenialReasonForCurrentUser()
 			throws UserIsNotAllowedException
 	{
-		UserInfos currentUser = userService.getCurrentUser();
+		UserInfo currentUser = userService.getCurrentUser();
 		if (!currentUser.isAuthenticated())
 			throw new UserIsNotAllowedException("Current user is not allowed to do this operation.");
 

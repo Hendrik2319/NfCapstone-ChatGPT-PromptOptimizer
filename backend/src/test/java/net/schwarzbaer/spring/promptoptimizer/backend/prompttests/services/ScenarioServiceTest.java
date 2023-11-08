@@ -3,7 +3,7 @@ package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewScenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfos;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,7 +67,7 @@ class ScenarioServiceTest {
 	@Test
 	void whenGetAllScenariosOfUser_isCalledWithUserWithoutUserDbId_returnsEmptyList() {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, true, false,
 				"id1", null, "login1", null, null, null, null
 		));
@@ -84,7 +84,7 @@ class ScenarioServiceTest {
 	@Test
 	void whenGetAllScenariosOfUser_isCalledWithUserWithUserDbId_returnsList() {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, true, false,
 				"id1", "author2", "login1", null, null, null, null
 		));
@@ -115,7 +115,7 @@ class ScenarioServiceTest {
 	@Test
 	void whenAddScenarios_isCalledWithUserWithoutUserDbId_returnsEmptyOptional() {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, true, false,
 				"id1", null, "login1", null, null, null, null
 		));
@@ -132,7 +132,7 @@ class ScenarioServiceTest {
 	@Test
 	void whenAddScenarios_isCalledWithUserWithUserDbId_returnsEmptyOptional() {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, true, false,
 				"id1", "author1", "login1", null, null, null, null
 		));
@@ -161,7 +161,7 @@ class ScenarioServiceTest {
 	@Test
 	void whenUpdateScenario_isCalledByUser_returnsUpdatedValue() throws UserIsNotAllowedException {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, true, false,
 				"userId1", "author1", null, null, null, null, null
 		));
@@ -230,7 +230,7 @@ class ScenarioServiceTest {
 	@Test
 	void whenUpdateScenario_isCalledByAdmin_returnsUpdatedValue() throws UserIsNotAllowedException {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, false, true,
 				"userId1", "authorAdmin", null, null, null, null, null
 		));
@@ -272,7 +272,7 @@ class ScenarioServiceTest {
 			String userDbId, String authorOfStored, String authorOfGiven
 	) {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, true, false,
 				"userId1", userDbId, null, null, null, null, null
 		));
@@ -311,7 +311,7 @@ class ScenarioServiceTest {
 		when(scenarioRepository.findById("id1")).thenReturn(Optional.of(
 				new Scenario("id1", storedAuthorID, "label1", 1)
 		));
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, isUser, isAdmin,
 				"userId1", userDbId, null, null, null, null, null
 		));
@@ -376,7 +376,7 @@ class ScenarioServiceTest {
 		when(scenarioRepository.findById("id1")).thenReturn( Optional.of(
 				new Scenario("id1", storedAuthorID, "label1", 1)
 		));
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				isAuthenticated, isUser, false,
 				userId, userDbId, null, null, null, null, null
 		));
@@ -413,7 +413,7 @@ class ScenarioServiceTest {
 		when(scenarioRepository.findById("id1")).thenReturn(Optional.of(
 				new Scenario("id1", storedAuthorID, "label1", 1)
 		));
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, isUser, isAdmin,
 				"userId1", userDbId, null, null, null, null, null
 		));
@@ -481,7 +481,7 @@ class ScenarioServiceTest {
 		when(scenarioRepository.findById("id1")).thenReturn( Optional.of(
 				new Scenario("id1", storedAuthorID, "label1", 1)
 		));
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				isAuthenticated, isUser, false,
 				userId, userDbId, null, null, null, null, null
 		));

@@ -2,7 +2,7 @@ package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfos;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.repositories.StoredUserInfoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -183,7 +183,7 @@ class StoredUserInfoServiceTest {
 	@Test
 	void whenGetAllStoredUsers_isCalledByAdmin_returnsList() throws UserIsNotAllowedException {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, true, true,
 				"userId1", "RegistrationIduserId1", "login1", null, null, null, null
 		));
@@ -227,7 +227,7 @@ class StoredUserInfoServiceTest {
 			boolean isAuthenticated, boolean isUser, String id, String userDbId, String login
 	) {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				isAuthenticated, isUser, false,
 				id, userDbId, login, null, null, null, null
 		));
@@ -247,7 +247,7 @@ class StoredUserInfoServiceTest {
 	@Test
 	void whenUpdateStoredUser_isCalledNormal_returnsUpdatedData() throws UserIsNotAllowedException {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, false, true,
 				"id", "userDbId", "login", null, null, null, null
 		));
@@ -282,7 +282,7 @@ class StoredUserInfoServiceTest {
 	@Test
 	void whenUpdateStoredUser_isCalledWithUnknownId_returnsEmptyOptional() throws UserIsNotAllowedException {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, false, true,
 				"id", "userDbId", "login", null, null, null, null
 		));
@@ -319,7 +319,7 @@ class StoredUserInfoServiceTest {
 			boolean isAuthenticated, boolean isUser, String id, String userDbId, String login
 	) {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				isAuthenticated, isUser, false,
 				id, userDbId, login, null, null, null, null
 		));
@@ -374,7 +374,7 @@ class StoredUserInfoServiceTest {
 	@Test
 	void whenDeleteStoredUser_isCalledNormal() throws UserIsNotAllowedException {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, false, true,
 				"id", "userDbId", "login", null, null, null, null
 		));
@@ -396,7 +396,7 @@ class StoredUserInfoServiceTest {
 	@Test
 	void whenDeleteStoredUser_isCalledWithUnknownId_throwsException() {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, false, true,
 				"id", "userDbId", "login", null, null, null, null
 		));
@@ -431,7 +431,7 @@ class StoredUserInfoServiceTest {
 			boolean isAuthenticated, boolean isUser, String id, String userDbId, String login
 	) {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				isAuthenticated, isUser, false,
 				id, userDbId, login, null, null, null, null
 		));
@@ -469,7 +469,7 @@ class StoredUserInfoServiceTest {
 			String storedReason, String expectedReason
 	) throws UserIsNotAllowedException {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, false, false,
 				"id", "RegistrationIduserId1", "login", null, null, null, null
 		));
@@ -496,7 +496,7 @@ class StoredUserInfoServiceTest {
 	@Test
 	void whenGetDenialReasonForCurrentUser_isCalledWithUnknownUserId_returnsNull() throws UserIsNotAllowedException {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				true, false, false,
 				"id", "RegistrationIduserId1", "login", null, null, null, null
 		));
@@ -516,7 +516,7 @@ class StoredUserInfoServiceTest {
 	@Test
 	void whenGetDenialReasonForCurrentUser_isCalledByUnauthorized_throwsException() {
 		// Given
-		when(userService.getCurrentUser()).thenReturn(new UserInfos(
+		when(userService.getCurrentUser()).thenReturn(new UserInfo(
 				false, false, false,
 				"anonymousUser", null, null, null, null, null, null
 		));

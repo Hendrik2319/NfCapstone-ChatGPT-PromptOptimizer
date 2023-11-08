@@ -1,10 +1,10 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security.models;
 
 public record StoredUserInfo(
-		String id,             // == UserInfos.userDbId
+		String id,             // == UserInfo.userDbId
 		Role   role,
 		String registrationId, // registration service: github, ...
-		String originalId,     // == UserInfos.id
+		String originalId,     // == UserInfo.id
 		String login,
 		String name,
 		String location,
