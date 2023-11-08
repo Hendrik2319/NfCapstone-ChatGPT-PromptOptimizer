@@ -25,23 +25,24 @@ export default function WaitUntilBecomeUserPage( props: Readonly<Props> ) {
 
     return (
         <SimpleCard>
-            <p>
-                {
-                    denialReason === ""
-                        ?
-                        <>
-                            You are now logged in, but should wait
-                            until an administrator grants you access to the app.
-                        </>
-                        :
-                        <>
+            {
+                denialReason === ""
+                    ?
+                    <p>
+                        You are now logged in, but should wait
+                        until an administrator grants you access to the app.
+                    </p>
+                    :
+                    <>
+                        <p>
                             You are now logged in, but an administrator has decided
-                            to deny you access to the app for the following reason:<br/>
+                            to deny you access to the app for the following reason:
+                        </p>
+                        <p>
                             {denialReason}
-                        </>
-                }
-
-            </p>
+                        </p>
+                    </>
+            }
             <button onClick={props.logout}>Logout</button>
         </SimpleCard>
     )
