@@ -84,7 +84,7 @@ export default function App() {
                 </nav>
             }
             <Routes>
-                <Route path={"/"} element={<MainPage user={user} login={login}/>}/>
+                <Route path={"/"} element={<MainPage user={user} login={login} logout={logout}/>}/>
                 <Route element={<RouteProtection backPath="/" condition={user?.isAuthenticated && (user.isUser || user.isAdmin)}/>}>
                     <Route path={"/chat"} element={<SimpleChatPage/>}/>
                     <Route path={"/scenario/:id"} element={<TestRunsPage user={user}/>}/>

@@ -116,6 +116,15 @@ export const BackendAPI = {
             callback
         ),
 
+    getDenialReasonForCurrentUser: (callerLabel: string, callback: (reason: string) => void) =>
+        processPromise(
+            axios.get("/api/users/reason"),
+            "getDenialReasonForCurrentUser",
+            "getting denial reason for current user",
+            callerLabel,
+            callback
+        ),
+
 };
 
 function processPromise<T>(promise: Promise<AxiosResponse>, functionLabel: string, whenText: string, callerLabel: string, callback: (responseData: T) => void) {
