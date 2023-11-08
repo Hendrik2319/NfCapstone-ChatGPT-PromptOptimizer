@@ -1,3 +1,4 @@
+import {OnlyOneActiveController} from "../global_functions/OnlyOneActive.tsx";
 
 export type UserInfo = {
     isAuthenticated : boolean
@@ -26,3 +27,10 @@ export type StoredUserInfo = {
 };
 
 export type Role = "ADMIN" | "USER" | "UNKNOWN_ACCOUNT";
+
+export type SetRoleFunction = ( role: Role ) => void;
+export type UserTableRowProps = {
+    user: StoredUserInfo
+    editRoleCtrl: OnlyOneActiveController
+    setRole: SetRoleFunction
+};

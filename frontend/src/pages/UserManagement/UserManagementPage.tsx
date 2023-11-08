@@ -1,9 +1,10 @@
 import "./UserManagementPage.css"
 import {useEffect, useState} from "react";
 import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
-import {StoredUserInfo} from "../../models/UserManagementTypes.tsx";
+import {Role, StoredUserInfo} from "../../models/UserManagementTypes.tsx";
 import styled from "styled-components";
 import UserTableRow from "./components/UserTableRow.tsx";
+import {createOnlyOneActiveController} from "../../global_functions/OnlyOneActive.tsx";
 
 const TableCard = styled.div`
   border: 1px solid var(--border-color, #707070);
@@ -23,6 +24,13 @@ export default function UserManagementPage() {
         );
     }, []);
 
+    const editRoleCtrl = createOnlyOneActiveController();
+
+    function saveRole( user: StoredUserInfo, role: Role ) {
+        // TODO
+        console.debug("saveRole", role, user);
+    }
+
     return (
         <>
             <h3>User Management</h3>
@@ -34,7 +42,9 @@ export default function UserManagementPage() {
                     <tbody>
                     {
                         users.map( user =>
-                            <UserTableRow key={user.id} user={user}/>
+                            <UserTableRow key={user.id} props={{
+                                user, editRoleCtrl, setRole: role => saveRole(user, role)
+                            }}/>
                         )
                     }
                     </tbody>

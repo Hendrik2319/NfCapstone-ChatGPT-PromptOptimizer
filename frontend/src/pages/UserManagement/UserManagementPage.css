@@ -12,13 +12,27 @@
 .UserTable tr {
     height: 2em;
 }
+.UserTable tbody tr:hover {
+    background: var(--button-background-color-hover);
+}
 
 .UserTable td {
     padding: 0.2em 0.5em;
+    vertical-align: center;
 }
 
-.UserTable th {
+.UserTable th, .UserTable .NoWrap {
     white-space: nowrap;
+}
+
+.UserTable a {
+    display: inline-block;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.UserTable a:hover {
+    background: var(--button-background-color);
 }
 
 .UserTable td.Name {
@@ -27,3 +41,13 @@
 .UserTable td.DenialReason {
     min-width: 10em;
 }
+
+.UserTable .EditBtn {
+    vertical-align: middle;
+    min-width: 1.5em;
+    margin-right: 0.5em;
+    background: none;
+    border: none;
+}
+
+

@@ -1,18 +1,25 @@
-import {StoredUserInfo} from "../../../models/UserManagementTypes.tsx";
+import {Role, UserTableRowProps} from "../../../models/UserManagementTypes.tsx";
+import {SVGsInVars} from "../../../assets/SVGsInVars.tsx";
+import {ChangeEvent, useEffect, useState} from "react";
 
 type Props = {
-    user?: StoredUserInfo
+    props?: UserTableRowProps
 }
 
-export default function UserTableRow( props:Readonly<Props> ) {
+export default function UserTableRow( props_:Readonly<Props> ) {
+    const [ editRoleActive, setEditRoleActive ] = useState<boolean>(false);
 
-    function getReplacementIfNeeded(str: string, replacement: string) {
-        if (!str || str.trim()==="")
-            return replacement;
-        return str;
-    }
+    useEffect(() => {
+        if (!props_.props) return;
+        props_.props.editRoleCtrl.registerMe(
+            props_.props.user.id,
+            () => setEditRoleActive(false)
+        );
+        return () => props_.props?.editRoleCtrl.unregisterMe(props_.props.user.id);
+    }, [props_.props]);
 
-    if (!props.user)
+
+    if (!props_.props) // if no props -> it's a header
         return <tr>
             <th>User           </th>
             <th>Role           </th>
@@ -25,21 +32,76 @@ export default function UserTableRow( props:Readonly<Props> ) {
             <th>Original ID    </th>
         </tr>;
 
+    const {
+        user,
+        editRoleCtrl,
+        setRole
+    } = props_.props;
+
+
+    function getReplacementIfNeeded(str: string, replacement: string) {
+        if (!str || str.trim()==="")
+            return replacement;
+        return str;
+    }
+
+    function onSetEditRoleActive() {
+        setEditRoleActive(true);
+        editRoleCtrl.setActive( user.id )
+    }
+
+    function onChangeRole( event: ChangeEvent<HTMLSelectElement> ) {
+        setEditRoleActive(true);
+        let selectedRole: Role = "USER";
+        switch (event.target.value) {
+            case "ADMIN"          : selectedRole = "ADMIN"          ; break;
+            case "USER"           : break;
+            case "UNKNOWN_ACCOUNT": selectedRole = "UNKNOWN_ACCOUNT"; break;
+        }
+        setRole(selectedRole);
+    }
+
     return (
         <tr>
             <td className={"Name"}>
-                {props.user.avatar_url && <img className={"AvatarImage"} alt={"Avatar of user with ID "+props.user.id} src={props.user.avatar_url}/>}
+                {user.avatar_url && <img className={"AvatarImage"} alt={"Avatar of user with ID "+user.id} src={user.avatar_url}/>}
                 {"   "}
-                {getReplacementIfNeeded(props.user.name, "------")}
+                {getReplacementIfNeeded(user.name, "------")}
             </td>
-            <td>{props.user.role          }</td>
-            <td className={"DenialReason"}>{props.user.denialReason  }</td>
-            <td>{props.user.login         }</td>
-            <td>{props.user.location      }</td>
-            <td><a href={props.user.url}>{props.user.url}</a> </td>
-            <td>{props.user.id            }</td>
-            <td>{props.user.registrationId}</td>
-            <td>{props.user.originalId    }</td>
+
+            <td className={"NoWrap"}>
+                {
+                    !editRoleActive &&
+                    <>
+                        <button
+                            className={"EditBtn"}
+                            onClick={onSetEditRoleActive}
+                        >
+                            { SVGsInVars.Edit }
+                        </button>
+                        {user.role}
+                    </>
+                }
+                {
+                    editRoleActive &&
+                    <select value={user.role} onChange={onChangeRole}>
+                        <option value={"ADMIN"}>Admin</option>
+                        <option value={"USER"}>User</option>
+                        <option value={"UNKNOWN_ACCOUNT"}>Unknown Account</option>
+                    </select>
+                }
+            </td>
+
+            <td className={"DenialReason"}>
+                {user.denialReason}
+            </td>
+
+            <td>{user.login         }</td>
+            <td>{user.location      }</td>
+            <td><a href={user.url}>{user.url}</a> </td>
+            <td>{user.id            }</td>
+            <td>{user.registrationId}</td>
+            <td>{user.originalId    }</td>
         </tr>
     );
 }
