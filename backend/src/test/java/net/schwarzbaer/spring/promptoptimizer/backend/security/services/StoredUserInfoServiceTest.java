@@ -5,13 +5,13 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUser
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfos;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.repositories.StoredUserInfoRepository;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Map;
@@ -171,7 +171,7 @@ class StoredUserInfoServiceTest {
 //               getAllStoredUsers
 // ####################################################################################
 
-	@NotNull
+	@NonNull
 	private static StoredUserInfo createStoredUserInfo(Role role, String registrationId, String originalId, int index) {
 		return new StoredUserInfo(
 				registrationId + originalId, role, registrationId, originalId,
