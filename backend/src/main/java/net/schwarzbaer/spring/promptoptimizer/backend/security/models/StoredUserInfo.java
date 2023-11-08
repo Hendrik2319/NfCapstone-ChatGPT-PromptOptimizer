@@ -9,5 +9,6 @@ public record StoredUserInfo(
 		String name,
 		String location,
 		String url,
-		String avatar_url
+		String avatar_url,
+		String denialReason    // defined by Admin
 ) {}

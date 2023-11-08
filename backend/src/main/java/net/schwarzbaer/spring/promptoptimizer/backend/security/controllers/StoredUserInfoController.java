@@ -39,6 +39,7 @@ public class StoredUserInfoController {
 
 	@GetMapping("reason") // allowed: authorized   | called by: unknown accounts
 	public String getDenialReasonForCurrentUser()
+			throws UserIsNotAllowedException
 	{
 		return storedUserInfoService.getDenialReasonForCurrentUser();
 	}

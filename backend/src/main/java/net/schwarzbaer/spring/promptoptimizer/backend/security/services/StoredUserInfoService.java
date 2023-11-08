@@ -10,10 +10,7 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.repositories.Stor
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -41,7 +38,8 @@ public class StoredUserInfoService {
 				Objects.toString(newAttributes.get(UserService.ATTR_NAME       ), null),
 				Objects.toString(newAttributes.get(UserService.ATTR_LOCATION   ), null),
 				Objects.toString(newAttributes.get(UserService.ATTR_URL        ), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), null)
+				Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), null),
+				null
 		));
 	}
 
@@ -55,7 +53,8 @@ public class StoredUserInfoService {
 				Objects.toString(newAttributes.get(UserService.ATTR_NAME       ), storedUserInfo.name      ()),
 				Objects.toString(newAttributes.get(UserService.ATTR_LOCATION   ), storedUserInfo.location  ()),
 				Objects.toString(newAttributes.get(UserService.ATTR_URL        ), storedUserInfo.url       ()),
-				Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), storedUserInfo.avatar_url())
+				Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), storedUserInfo.avatar_url()),
+				storedUserInfo.denialReason()
 		);
 		if (!updatedUserInfo.equals(storedUserInfo))
 			storedUserInfoRepository.save(updatedUserInfo);
@@ -69,31 +68,59 @@ public class StoredUserInfoService {
 			throws UserIsNotAllowedException
 	{
 		UserInfos currentUser = userService.getCurrentUser();
-		// if (9)
-		// TODO
-		return null;
+		if (!currentUser.isAdmin())
+			 throw new UserIsNotAllowedException("Current user is not allowed to get all stored users.");
+
+		return storedUserInfoRepository.findAll();
 	}
 
 	public Optional<StoredUserInfo> updateStoredUser(@NonNull String id, @NonNull StoredUserInfo storedUserInfo)
 			throws UserIsNotAllowedException
 	{
-		// TODO
-		return null;
+		if ( storedUserInfo.id()==null     ) throw new IllegalArgumentException("StoredUserInfo have no [id]");
+		if (!storedUserInfo.id().equals(id)) throw new IllegalArgumentException("StoredUserInfo have an [id] different to path variable");
+
+		UserInfos currentUser = userService.getCurrentUser();
+		if (!currentUser.isAdmin())
+			throw new UserIsNotAllowedException("Current user is not allowed to update a stored user.");
+
+		Optional<StoredUserInfo> stored = storedUserInfoRepository.findById(id);
+		if (stored.isEmpty())
+			return Optional.empty();
+
+		return Optional.of(storedUserInfoRepository.save(storedUserInfo));
 	}
 
 	public void deleteStoredUser(@NonNull String id)
 			throws UserIsNotAllowedException
 	{
-		// TODO
+		UserInfos currentUser = userService.getCurrentUser();
+		if (!currentUser.isAdmin())
+			throw new UserIsNotAllowedException("Current user is not allowed to delete a stored user.");
+
+		Optional<StoredUserInfo> stored = storedUserInfoRepository.findById(id);
+		if (stored.isEmpty())
+			throw new NoSuchElementException("Can't delete, StoredUserInfo with ID \"%s\" found.".formatted(id));
+
+		storedUserInfoRepository.deleteById(id);
 	}
 
 // ####################################################################################
 //               Called by and allowed for authorized users
 // ####################################################################################
 
-	public String getDenialReasonForCurrentUser() {
-		// TODO
-		return null;
+	public String getDenialReasonForCurrentUser()
+			throws UserIsNotAllowedException
+	{
+		UserInfos currentUser = userService.getCurrentUser();
+		if (!currentUser.isAuthenticated())
+			throw new UserIsNotAllowedException("Current user is not allowed to do this operation.");
+
+		Optional<StoredUserInfo> storedUserInfo = storedUserInfoRepository.findById(currentUser.userDbId());
+
+		return storedUserInfo
+				.map(StoredUserInfo::denialReason) // message or null (-> no message -> not denied, "please wait")
+				.orElse(null); // no message -> not denied, "please wait"
 	}
 }
 
