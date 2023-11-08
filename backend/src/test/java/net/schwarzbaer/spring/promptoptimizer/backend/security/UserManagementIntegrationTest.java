@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -238,13 +239,133 @@ class UserManagementIntegrationTest {
 // ####################################################################################
 
 	@Test @DirtiesContext
-	void updateStoredUser() {
+	void whenUpdateStoredUser_isCalledNormal_returnsUpdatedData() throws Exception {
+		// Given
+		fillStoredUserInfoRepository();
 
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/users/%s".formatted("registrationIduserId2"))
+						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "registrationIduserId1", "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(
+								buildResponse(createStoredUserInfo(Role.USER, "registrationId", "userId2", 7))
+						)
+				)
+
+				// Then
+				.andExpect(status().isOk())
+				.andExpect(content().json(
+						buildResponse(createStoredUserInfo(Role.USER, "registrationId", "userId2", 7))
+				));
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateStoredUser_isCalledWithUnknownId_returns404NotFound() throws Exception {
+		// Given
+		fillStoredUserInfoRepository();
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/users/%s".formatted("registrationIduserId7"))
+						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "registrationIduserId1", "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(
+								buildResponse(createStoredUserInfo(Role.USER, "registrationId", "userId7", 7))
+						)
+				)
+
+				// Then
+				.andExpect(status().isNotFound())
+				.andExpect(content().string(""));
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateStoredUser_isCalledByUnknownAccount_returns403Forbidden() throws Exception {
+		whenUpdateStoredUser_isCalledByNotAllowedUser_returns403Forbidden(Role.UNKNOWN_ACCOUNT);
+	}
+	@Test @DirtiesContext
+	void whenUpdateStoredUser_isCalledByUSER_returns403Forbidden() throws Exception {
+		whenUpdateStoredUser_isCalledByNotAllowedUser_returns403Forbidden(Role.USER);
+	}
+	private void whenUpdateStoredUser_isCalledByNotAllowedUser_returns403Forbidden(Role role) throws Exception {
+		// Given
+		fillStoredUserInfoRepository();
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/users/%s".formatted("registrationIduserId2"))
+						.with(SecurityTestTools.buildUser(role, "userId1", "registrationIduserId1", "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(
+								buildResponse(createStoredUserInfo(Role.USER, "registrationId", "userId2", 7))
+						)
+				)
+
+				// Then
+				.andExpect(status().isForbidden())
+				.andExpect(content().string(""));
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateStoredUser_isCalledByUnauthenticated_returns401Unauthorized() throws Exception {
+		// Given
+		fillStoredUserInfoRepository();
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/users/%s".formatted("registrationIduserId2"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(
+								buildResponse(createStoredUserInfo(Role.USER, "registrationId", "userId2", 7))
+						)
+				)
+
+				// Then
+				.andExpect(status().isUnauthorized())
+				.andExpect(content().string(""));
+	}
+
+	@Test @DirtiesContext
+	void whenUpdateStoredUser_isCalledWithNoIdInData_returns400BadRequest() throws Exception {
+		whenUpdateStoredUser_isCalledWithWrongIDs_returns400BadRequest("userId2", null);
+	}
+	@Test @DirtiesContext
+	void whenUpdateStoredUser_isCalledWithDifferentIDs_returns400BadRequest() throws Exception {
+		whenUpdateStoredUser_isCalledWithWrongIDs_returns400BadRequest("userId3", "userId2");
+	}
+	private void whenUpdateStoredUser_isCalledWithWrongIDs_returns400BadRequest(String idInPath, String idInData) throws Exception {
+		// Given
+		fillStoredUserInfoRepository();
+
+		// When
+		mockMvc
+				.perform(MockMvcRequestBuilders
+						.put("/api/users/%s".formatted("registrationId"+ idInPath))
+						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "registrationIduserId1", "login"))
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(
+								buildResponse(createStoredUserInfo(Role.USER, "registrationId", idInData, 7))
+						)
+				)
+
+				// Then
+				.andExpect(status().isBadRequest());
 	}
 
 // ####################################################################################
 //               StoredUserInfoController.deleteStoredUser
 // ####################################################################################
+
+	@Test @DirtiesContext
+	void whenDeleteStoredUser_isCalledNormal() {
+
+
+	}
 
 // ####################################################################################
 //               StoredUserInfoController.getDenialReasonForCurrentUser
