@@ -14,7 +14,7 @@ export default function EditDenialReasonDialog( props: Readonly<Props> ) {
     if (SHOW_RENDERING_HINTS) console.debug("Rendering EditDenialReasonDialog");
 
     props.setInitFunction((options: EditDenialReasonDialogOptions) => {
-        setReason( options.user.denialReason );
+        setReason( !options.user.denialReason ? "" : options.user.denialReason );
         setUser( options.user );
     });
 
@@ -32,10 +32,13 @@ export default function EditDenialReasonDialog( props: Readonly<Props> ) {
 
     return (
         <form onSubmit={onSubmit}>
-            <label>
-                Enter a reason for denial of the user:<br/>
-            </label>
-            <textarea value={reason} onChange={onChange}></textarea>
+            <label>Enter a reason for denial of the user:</label><br/>
+            <textarea
+                value={reason}
+                onChange={onChange}
+                rows={10}
+                cols={40}
+            />
             <br/>
             <button>Set</button>
             <button type="button" onClick={props.closeDialog}>Cancel</button>

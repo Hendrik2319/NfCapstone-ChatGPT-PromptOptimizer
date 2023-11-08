@@ -40,6 +40,8 @@
 }
 .UserTable td.DenialReason {
     min-width: 10em;
+    max-width: 10em;
+    word-break: break-all;
 }
 
 .UserTable .EditBtn {

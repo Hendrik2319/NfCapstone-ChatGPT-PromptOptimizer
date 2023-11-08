@@ -1,6 +1,7 @@
 import {Role, UserTableRowProps} from "../../../models/UserManagementTypes.tsx";
 import {SVGsInVars} from "../../../assets/SVGsInVars.tsx";
 import {ChangeEvent, useEffect, useState} from "react";
+import {trimLongText} from "../../../global_functions/Tools.tsx";
 
 type Props = {
     props?: UserTableRowProps
@@ -62,6 +63,13 @@ export default function UserTableRow( props_:Readonly<Props> ) {
         saveUser({...user, role: selectedRole});
     }
 
+    function onDenialReasonCheckboxChange( event: ChangeEvent<HTMLInputElement> ) {
+        if (event.target.checked)
+            showEditReasonDialog({user});
+        else
+            saveUser({...user, denialReason: ""});
+    }
+
     return (
         <tr>
             <td className={"Name"}>
@@ -75,10 +83,7 @@ export default function UserTableRow( props_:Readonly<Props> ) {
                     !editRoleActive &&
                     <>
                         {user.role}
-                        <button
-                            className={"EditBtn"}
-                            onClick={onSetEditRoleActive}
-                        >
+                        <button className={"EditBtn"} onClick={onSetEditRoleActive}>
                             { SVGsInVars.Edit }
                         </button>
                     </>
@@ -94,7 +99,14 @@ export default function UserTableRow( props_:Readonly<Props> ) {
             </td>
 
             <td className={"DenialReason"}>
-                {user.denialReason}
+                <input type={"checkbox"} checked={!(!user.denialReason)} onChange={onDenialReasonCheckboxChange}/>
+                { trimLongText( user.denialReason, 35 ) }
+                {
+                    user.denialReason &&
+                    <button className={"EditBtn"} onClick={() => showEditReasonDialog({ user })}>
+                        { SVGsInVars.Edit }
+                    </button>
+                }
             </td>
 
             <td>{user.login         }</td>
