@@ -51,7 +51,7 @@ export default function UserTableRow( props_:Readonly<Props> ) {
     }
 
     function onChangeRole( event: ChangeEvent<HTMLSelectElement> ) {
-        setEditRoleActive(true);
+        setEditRoleActive(false);
         let selectedRole: Role = "USER";
         switch (event.target.value) {
             case "ADMIN"          : selectedRole = "ADMIN"          ; break;
@@ -73,13 +73,13 @@ export default function UserTableRow( props_:Readonly<Props> ) {
                 {
                     !editRoleActive &&
                     <>
+                        {user.role}
                         <button
                             className={"EditBtn"}
                             onClick={onSetEditRoleActive}
                         >
                             { SVGsInVars.Edit }
                         </button>
-                        {user.role}
                     </>
                 }
                 {

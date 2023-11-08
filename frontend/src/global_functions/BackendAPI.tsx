@@ -130,7 +130,16 @@ export const BackendAPI = {
         processPromise(
             axios.get("/api/users"),
             "getDenialReasonForCurrentUser",
-            "getting denial reason for current user",
+            "getting all stored users",
+            callerLabel,
+            callback
+        ),
+
+    updateStoredUser: (changedUser: StoredUserInfo,  callerLabel: string, callback: (savedUser: StoredUserInfo) => void) =>
+        processPromise(
+            axios.put(`/api/users/${changedUser.id}`, changedUser),
+            "updateStoredUser",
+            "updating a stored user",
             callerLabel,
             callback
         ),

@@ -27,8 +27,16 @@ export default function UserManagementPage() {
     const editRoleCtrl = createOnlyOneActiveController();
 
     function saveRole( user: StoredUserInfo, role: Role ) {
-        // TODO
-        console.debug("saveRole", role, user);
+        BackendAPI.updateStoredUser(
+            { ...user, role },
+            "UserManagementPage.saveRole",
+            () => {
+                BackendAPI.getAllStoredUsers(
+                    "UserManagementPage.saveRole",
+                    setUsers
+                );
+            }
+        )
     }
 
     return (
