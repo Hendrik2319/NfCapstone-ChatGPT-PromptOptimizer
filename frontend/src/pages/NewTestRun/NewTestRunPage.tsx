@@ -19,6 +19,7 @@ const BigButton = styled.button`
   font-size: 1.2em;
   font-weight: bold;
   padding: 0.5em 2em;
+  height: unset;
 `;
 
 export default function NewTestRunPage() {

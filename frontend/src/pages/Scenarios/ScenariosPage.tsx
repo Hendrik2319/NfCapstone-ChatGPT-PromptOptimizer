@@ -17,6 +17,7 @@ const AddButton = styled.button`
   border: 1px solid var(--border-color);
   background-color: var(--background-color);
   box-shadow: 5px 5px 5px var(--box-shadow-color);
+  height: unset;
 `;
 
 type Props = {

@@ -39,6 +39,11 @@
 
 .UserTable .EditBtn {
     margin-left: 0.5em;
+    vertical-align: middle;
+    min-width: 1em;
+    background: none;
+    border: none;
+    padding: 0;
 }
 
 
