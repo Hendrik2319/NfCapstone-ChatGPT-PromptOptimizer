@@ -81,12 +81,12 @@ export default function TestRunCard( props:Readonly<Props> ) {
 
             <ValueBlock>
                 <BigLabel>Timestamp : </BigLabel>
-                <SimpleCardNoBg02>{props.testRun.timestamp.toLocaleString()}</SimpleCardNoBg02>
+                <SimpleCardNoBg05>{props.testRun.timestamp.toLocaleString()}</SimpleCardNoBg05>
             </ValueBlock>
 
             <ValueBlock>
                 <BigLabel>Prompt    : </BigLabel>
-                <SimpleCardNoBg02>{props.testRun.prompt    }</SimpleCardNoBg02>
+                <SimpleCardNoBg05>{props.testRun.prompt    }</SimpleCardNoBg05>
             </ValueBlock>
 
             <ValueBlock>
