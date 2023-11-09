@@ -74,7 +74,7 @@ export default function TestRunCard( props:Readonly<Props> ) {
         <BaseCard>
             {
                 props.startNewTestRun &&
-                <StartNewButton onClick={props.startNewTestRun}>Start a new based on this</StartNewButton>
+                <StartNewButton onClick={props.startNewTestRun}>New TestRun</StartNewButton>
             }
             <Id>id         : {props.testRun.id        }</Id>
             <Id>scenarioId : {props.testRun.scenarioId}</Id>

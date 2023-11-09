@@ -1,5 +1,5 @@
 import {Link} from "react-router-dom";
-import {BigLabel, Id} from "../../../components/StandardStyledComponents.tsx";
+import {BigLabel, ButtonSVG, Id} from "../../../components/StandardStyledComponents.tsx";
 import styled from "styled-components";
 import {Scenario, ScenarioDialogOptions} from "../../../models/ScenarioTypes.tsx";
 import {SVGsInVars} from "../../../assets/SVGsInVars.tsx";
@@ -22,12 +22,6 @@ const ScenarioTitle = styled.div`
   font-size: 1.2em;
   font-weight: bold;
   margin: 0.5em 0;
-`;
-
-const ButtonImage = styled.div`
-  display: inline-block;
-  vertical-align: middle;
-  min-width: 1em;
 `;
 
 type Props = {
@@ -62,8 +56,8 @@ export default function ScenarioCard( props:Readonly<Props> ) {
                 }
             </Link>
             <br/>
-            <button onClick={editScenario}><ButtonImage>{ SVGsInVars.Edit }</ButtonImage>Change Name</button>
-            <button onClick={deleteScenario}><ButtonImage>{ SVGsInVars.Delete }</ButtonImage>Delete</button>
+            <button onClick={editScenario}><ButtonSVG>{ SVGsInVars.Edit }</ButtonSVG>Change Name</button>
+            <button onClick={deleteScenario}><ButtonSVG>{ SVGsInVars.Delete }</ButtonSVG>Delete</button>
         </BaseCard>
     )
 }

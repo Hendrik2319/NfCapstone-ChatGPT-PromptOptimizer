@@ -26,3 +26,9 @@ export const MainCard = styled(SimpleCard)`
   border-radius: 0.4em;
   padding: 1em;
 `;
+
+export const ButtonSVG = styled.div`
+  display: inline-block;
+  vertical-align: middle;
+  min-width: 1em;
+`;
