@@ -9,7 +9,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
 import BreadCrumbs from "../../components/BreadCrumbs.tsx";
 
-export const BigLabel = styled.label`
+const BigLabel = styled.label`
   display: block;
   color: var(--text-color-biglabel);
   font-size: 1em;
