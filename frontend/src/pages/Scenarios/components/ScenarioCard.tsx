@@ -63,7 +63,7 @@ export default function ScenarioCard( props:Readonly<Props> ) {
             </Link>
             <br/>
             <button onClick={editScenario}><ButtonImage>{ SVGsInVars.Edit }</ButtonImage>Change Name</button>
-            <button onClick={deleteScenario}>Delete</button>
+            <button onClick={deleteScenario}><ButtonImage>{ SVGsInVars.Delete }</ButtonImage>Delete</button>
         </BaseCard>
     )
 }
