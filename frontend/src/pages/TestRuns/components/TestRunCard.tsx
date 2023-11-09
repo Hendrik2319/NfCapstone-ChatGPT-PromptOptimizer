@@ -1,6 +1,6 @@
 import {TestAnswer, TestRun} from "../../../models/TestRunTypes.tsx";
 import styled from "styled-components";
-import {BigLabel, Id, Label} from "../../../components/StandardStyledComponents.tsx";
+import {BigLabel, Id, Label, SimpleCard} from "../../../components/StandardStyledComponents.tsx";
 import TestCasesView from "../../NewTestRun/components/TestCasesView.tsx";
 import {ChangeEvent, useState} from "react";
 import {getWordCount} from "../../../global_functions/Tools.tsx";
@@ -13,15 +13,13 @@ const BaseCard = styled.div`
   box-shadow: 5px 5px 5px var(--box-shadow-color);
 `;
 
-const SimpleCard = styled.div`
-    border: 1px solid var(--border-color, #707070);
-    border-radius: 4px;
-    padding: 0.2em;
+const SimpleCardNoBg02 = styled(SimpleCard)`
+  padding: 0.2em;
+  background: none;
 `;
-const SimpleCard05 = styled.div`
-    border: 1px solid var(--border-color, #707070);
-    border-radius: 4px;
-    padding: 0.5em;
+const SimpleCardNoBg05 = styled(SimpleCard)`
+  padding: 0.5em;
+  background: none;
 `;
 
 const AnswerCard = styled.div<{ $bgcolor: string }>`
@@ -83,25 +81,25 @@ export default function TestRunCard( props:Readonly<Props> ) {
 
             <ValueBlock>
                 <BigLabel>Timestamp : </BigLabel>
-                <SimpleCard>{props.testRun.timestamp.toLocaleString()}</SimpleCard>
+                <SimpleCardNoBg02>{props.testRun.timestamp.toLocaleString()}</SimpleCardNoBg02>
             </ValueBlock>
 
             <ValueBlock>
                 <BigLabel>Prompt    : </BigLabel>
-                <SimpleCard>{props.testRun.prompt    }</SimpleCard>
+                <SimpleCardNoBg02>{props.testRun.prompt    }</SimpleCardNoBg02>
             </ValueBlock>
 
             <ValueBlock>
                 <BigLabel>Variables : </BigLabel>
                 {
                     props.testRun.variables.length===0 &&
-                    <SimpleCard05>Currently are no Variables defined.</SimpleCard05>
+                    <SimpleCardNoBg05>Currently are no Variables defined.</SimpleCardNoBg05>
                 }
                 {
                     props.testRun.variables.length!==0 &&
-                    <SimpleCard05 className="FlexRow">{
-                        props.testRun.variables.map(varName=> <SimpleCard key={varName}>{varName}</SimpleCard>)
-                    }</SimpleCard05>
+                    <SimpleCardNoBg05 className="FlexRow">{
+                        props.testRun.variables.map(varName=> <SimpleCardNoBg02 key={varName}>{varName}</SimpleCardNoBg02>)
+                    }</SimpleCardNoBg05>
                 }
             </ValueBlock>
 
@@ -144,7 +142,7 @@ export default function TestRunCard( props:Readonly<Props> ) {
                 }</div>
                 {
                     props.rateAnswers_MaxWordCount &&
-                    <SimpleCard>
+                    <SimpleCardNoBg02>
                         {
                             props.testRun.answers
                                 .filter( answer => props.rateAnswers_MaxWordCount && getWordCount(answer.answer) <= props.rateAnswers_MaxWordCount)
@@ -155,13 +153,13 @@ export default function TestRunCard( props:Readonly<Props> ) {
                             props.rateAnswers_MaxWordCount
                             +" word(s)"
                         }
-                    </SimpleCard>
+                    </SimpleCardNoBg02>
                 }
                 {
                     typeof props.testRun.averageTokensPerRequest==="number" &&
-                    <SimpleCard>
+                    <SimpleCardNoBg02>
                         Average cost: {props.testRun.averageTokensPerRequest.toLocaleString(undefined, {maximumFractionDigits:2})} tokens per request
-                    </SimpleCard>
+                    </SimpleCardNoBg02>
                 }
             </ValueBlock>
 

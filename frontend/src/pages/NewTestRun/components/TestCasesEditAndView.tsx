@@ -3,14 +3,7 @@ import TestCasesEdit from "./TestCasesEdit.tsx";
 import TestCasesView from "./TestCasesView.tsx";
 import {TestCase, VariablesChangeMethod} from "../../../models/TestRunTypes.tsx";
 import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
-import styled from "styled-components";
-
-const SimpleCard = styled.div`
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
-`;
+import {SimpleCard} from "../../../components/StandardStyledComponents.tsx";
 
 type Mode = "edit" | "view";
 type Props = {

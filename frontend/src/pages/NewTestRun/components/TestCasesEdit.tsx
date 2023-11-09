@@ -1,16 +1,9 @@
-import {Id} from "../../../components/StandardStyledComponents.tsx";
+import {Id, SimpleCard} from "../../../components/StandardStyledComponents.tsx";
 import StringListInput from "./StringListInput.tsx";
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {TestCase} from "../../../models/TestRunTypes.tsx";
 import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
-
-const SimpleCard = styled.div`
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
-`;
 
 const ColoredVarName = styled.label<{ $bgcolor: string }>`
   display: inline-block;

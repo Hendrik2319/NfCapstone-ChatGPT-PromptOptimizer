@@ -1,15 +1,8 @@
 import StringListInput from "./StringListInput.tsx";
 import {useEffect, useState} from "react";
-import styled from "styled-components";
 import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 import {VariablesChangeMethod} from "../../../models/TestRunTypes.tsx";
-
-const SimpleCard = styled.div`
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
-`;
+import {SimpleCard} from "../../../components/StandardStyledComponents.tsx";
 
 type Props = {
     variables: string[]

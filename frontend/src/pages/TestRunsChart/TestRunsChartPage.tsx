@@ -8,12 +8,9 @@ import {TestRun} from "../../models/TestRunTypes.tsx";
 import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
 import {getWordCount} from "../../global_functions/Tools.tsx";
 import {Scenario} from "../../models/ScenarioTypes.tsx";
+import {SimpleCard} from "../../components/StandardStyledComponents.tsx";
 
-const SimpleCard = styled.div`
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
+const SimpleCardScrollX = styled(SimpleCard)`
   overflow-x: scroll;
 `;
 
@@ -73,7 +70,7 @@ export default function TestRunsChartPage() {
     if (entries.length === 0)
         return <>
             <BreadCrumbs scenarioId={scenarioId} extraLabel={"Chart"}/>
-            <SimpleCard>No values to show.</SimpleCard>
+            <SimpleCardScrollX>No values to show.</SimpleCardScrollX>
         </>
 
     function getValue( defaultValue: number, value?: number ) {
@@ -93,7 +90,7 @@ export default function TestRunsChartPage() {
     return (
         <>
             <BreadCrumbs scenarioId={scenarioId} extraLabel={"Chart"}/>
-            <SimpleCard>
+            <SimpleCardScrollX>
                 <ChartMinSizeContainer>
                     <TestRunsChart
                         chartTitle={"Values of Answers in TestRun"}
@@ -118,7 +115,7 @@ export default function TestRunsChartPage() {
                         }
                     />
                 </ChartMinSizeContainer>
-            </SimpleCard>
+            </SimpleCardScrollX>
         </>
     )
 }

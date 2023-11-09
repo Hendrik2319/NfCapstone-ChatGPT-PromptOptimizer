@@ -1,19 +1,12 @@
-import {Id, Label} from "../../../components/StandardStyledComponents.tsx";
+import {Id, Label, SimpleCard} from "../../../components/StandardStyledComponents.tsx";
 import {compareStringsIgnoringCase} from "../../../global_functions/Tools.tsx";
 import styled from "styled-components";
 import {TestCase} from "../../../models/TestRunTypes.tsx";
 import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 
-const SimpleCard = styled.div`
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
-`;
-
 const TestCasesList = styled.div`
   border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
+  border-radius: 0.2em;
   padding: 0.5em;
   background: var(--background-color);
 `;
