@@ -9,7 +9,8 @@ const ColoredVarName = styled.label<{ $bgcolor: string }>`
   display: inline-block;
   border: 1px solid var(--border-color, #707070);
   border-radius: 4px;
-  padding: 0.1em 0.5em;
+  padding: 0.2em 0.5em;
+  margin-bottom: 0.2em;
   background: ${props => props.$bgcolor};
 `;
 
