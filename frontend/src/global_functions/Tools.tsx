@@ -14,6 +14,7 @@ export function getWordCount(answer: string) {
 }
 
 export function trimLongText(text: string, maxLength: number) {
-    if (!text || text.length <= maxLength - 3) return text;
-    return text.substring(0, maxLength - 3) + "..."
+    maxLength = Math.abs( maxLength - 3 );
+    if (!text || text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "..."
 }
