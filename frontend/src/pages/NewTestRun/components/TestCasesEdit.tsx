@@ -1,23 +1,37 @@
-import {Id} from "../../../components/StandardStyledComponents.tsx";
+import {ButtonSVG, Id, SimpleCard} from "../../../components/StandardStyledComponents.tsx";
 import StringListInput from "./StringListInput.tsx";
 import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {TestCase} from "../../../models/TestRunTypes.tsx";
 import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
-
-const SimpleCard = styled.div`
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
-`;
+import {SVGsInVars} from "../../../assets/SVGsInVars.tsx";
 
 const ColoredVarName = styled.label<{ $bgcolor: string }>`
   display: inline-block;
   border: 1px solid var(--border-color, #707070);
   border-radius: 4px;
-  padding: 0.1em 0.5em;
+  padding: 0.2em 0.5em;
+  margin-bottom: 0.2em;
   background: ${props => props.$bgcolor};
+`;
+
+const TestCasesEditOptions = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 0.5em;
+
+  .Spacer {
+    width: 1em;
+  }
+  
+  button, select {
+    height: 2em;
+  }
+`;
+
+const TestCasesList = styled(SimpleCard)`
+  padding: 0.5em;
 `;
 
 function deepcopy(oldMap: TestCase): TestCase {
@@ -101,25 +115,28 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
     }
 
     return (
-        <SimpleCard>
-            {"Test Case: "}
-            {
-                props.testcases.length > 0 &&
-                <>
-                    <select value={selectedTestCaseIndex} onChange={onTestCaseSelectChange}>
-                        {
-                            props.testcases.map( (tc, index) =>
-                                <option key={generateKey(index)} value={index}>{index+1}</option>
-                            )
-                        }
-                    </select>
-                    <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex-1)}>&lt;</button>
-                    <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex+1)}>&gt;</button>
-                    {"  "}
-                </>
-            }
-            <button type={"button"} onClick={addTestCase   }>Add</button>
-            <button type={"button"} onClick={removeTestCase}>Remove</button>
+        <TestCasesList>
+            <TestCasesEditOptions>
+                {
+                    props.testcases.length > 0 &&
+                    <>
+                        <button onClick={()=>switchTo(selectedTestCaseIndex-1)}>&lt;</button>
+                        <select value={selectedTestCaseIndex} onChange={onTestCaseSelectChange}>
+                            {
+                                props.testcases.map( (tc, index) =>
+                                    <option key={generateKey(index)} value={index}>Test Case {index+1}</option>
+                                )
+                            }
+                        </select>
+                        <button type={"button"} onClick={()=>switchTo(selectedTestCaseIndex+1)}>&gt;</button>
+                    </>
+                }
+                <span className={"Spacer"}></span>
+                <div>
+                    <button onClick={addTestCase   }>Add <ButtonSVG>{ SVGsInVars.AddDoc }</ButtonSVG></button>
+                    <button onClick={removeTestCase}>Remove <ButtonSVG>{ SVGsInVars.RemoveDoc }</ButtonSVG></button>
+                </div>
+            </TestCasesEditOptions>
             {
                 selectedTestcase &&
                 <SimpleCard>
@@ -144,6 +161,6 @@ export default function TestCasesEdit( props: Readonly<Props> ) {
                     }</div>
                 </SimpleCard>
             }
-        </SimpleCard>
+        </TestCasesList>
     )
 }

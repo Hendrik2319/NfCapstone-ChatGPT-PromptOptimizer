@@ -8,6 +8,8 @@ const InputField = styled.input<{ $bgcolor: string }>`
   border: 1px solid var(--border-color, #707070);
   border-radius: 3px;
   color: var(--text-color);
+  font-size: 1em;
+  padding: 0.2em 0.5em;
 `;
 
 type Props = {
@@ -66,7 +68,7 @@ export default function StringListInput( props:Readonly<Props> ) {
     }
 
     return (
-        <div className={"FlexRow InlineBlock"}>
+        <div className={"FlexRow"}>
             {props.labelComp}
             {
                 values.map(

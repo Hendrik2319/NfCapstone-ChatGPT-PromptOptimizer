@@ -4,9 +4,14 @@ import {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import {Scenario} from "../../../models/ScenarioTypes.tsx";
 import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
+import {SimpleCard} from "../../../components/StandardStyledComponents.tsx";
 
 const MainPanel = styled.div`
     margin-top: 0.5em;
+`;
+
+const OptionsBar = styled(SimpleCard)`
+  padding: 0.3em;
 `;
 
 const RateLabel = styled.label`
@@ -72,7 +77,7 @@ export default function TestRunsList( props:Readonly<Props> ) {
 
     return (
         <MainPanel>
-            <div>
+            <OptionsBar>
                 {"Rate Answers : "}
                 <RateLabel className="ButtonLike">
                     <input
@@ -97,7 +102,7 @@ export default function TestRunsList( props:Readonly<Props> ) {
                         </>
                     }
                 </RateLabel>
-            </div>
+            </OptionsBar>
             <div className="FlexRowNoWrap">{
                 props.testruns.map(testRun =>
                     <TestRunCard

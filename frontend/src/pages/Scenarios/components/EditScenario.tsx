@@ -1,6 +1,21 @@
 import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 import {ChangeEvent, FormEvent, useState} from "react";
 import {Scenario, ScenarioDialogOptions} from "../../../models/ScenarioTypes.tsx";
+import styled from "styled-components";
+
+const StyledForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  
+  & > div {
+    text-align: right;
+  }
+  & > * {
+    margin: 0.5em 0;
+  }
+  & > *:first-child { margin-top: 0; }
+  & > *:last-child  { margin-bottom: 0; }
+`;
 
 type Props = {
     saveChanges: (scenario: Scenario) => void
@@ -38,14 +53,13 @@ export default function EditScenario( props: Readonly<Props> ) {
     }
 
     return (
-        <form onSubmit={onSubmit}>
-            <label>
-                Enter a Scenario Label:<br/>
-                <input value={label} onChange={onChange}/>
-            </label>
-            <br/>
-            <button>Set</button>
-            <button type="button" onClick={closeDialog}>Cancel</button>
-        </form>
+        <StyledForm onSubmit={onSubmit}>
+            <label>Enter a Scenario Label :</label>
+            <input value={label} onChange={onChange}/>
+            <div>
+                <button>Set</button>
+                <button type="button" onClick={closeDialog}>Cancel</button>
+            </div>
+        </StyledForm>
     )
 }

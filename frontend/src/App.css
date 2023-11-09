@@ -83,6 +83,8 @@ nav a {
 
 button, select {
     font-size: 1em;
+    height: 2em;
+    padding: 0 0.5em;
 }
 
 button, select, .CurrentUser a, nav a, .ButtonLike {
@@ -154,9 +156,17 @@ textarea {
     text-decoration: none;
     color: var(--text-color-biglabel)
 }
+
 .SimpleCard {
     border: 1px solid var(--border-color, #707070);
-    border-radius: 4px;
+    border-radius: 0.2em;
     padding: 0.2em;
     background: var(--background-color);
+}
+
+.AvatarImage {
+    vertical-align: middle;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
 }

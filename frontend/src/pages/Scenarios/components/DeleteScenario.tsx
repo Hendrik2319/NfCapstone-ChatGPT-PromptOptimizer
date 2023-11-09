@@ -1,6 +1,14 @@
 import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
 import {useState} from "react";
 import {Scenario, ScenarioDialogOptions} from "../../../models/ScenarioTypes.tsx";
+import styled from "styled-components";
+
+const Dialog = styled.div`
+    text-align: right;
+`;
+const MessageBlock = styled.div`
+    margin-bottom: 1em;
+`;
 
 type Props = {
     deleteScenario: (id: string) => void
@@ -27,11 +35,11 @@ export default function DeleteScenario( props: Readonly<Props> ) {
         return <>Loading</>
 
     return (
-        <>
-            <div>Do you really want to delete Scenario "{scenario.label}"?</div>
+        <Dialog>
+            <MessageBlock>Do you really want to delete Scenario "{scenario.label}"?</MessageBlock>
             <button onClick={deleteScenario}>Yes</button>
             <button onClick={()=>props.closeDialog()}>No</button>
             <button onClick={()=>props.closeDialog()}>Cancel</button>
-        </>
+        </Dialog>
     )
 }

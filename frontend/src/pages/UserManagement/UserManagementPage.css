@@ -1,19 +1,9 @@
-.AvatarImage {
-    vertical-align: middle;
-    width: 1.5em;
-    height: 1.5em;
-    border-radius: 50%;
-}
-
 .UserTable {
     margin-right: 2em;
 }
 
 .UserTable tr {
     height: 2em;
-}
-.UserTable tbody tr:hover {
-    background: var(--button-background-color-hover);
 }
 
 .UserTable td {
@@ -31,10 +21,6 @@
     text-decoration: none;
 }
 
-.UserTable a:hover {
-    background: var(--button-background-color);
-}
-
 .UserTable td.Name {
     min-width: 10em;
 }
@@ -45,11 +31,12 @@
 }
 
 .UserTable .EditBtn {
+    margin-left: 0.5em;
     vertical-align: middle;
-    min-width: 1.5em;
-    margin-right: 0.5em;
+    min-width: 1em;
     background: none;
     border: none;
+    padding: 0;
 }
 
 

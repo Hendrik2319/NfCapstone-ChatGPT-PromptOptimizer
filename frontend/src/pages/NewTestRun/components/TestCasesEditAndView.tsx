@@ -3,13 +3,13 @@ import TestCasesEdit from "./TestCasesEdit.tsx";
 import TestCasesView from "./TestCasesView.tsx";
 import {TestCase, VariablesChangeMethod} from "../../../models/TestRunTypes.tsx";
 import {SHOW_RENDERING_HINTS} from "../../../models/BaseTypes.tsx";
+import {ButtonSVG, SimpleCard} from "../../../components/StandardStyledComponents.tsx";
+import {SVGsInVars} from "../../../assets/SVGsInVars.tsx";
 import styled from "styled-components";
 
-const SimpleCard = styled.div`
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
+const SwitchButton = styled.button`
+  height: 2em;
+  padding: 0 1em;
 `;
 
 type Mode = "edit" | "view";
@@ -81,7 +81,9 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
             {
                 mode === "view" &&
                 <>
-                    <button type={"button"} onClick={ () => setMode("edit") }>Switch to Edit</button>
+                    <SwitchButton onClick={ () => setMode("edit") }>
+                        Edit <ButtonSVG>{ SVGsInVars.Edit }</ButtonSVG>
+                    </SwitchButton>
                     <TestCasesView
                         testcases={testcases}
                         getVariables={props.getVariables}
@@ -91,7 +93,9 @@ export default function TestCasesEditAndView(props:Readonly<Props> ) {
             {
                 mode === "edit" &&
                 <>
-                    <button type={"button"} onClick={ () => setMode("view") }>Switch to View</button>
+                    <SwitchButton onClick={ () => setMode("view") }>
+                        View
+                    </SwitchButton>
                     <TestCasesEdit
                         testcases={testcases}
                         setTestcases={onChangedTestcases}

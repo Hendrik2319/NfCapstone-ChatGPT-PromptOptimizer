@@ -7,10 +7,12 @@
     border-radius: 4px;
     background-color: var(--background-color, #FFFFFF);
 }
-.SidePanel > button {
+.SidePanelOpenerBtn {
     background: var(--background-color, #FFFFFF);
     border: none;
+    width: 2em;
 }
+
 .SidePanelContent {
     display: none;
     flex-direction: column;
@@ -19,4 +21,13 @@
 }
 .SidePanelContent.open {
     display: flex;
+}
+
+.SidePanelContent .Spacer {
+    height: 1em;
+}
+
+.SidePanelContent button {
+    height: 2em;
+    background: none;
 }

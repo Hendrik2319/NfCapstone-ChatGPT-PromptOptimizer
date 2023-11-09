@@ -12,7 +12,7 @@ export default function SidePanel( props: Readonly<Props> ) {
 
     return (
         <div className={"SidePanel"}>
-            <button onClick={()=>setIsOpen(!isOpen)}>{isOpen ? ">" : "<"}</button>
+            <button className={"SidePanelOpenerBtn"} onClick={()=>setIsOpen(!isOpen)}>{isOpen ? ">" : "<"}</button>
             <div className={"SidePanelContent"+(isOpen ? " open" : "")}>{props.children}</div>
         </div>
     )

@@ -9,6 +9,17 @@ import BreadCrumbs from "../../components/BreadCrumbs.tsx";
 import {Scenario} from "../../models/ScenarioTypes.tsx";
 import {TestRun} from "../../models/TestRunTypes.tsx";
 import {UserInfo} from "../../models/UserManagementTypes.tsx";
+import {ButtonSVG, SimpleCard} from "../../components/StandardStyledComponents.tsx";
+import styled from "styled-components";
+import {SVGsInVars} from "../../assets/SVGsInVars.tsx";
+
+const LocalNavBar = styled(SimpleCard)`
+  padding: 0.3em;
+  
+  & > * {
+    margin-left: 1em;
+  }
+`;
 
 type Props = {
     user?: UserInfo
@@ -68,11 +79,13 @@ export default function TestRunsPage( props:Readonly<Props> ) {
     return (
         <>
             <BreadCrumbs scenarioId={scenarioId}/>
-            <button onClick={()=>navigate("/scenario/"+scenarioId+"/chart")}>Chart</button>
-            {
-                userCanStartNewTestRun && (currentNewTestRunIsStored || testruns.length===0) &&
-                <button onClick={()=>navigate("/scenario/"+scenarioId+"/newtestrun")}>New TestRun</button>
-            }
+            <LocalNavBar>
+                <button onClick={()=>navigate("/scenario/"+scenarioId+"/chart")}>Optimization Chart <ButtonSVG>{ SVGsInVars.Chart }</ButtonSVG></button>
+                {
+                    userCanStartNewTestRun && (currentNewTestRunIsStored || testruns.length===0) &&
+                    <button onClick={()=>navigate("/scenario/"+scenarioId+"/newtestrun")}>New TestRun</button>
+                }
+            </LocalNavBar>
             <br/>
             <TestRunsList
                 scenario={scenario}

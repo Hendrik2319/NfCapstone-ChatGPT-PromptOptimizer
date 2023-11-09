@@ -8,12 +8,15 @@ import {TestRun} from "../../models/TestRunTypes.tsx";
 import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
 import {getWordCount} from "../../global_functions/Tools.tsx";
 import {Scenario} from "../../models/ScenarioTypes.tsx";
+import {MainCard} from "../../components/StandardStyledComponents.tsx";
 
-const SimpleCard = styled.div`
-  border: 1px solid var(--border-color, #707070);
-  border-radius: 4px;
-  padding: 0.2em;
-  background: var(--background-color);
+const MainCardScrollX = styled(MainCard)`
+  overflow-x: scroll;
+`;
+
+const ChartMinSizeContainer = styled.div`
+  min-width: 40em;
+  min-height: 20em;
 `;
 
 type ChartEntry = {
@@ -67,7 +70,7 @@ export default function TestRunsChartPage() {
     if (entries.length === 0)
         return <>
             <BreadCrumbs scenarioId={scenarioId} extraLabel={"Chart"}/>
-            <SimpleCard>No values to show.</SimpleCard>
+            <MainCard>No values to show.</MainCard>
         </>
 
     function getValue( defaultValue: number, value?: number ) {
@@ -87,30 +90,32 @@ export default function TestRunsChartPage() {
     return (
         <>
             <BreadCrumbs scenarioId={scenarioId} extraLabel={"Chart"}/>
-            <SimpleCard>
-                <TestRunsChart
-                    chartTitle={"Values of Answers in TestRun"}
+            <MainCardScrollX>
+                <ChartMinSizeContainer>
+                    <TestRunsChart
+                        chartTitle={"Values of Answers in TestRun"}
 
-                    xData={labels}
-                    axisXLabel={"TestRuns"}
+                        xData={labels}
+                        axisXLabel={"TestRuns"}
 
-                    lineSet={{
-                        data: averageTokensPerRequest,
-                        label: "Average Tokens per Request",
-                        axisLabel: "Tokens per Request",
-                    }}
+                        lineSet={{
+                            data: averageTokensPerRequest,
+                            label: "Average Tokens per Request",
+                            axisLabel: "Tokens per Request",
+                        }}
 
-                    barSet={
-                        scenario.maxWantedWordCount
-                            ? {
-                                data: amountOfAnswersMeetMaxWordCount,
-                                label: "Answers meet Max. Word Count (%)",
-                                axisLabel: [ "Amount of Answers, that", "meet Max. Word Count (%)" ],
-                            }
-                            : undefined
-                    }
-                />
-            </SimpleCard>
+                        barSet={
+                            scenario.maxWantedWordCount
+                                ? {
+                                    data: amountOfAnswersMeetMaxWordCount,
+                                    label: "Answers meet Max. Word Count (%)",
+                                    axisLabel: [ "Amount of Answers, that", "meet Max. Word Count (%)" ],
+                                }
+                                : undefined
+                        }
+                    />
+                </ChartMinSizeContainer>
+            </MainCardScrollX>
         </>
     )
 }
