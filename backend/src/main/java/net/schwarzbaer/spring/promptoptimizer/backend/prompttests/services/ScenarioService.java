@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewScenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfos;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserService;
 import org.springframework.lang.NonNull;
@@ -27,13 +27,13 @@ public class ScenarioService {
 	}
 
 	public List<Scenario> getAllScenariosOfUser() {
-		UserInfos currentUser = userService.getCurrentUser();
+		UserInfo currentUser = userService.getCurrentUser();
 		if (currentUser.userDbId()==null) return List.of();
 		return scenarioRepository.findByAuthorID(currentUser.userDbId());
 	}
 
 	public Optional<Scenario> addScenarios(@NonNull NewScenario newScenario) {
-		UserInfos currentUser = userService.getCurrentUser();
+		UserInfo currentUser = userService.getCurrentUser();
 		if (currentUser.userDbId()==null) return Optional.empty();
 		return Optional.of(scenarioRepository.save(new Scenario( currentUser.userDbId(), newScenario )));
 	}
@@ -76,7 +76,7 @@ public class ScenarioService {
 		checkAuthorIDs(action, authorID, null);
 	}
 	private void checkAuthorIDs(@NonNull String action, @NonNull String authorID1, @Nullable String authorID2) throws UserIsNotAllowedException {
-		UserInfos currentUser = userService.getCurrentUser();
+		UserInfo currentUser = userService.getCurrentUser();
 		if (currentUser.isUser()) {
 			if (currentUser.userDbId()==null)
 				throw new UserIsNotAllowedException("Current user has no [userDbId]");

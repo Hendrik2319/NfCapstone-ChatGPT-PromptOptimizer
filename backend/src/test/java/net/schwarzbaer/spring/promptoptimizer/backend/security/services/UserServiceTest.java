@@ -1,7 +1,7 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfos;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -52,6 +52,10 @@ class UserServiceTest {
 		SecurityContextHolder.setContext(securityContext);
 	}
 
+// ####################################################################################
+//               getCurrentUser
+// ####################################################################################
+
 	@Test
 	void whenGetCurrentUser_isCalledAndAuthenticationIsNull() {
 		// Given
@@ -59,10 +63,10 @@ class UserServiceTest {
 		SecurityContextHolder.setContext(securityContext);
 
 		// When
-		UserInfos actual = userService.getCurrentUser();
+		UserInfo actual = userService.getCurrentUser();
 
 		// Then
-		UserInfos expected = new UserInfos(
+		UserInfo expected = new UserInfo(
 				false, false, false,
 				"anonymousUser", null, null, null, null, null, null
 		);
@@ -78,16 +82,36 @@ class UserServiceTest {
 		SecurityContextHolder.setContext(securityContext);
 
 		// When
-		UserInfos actual = userService.getCurrentUser();
+		UserInfo actual = userService.getCurrentUser();
 
 		// Then
-		UserInfos expected = new UserInfos(
+		UserInfo expected = new UserInfo(
 				false, false, false,
 				"anonymousUser", null, null, null, null, null, null
 		);
 		assertEquals(expected, actual);
 	}
 
+	@Test void whenGetCurrentUser_isCalledByAuthenticatedUser() {
+		whenGetCurrentUser_isCalled(
+				null, "TestID2", "TestLogin",
+				false, false );
+	}
+	@Test void whenGetCurrentUser_isCalledByUnknownAccount() {
+		whenGetCurrentUser_isCalled(
+				Role.UNKNOWN_ACCOUNT, "TestID3", "TestUnknownAccount",
+				false, false );
+	}
+	@Test void whenGetCurrentUser_isCalledByUser() {
+		whenGetCurrentUser_isCalled(
+				Role.USER, "TestID4", "TestUser",
+				true, false );
+	}
+	@Test void whenGetCurrentUser_isCalledByAdmin() {
+		whenGetCurrentUser_isCalled(
+				Role.ADMIN, "TestID5", "TestAdmin",
+				false, true );
+	}
 	private void whenGetCurrentUser_isCalled(
 			Role loggedUserRole,
 			String loggedUserID,
@@ -98,45 +122,13 @@ class UserServiceTest {
 		initSecurityContext(loggedUserRole, loggedUserID, loggedUserLogin);
 
 		// When
-		UserInfos actual = userService.getCurrentUser();
+		UserInfo actual = userService.getCurrentUser();
 
 		// Then
-		UserInfos expected = new UserInfos(
+		UserInfo expected = new UserInfo(
 				true, isUser, isAdmin,
 				loggedUserID, null, loggedUserLogin, null, null, null, null
 		);
 		assertEquals(expected, actual);
-	}
-
-	@Test
-	void whenGetCurrentUser_isCalledByAuthenticatedUser() {
-		whenGetCurrentUser_isCalled(
-				null, "TestID2", "TestLogin",
-				false, false
-		);
-	}
-
-	@Test
-	void whenGetCurrentUser_isCalledByUnknownAccount() {
-		whenGetCurrentUser_isCalled(
-				Role.UNKNOWN_ACCOUNT, "TestID3", "TestUnknownAccount",
-				false, false
-		);
-	}
-
-	@Test
-	void whenGetCurrentUser_isCalledByUser() {
-		whenGetCurrentUser_isCalled(
-				Role.USER, "TestID4", "TestUser",
-				true, false
-		);
-	}
-
-	@Test
-	void whenGetCurrentUser_isCalledByAdmin() {
-		whenGetCurrentUser_isCalled(
-				Role.ADMIN, "TestID5", "TestAdmin",
-				false, true
-		);
 	}
 }

@@ -1,6 +1,8 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.StoredUserInfoService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +22,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -50,17 +49,15 @@ public class SecurityConfig {
 								"/api/users/me", "/api/apistate"
 						).permitAll()
 
-						.requestMatchers(
-								"/api/testrunexample"
-						).permitAll()
-
-						.requestMatchers(
-								"/api/logout"
+						.requestMatchers( HttpMethod.GET,
+								"/api/logout",
+								"/api/users/reason"
 						).authenticated()
 
-						.requestMatchers(HttpMethod.GET,
+						.requestMatchers(
 								"/api/scenario/all",
-								"/api/users/restricted"
+								"/api/users",
+								"/api/users/**"
 						).hasRole(Role.ADMIN.getShort())
 
 						.anyRequest().hasAnyRole(Role.ADMIN.getShort(), Role.USER.getShort())
@@ -83,30 +80,36 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
+	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(StoredUserInfoService storedUserInfoService) {
 		DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-		return request -> configureUserData(delegate, request);
+		return request -> configureUserData(storedUserInfoService, delegate, request);
 	}
 
-	DefaultOAuth2User configureUserData(DefaultOAuth2UserService delegate, OAuth2UserRequest request) {
+	DefaultOAuth2User configureUserData(StoredUserInfoService storedUserInfoService, DefaultOAuth2UserService delegate, OAuth2UserRequest request) {
 		OAuth2User user = delegate.loadUser(request);
 		Collection<GrantedAuthority> newAuthorities = new ArrayList<>(user.getAuthorities());
 		Map<String, Object> newAttributes = new HashMap<>(user.getAttributes());
 
-		String userDbId = request.getClientRegistration().getRegistrationId() + user.getName();
+		String registrationId = request.getClientRegistration().getRegistrationId();
+		String userDbId = registrationId + user.getName();
 		newAttributes.put("UserDbId", userDbId);
 		Role role = null;
 
-		/*
-		query user database for role
-		...
-		If not found, do this
-		 */
+		final Optional<StoredUserInfo> storedUserInfoOpt = storedUserInfoService.getUserById(userDbId);
+		if (storedUserInfoOpt.isPresent()) {
+			final StoredUserInfo storedUserInfo = storedUserInfoOpt.get();
+			role = storedUserInfo.role();
+			storedUserInfoService.updateUserIfNeeded(storedUserInfo, newAttributes);
+		}
+
 		if (role==null && initialAdmin.equals(userDbId))
 			role = Role.ADMIN;
 
 		if (role==null)
 			role = Role.UNKNOWN_ACCOUNT;
+
+		if (storedUserInfoOpt.isEmpty())
+			storedUserInfoService.addUser(role, registrationId, newAttributes);
 
 		newAuthorities.add(new SimpleGrantedAuthority(role.getLong()));
 		return new DefaultOAuth2User(newAuthorities, newAttributes, "id");

@@ -1,16 +1,17 @@
 import "./TestRunsPage.css";
 import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {SHOW_RENDERING_HINTS, UserInfos} from "../../models/BaseTypes.tsx";
+import {SHOW_RENDERING_HINTS} from "../../models/BaseTypes.tsx";
 import {isCurrentNewTestRunStored, saveCurrentNewTestRun} from "../../global_functions/NewTestRunStoarage.tsx";
 import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
 import TestRunsList from "./components/TestRunsList.tsx";
 import BreadCrumbs from "../../components/BreadCrumbs.tsx";
 import {Scenario} from "../../models/ScenarioTypes.tsx";
 import {TestRun} from "../../models/TestRunTypes.tsx";
+import {UserInfo} from "../../models/UserManagementTypes.tsx";
 
 type Props = {
-    user?: UserInfos
+    user?: UserInfo
 }
 
 export default function TestRunsPage( props:Readonly<Props> ) {

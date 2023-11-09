@@ -17,39 +17,39 @@ public class ScenarioController {
 
 	private final ScenarioService scenarioService;
 
-	@GetMapping
+	@GetMapping // allowed: admin & user
 	public List<Scenario> getAllScenariosOfUser()
 	{
 		return scenarioService.getAllScenariosOfUser();
 	}
 
-	@GetMapping("all")
+	@GetMapping("all") // allowed: admin
 	public List<Scenario> getAllScenarios()
 	{
 		return scenarioService.getAllScenarios();
 	}
 
-	@GetMapping("{id}")
+	@GetMapping("{id}") // allowed: user (author) & admin
 	public ResponseEntity<Scenario> getScenarioById(@PathVariable String id)
 			throws UserIsNotAllowedException
 	{
 		return ResponseEntity.of(scenarioService.getScenarioById(id));
 	}
 
-	@PostMapping
+	@PostMapping // allowed: user & admin   --> author
 	public ResponseEntity<Scenario> addScenarios(@RequestBody NewScenario newScenario)
 	{
 		return ResponseEntity.of(scenarioService.addScenarios(newScenario));
 	}
 
-	@PutMapping("{id}")
+	@PutMapping("{id}") // allowed: user (author) & admin
 	public ResponseEntity<Scenario> updateScenario(@PathVariable String id, @RequestBody Scenario scenario)
 			throws UserIsNotAllowedException
 	{
 		return ResponseEntity.of(scenarioService.updateScenario(id, scenario));
 	}
 
-	@DeleteMapping("{id}")
+	@DeleteMapping("{id}") // allowed: user (author) & admin
 	public void deleteScenario(@PathVariable String id)
 			throws UserIsNotAllowedException
 	{

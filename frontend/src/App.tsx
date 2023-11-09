@@ -2,7 +2,8 @@ import './App.css'
 import {useEffect, useState} from "react";
 import {Link, Navigate, Route, Routes, useLocation} from "react-router-dom";
 import {DarkModeState, getCurrentDarkModeState} from "./pages/Main/components/DarkModeSwitch.Functions.tsx";
-import {DEBUG, SHOW_RENDERING_HINTS, UserInfos} from "./models/BaseTypes.tsx";
+import {DEBUG, SHOW_RENDERING_HINTS} from "./models/BaseTypes.tsx";
+import {UserInfo} from "./models/UserManagementTypes.tsx";
 import RouteProtection from "./components/RouteProtection.tsx";
 import ApiStateIndicator from "./pages/Main/components/ApiStateIndicator.tsx";
 import DarkModeSwitch from "./pages/Main/components/DarkModeSwitch.tsx";
@@ -15,9 +16,10 @@ import TestRunWaitPage from "./pages/TestRunWaitPage.tsx";
 import {BackendAPI} from "./global_functions/BackendAPI.tsx";
 import TestRunsChartPage from "./pages/TestRunsChart/TestRunsChartPage.tsx";
 import {notifyAppThemeListener} from "./global_functions/AppThemeListener.tsx";
+import UserManagementPage from "./pages/UserManagement/UserManagementPage.tsx";
 
 export default function App() {
-    const [user, setUser] = useState<UserInfos>();
+    const [user, setUser] = useState<UserInfo>();
     const location = useLocation();
     if (SHOW_RENDERING_HINTS) console.debug("Rendering App");
 
@@ -81,16 +83,20 @@ export default function App() {
                 <nav>
                     <Link to={"/"    }>Home</Link>
                     <Link to={"/chat"}>Simple Chat View</Link>
+                    { user.isAdmin && <Link to={"/admin"}>User Management</Link> }
                 </nav>
             }
             <Routes>
-                <Route path={"/"} element={<MainPage user={user} login={login}/>}/>
+                <Route path={"/"} element={<MainPage user={user} login={login} logout={logout}/>}/>
                 <Route element={<RouteProtection backPath="/" condition={user?.isAuthenticated && (user.isUser || user.isAdmin)}/>}>
                     <Route path={"/chat"} element={<SimpleChatPage/>}/>
                     <Route path={"/scenario/:id"} element={<TestRunsPage user={user}/>}/>
                     <Route path={"/scenario/:id/newtestrun"} element={<NewTestRunPage/>}/>
                     <Route path={"/scenario/:id/pleasewait"} element={<TestRunWaitPage/>}/>
                     <Route path={"/scenario/:id/chart"} element={<TestRunsChartPage/>}/>
+                </Route>
+                <Route element={<RouteProtection backPath="/" condition={user?.isAuthenticated && user.isAdmin}/>}>
+                    <Route path={"/admin"} element={<UserManagementPage/>}/>
                 </Route>
                 <Route path={"/*"} element={<Navigate to={"/"}/>}/>
             </Routes>

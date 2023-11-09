@@ -12,3 +12,9 @@ export function getWordCount(answer: string) {
     const words = answer.split(/\s+/);
     return words.length;
 }
+
+export function trimLongText(text: string, maxLength: number) {
+    maxLength = Math.abs( maxLength - 3 );
+    if (!text || text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "..."
+}

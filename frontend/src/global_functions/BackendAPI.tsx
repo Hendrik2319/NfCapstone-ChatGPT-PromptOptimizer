@@ -2,7 +2,8 @@ import axios, {AxiosResponse} from "axios";
 import {NewScenario, Scenario} from "../models/ScenarioTypes.tsx";
 import {NewTestRun, RunningTestRun, TestRun, TestRunDTO} from "../models/TestRunTypes.tsx";
 import {convertNewTestRunIntoDTO, convertTestRunsFromDTOs} from "./TestRunFunctions.tsx";
-import {Answer, ApiState, Prompt, UserInfos} from "../models/BaseTypes.tsx";
+import {Answer, ApiState, Prompt} from "../models/BaseTypes.tsx";
+import {StoredUserInfo, UserInfo} from "../models/UserManagementTypes.tsx";
 
 export const BackendAPI = {
 
@@ -98,7 +99,7 @@ export const BackendAPI = {
             callback
         ),
 
-    determineCurrentUser: (callerLabel: string, callback: (user: UserInfos) => void) =>
+    determineCurrentUser: (callerLabel: string, callback: (user: UserInfo) => void) =>
         processPromise(
             axios.get("/api/users/me"),
             "determineCurrentUser",
@@ -112,6 +113,33 @@ export const BackendAPI = {
             axios.post("/api/ask", prompt),
             "askChatGPT",
             "sending request to ChatGPT",
+            callerLabel,
+            callback
+        ),
+
+    getDenialReasonForCurrentUser: (callerLabel: string, callback: (reason: string) => void) =>
+        processPromise(
+            axios.get("/api/users/reason"),
+            "getDenialReasonForCurrentUser",
+            "getting denial reason for current user",
+            callerLabel,
+            callback
+        ),
+
+    getAllStoredUsers: (callerLabel: string, callback: (users: StoredUserInfo[]) => void) =>
+        processPromise(
+            axios.get("/api/users"),
+            "getDenialReasonForCurrentUser",
+            "getting all stored users",
+            callerLabel,
+            callback
+        ),
+
+    updateStoredUser: (changedUser: StoredUserInfo,  callerLabel: string, callback: (savedUser: StoredUserInfo) => void) =>
+        processPromise(
+            axios.put(`/api/users/${changedUser.id}`, changedUser),
+            "updateStoredUser",
+            "updating a stored user",
             callerLabel,
             callback
         ),

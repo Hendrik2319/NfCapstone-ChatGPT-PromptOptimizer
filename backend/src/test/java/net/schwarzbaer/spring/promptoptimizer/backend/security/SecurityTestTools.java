@@ -8,8 +8,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.stream.Stream;
 
@@ -38,19 +36,6 @@ public class SecurityTestTools {
 				});
 	}
 
-	@NonNull
-	public static MockHttpServletRequestBuilder buildGetCurrentUserRequest(@Nullable Role role, @NonNull String id, @NonNull String login) {
-		return MockMvcRequestBuilders
-				.get("/api/users/me")
-				.with(buildUser(role, id, login));
-	}
-
-	@NonNull
-	public static MockHttpServletRequestBuilder buildGetCurrentUserRequest() {
-		return MockMvcRequestBuilders
-				.get("/api/users/me");
-	}
-
 	public static class UserAndAdminRoles implements ArgumentsProvider {
 		@Override
 		public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
@@ -62,6 +47,13 @@ public class SecurityTestTools {
 		@Override
 		public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
 			return Stream.of(Role.USER, Role.UNKNOWN_ACCOUNT).map(Arguments::of);
+		}
+	}
+
+	public static class AllRoles implements ArgumentsProvider {
+		@Override
+		public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) {
+			return Stream.of(Role.values()).map(Arguments::of);
 		}
 	}
 }
