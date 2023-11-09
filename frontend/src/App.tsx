@@ -17,6 +17,7 @@ import {BackendAPI} from "./global_functions/BackendAPI.tsx";
 import TestRunsChartPage from "./pages/TestRunsChart/TestRunsChartPage.tsx";
 import {notifyAppThemeListener} from "./global_functions/AppThemeListener.tsx";
 import UserManagementPage from "./pages/UserManagement/UserManagementPage.tsx";
+import UserProfilePage from "./pages/UserProfilePage.tsx";
 
 export default function App() {
     const [user, setUser] = useState<UserInfo>();
@@ -78,16 +79,28 @@ export default function App() {
                 }
             </SidePanel>
             <h1>ChatGPT PromptOptimizer</h1>
-            {
-                user?.isAuthenticated && (user.isUser || user.isAdmin) &&
-                <nav>
-                    <Link to={"/"    }>Home</Link>
-                    <Link to={"/chat"}>Simple Chat View</Link>
-                    { user.isAdmin && <Link to={"/admin"}>User Management</Link> }
-                </nav>
-            }
+            <nav>
+                <Link to={"/"}>Home</Link>
+                {
+                    user?.isAuthenticated &&
+                    <>
+                    {
+                        (user.isUser || user.isAdmin) &&
+                        <Link to={"/chat"}>Simple Chat View</Link>
+                    }
+                    {
+                        user.isAdmin &&
+                        <Link to={"/admin"}>User Management</Link>
+                    }
+                        <Link to={"/user"}>User Profile</Link>
+                    </>
+                }
+            </nav>
             <Routes>
                 <Route path={"/"} element={<MainPage user={user} login={login} logout={logout}/>}/>
+                <Route element={<RouteProtection backPath="/" condition={user?.isAuthenticated}/>}>
+                    <Route path={"/user"} element={<UserProfilePage user={user!}/>}/>
+                </Route>
                 <Route element={<RouteProtection backPath="/" condition={user?.isAuthenticated && (user.isUser || user.isAdmin)}/>}>
                     <Route path={"/chat"} element={<SimpleChatPage/>}/>
                     <Route path={"/scenario/:id"} element={<TestRunsPage user={user}/>}/>
