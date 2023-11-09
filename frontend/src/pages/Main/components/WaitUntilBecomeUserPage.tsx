@@ -1,6 +1,6 @@
 import {BackendAPI} from "../../../global_functions/BackendAPI.tsx";
 import {useEffect, useState} from "react";
-import {SimpleCard} from "../../../components/StandardStyledComponents.tsx";
+import {MainCard} from "../../../components/StandardStyledComponents.tsx";
 
 type Props = {
     logout: ()=>void
@@ -17,7 +17,7 @@ export default function WaitUntilBecomeUserPage( props: Readonly<Props> ) {
     }, []);
 
     return (
-        <SimpleCard>
+        <MainCard>
             {
                 denialReason === ""
                     ?
@@ -37,6 +37,6 @@ export default function WaitUntilBecomeUserPage( props: Readonly<Props> ) {
                     </>
             }
             <button onClick={props.logout}>Logout</button>
-        </SimpleCard>
+        </MainCard>
     )
 }

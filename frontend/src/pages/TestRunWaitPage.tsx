@@ -3,7 +3,7 @@ import {useParams} from "react-router-dom";
 import BreadCrumbs from "../components/BreadCrumbs.tsx";
 import {BackendAPI} from "../global_functions/BackendAPI.tsx";
 import {RunningTestRun} from "../models/TestRunTypes.tsx";
-import {BigLabel} from "../components/StandardStyledComponents.tsx";
+import {BigLabel, MainCard, SimpleCard} from "../components/StandardStyledComponents.tsx";
 
 export default function TestRunWaitPage() {
     const [ runningTestRuns, setRunningTestRuns ] = useState<RunningTestRun[]>([]);
@@ -59,22 +59,20 @@ export default function TestRunWaitPage() {
     return (
         <>
             <BreadCrumbs scenarioId={scenarioId} extraLabel={"New TestRun"}/>
-            <p className={"SimpleCard"}>
+            <MainCard>
                 Please wait.<br/>
                 { getFirstPart(runningTestRuns.length) } in progress ...
-            </p>
+            </MainCard>
             {
                 runningTestRuns.map( (rtr, index) =>
-                    <div key={generateKey(rtr, index)} className="SimpleCard">
+                    <MainCard key={generateKey(rtr, index)}>
                         TestRun {rtr.promptIndex+1}/{rtr.totalAmountOfPrompts}<br/>
                         <progress value={rtr.promptIndex} max={rtr.totalAmountOfPrompts} >
                             {rtr.promptIndex+1}/{rtr.totalAmountOfPrompts}
                         </progress><br/>
-                        <BigLabel>Label  : </BigLabel>
-                        <div className="SimpleCard">{rtr.label}</div>
-                        <BigLabel>Prompt : </BigLabel>
-                        <div className="SimpleCard">{rtr.prompt}</div>
-                    </div>
+                        <BigLabel>Label  : </BigLabel><SimpleCard>{rtr.label }</SimpleCard>
+                        <BigLabel>Prompt : </BigLabel><SimpleCard>{rtr.prompt}</SimpleCard>
+                    </MainCard>
                 )
             }
         </>

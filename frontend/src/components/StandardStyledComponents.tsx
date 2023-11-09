@@ -18,6 +18,11 @@ export const Id = styled.div`
 export const SimpleCard = styled.div`
   border: 1px solid var(--border-color, #707070);
   border-radius: 0.2em;
-  padding: 1em;
+  padding: 0.2em;
   background: var(--background-color);
+`;
+
+export const MainCard = styled(SimpleCard)`
+  border-radius: 0.4em;
+  padding: 1em;
 `;

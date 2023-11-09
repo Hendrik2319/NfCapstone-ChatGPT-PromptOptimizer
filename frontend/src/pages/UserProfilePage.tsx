@@ -1,6 +1,6 @@
 import {UserInfo} from "../models/UserManagementTypes.tsx";
 import styled from "styled-components";
-import {BigLabel, Id, SimpleCard} from "../components/StandardStyledComponents.tsx";
+import {BigLabel, Id, MainCard} from "../components/StandardStyledComponents.tsx";
 
 const AvatarImage = styled.img`
   width: 10em;
@@ -14,7 +14,7 @@ const BigLabel2 = styled(BigLabel)`
   padding: 0;
 `;
 
-const MainCard = styled(SimpleCard)`
+const MyMainCard = styled(MainCard)`
   & > * {
     margin: 0.5em;
   }
@@ -39,7 +39,7 @@ export default function UserProfilePage( props:Readonly<Props> ) {
     }
 
     return (
-        <MainCard className={"FlexRow"}>
+        <MyMainCard className={"FlexRow"}>
             {
                 props.user.avatar_url &&
                 <div><AvatarImage alt={""} src={props.user.avatar_url}/></div>
@@ -55,6 +55,6 @@ export default function UserProfilePage( props:Readonly<Props> ) {
                     <a href={props.user.url} target={"_blank"}>{props.user.url}</a>
                 </div>
             </ValuesCard>
-        </MainCard>
+        </MyMainCard>
     )
 }
