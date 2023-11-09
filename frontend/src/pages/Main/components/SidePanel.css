@@ -7,10 +7,12 @@
     border-radius: 4px;
     background-color: var(--background-color, #FFFFFF);
 }
-.SidePanel > button {
+.SidePanelOpenerBtn {
     background: var(--background-color, #FFFFFF);
     border: none;
+    width: 2em;
 }
+
 .SidePanelContent {
     display: none;
     flex-direction: column;
@@ -19,4 +21,24 @@
 }
 .SidePanelContent.open {
     display: flex;
+}
+
+.SidePanelContent .Spacer {
+    height: 1em;
+}
+
+.SidePanelContent button, .SidePanelContent a {
+    height: 2em;
+}
+
+.SidePanelContent button {
+    background: none;
+}
+
+.SidePanelContent a {
+    /*display: block;*/
+    text-decoration: none;
+    color: var(--text-color);
+    border: 1px solid var(--button-border-color, #707070);
+    border-radius: 0.3em;
 }

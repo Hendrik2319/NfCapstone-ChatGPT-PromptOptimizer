@@ -39,22 +39,25 @@ export default function UserProfilePage( props:Readonly<Props> ) {
     }
 
     return (
-        <MyMainCard className={"FlexRow"}>
-            {
-                props.user.avatar_url &&
-                <div><AvatarImage alt={""} src={props.user.avatar_url}/></div>
-            }
-            <ValuesCard className={"FlexColumn"}>
-                <Id>id : {props.user.id}</Id>
-                <Id>database id : {props.user.userDbId}</Id>
-                <div><BigLabel2>Name    </BigLabel2>{props.user.name    }</div>
-                <div><BigLabel2>Role    </BigLabel2>{getRoleLabel()     }</div>
-                <div><BigLabel2>Login   </BigLabel2>{props.user.login   }</div>
-                <div><BigLabel2>Location</BigLabel2>{props.user.location}</div>
-                <div><BigLabel2>URL     </BigLabel2>
-                    <a href={props.user.url} target={"_blank"}>{props.user.url}</a>
-                </div>
-            </ValuesCard>
-        </MyMainCard>
+        <>
+            <h3>User Profile</h3>
+            <MyMainCard className={"FlexRow"}>
+                {
+                    props.user.avatar_url &&
+                    <div><AvatarImage alt={""} src={props.user.avatar_url}/></div>
+                }
+                <ValuesCard className={"FlexColumn"}>
+                    <Id>id : {props.user.id}</Id>
+                    <Id>database id : {props.user.userDbId}</Id>
+                    <div><BigLabel2>Name    </BigLabel2>{props.user.name    }</div>
+                    <div><BigLabel2>Role    </BigLabel2>{getRoleLabel()     }</div>
+                    <div><BigLabel2>Login   </BigLabel2>{props.user.login   }</div>
+                    <div><BigLabel2>Location</BigLabel2>{props.user.location}</div>
+                    <div><BigLabel2>URL     </BigLabel2>
+                        <a href={props.user.url} target={"_blank"}>{props.user.url}</a>
+                    </div>
+                </ValuesCard>
+            </MyMainCard>
+        </>
     )
 }

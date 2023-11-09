@@ -1,6 +1,6 @@
 import './App.css'
 import {useEffect, useState} from "react";
-import {Link, Navigate, Route, Routes, useLocation} from "react-router-dom";
+import {Navigate, Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import {DarkModeState, getCurrentDarkModeState} from "./pages/Main/components/DarkModeSwitch.Functions.tsx";
 import {DEBUG, SHOW_RENDERING_HINTS} from "./models/BaseTypes.tsx";
 import {UserInfo} from "./models/UserManagementTypes.tsx";
@@ -22,6 +22,7 @@ import UserProfilePage from "./pages/UserProfilePage.tsx";
 export default function App() {
     const [user, setUser] = useState<UserInfo>();
     const location = useLocation();
+    const navigate = useNavigate();
     if (SHOW_RENDERING_HINTS) console.debug("Rendering App");
 
     useEffect(() => {
@@ -60,42 +61,36 @@ export default function App() {
             <SidePanel>
                 <ApiStateIndicator/>
                 <DarkModeSwitch onChange={setAppTheme}/>
-                <hr/>
+                <div className={"Spacer"}/>
                 {!user?.isAuthenticated && <button onClick={login}>Login</button>}
                 { user?.isAuthenticated && <button onClick={logout}>Logout</button>}
-                <button onClick={determineCurrentUser}>me</button>
-                {
-                    user?.isAuthenticated &&
-                    <div className={"CurrentUser"}>
-                        Current user:<br/>
-                        <a href={user.url} target="_blank">
-                            {user.avatar_url && <img alt="user avatar image" src={user.avatar_url}/>}{" "}
-                            {user.login}<br/>
-                            {user.name}<br/>
-                            [{user.id}]
-                        </a>
-
-                    </div>
-                }
-            </SidePanel>
-            <h1>ChatGPT PromptOptimizer</h1>
-            <nav>
-                <Link to={"/"}>Home</Link>
+                <div className={"Spacer"}/>
+                <button onClick={()=>navigate("/")}>Home</button>
                 {
                     user?.isAuthenticated &&
                     <>
-                    {
-                        (user.isUser || user.isAdmin) &&
-                        <Link to={"/chat"}>Simple Chat View</Link>
-                    }
-                    {
-                        user.isAdmin &&
-                        <Link to={"/admin"}>User Management</Link>
-                    }
-                        <Link to={"/user"}>User Profile</Link>
+                        {
+                            (user.isUser || user.isAdmin) &&
+                            <button onClick={()=>navigate("/chat")}>Simple Chat View</button>
+                        }
+                        {
+                            user.isAdmin &&
+                            <button onClick={()=>navigate("/admin")}>User Management</button>
+                        }
+                        <button onClick={()=>navigate("/user")}>
+                            { !user.login && "User Profile" }
+                            {
+                                user.login &&
+                                <>
+                                    {user.avatar_url && <img alt="user avatar image" src={user.avatar_url} className={"AvatarImage"}/>}
+                                    {" "+user.login}
+                                </>
+                            }
+                        </button>
                     </>
                 }
-            </nav>
+            </SidePanel>
+            <h1>ChatGPT PromptOptimizer</h1>
             <Routes>
                 <Route path={"/"} element={<MainPage user={user} login={login} logout={logout}/>}/>
                 <Route element={<RouteProtection backPath="/" condition={user?.isAuthenticated}/>}>

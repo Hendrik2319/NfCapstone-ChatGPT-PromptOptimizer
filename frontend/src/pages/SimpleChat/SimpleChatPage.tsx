@@ -28,12 +28,15 @@ export default function SimpleChatPage() {
     }
 
     return (
-        <form onSubmit={onSubmitForm} className={"SimpleChatForm"}>
-            <label htmlFor="prompt">Prompt :</label>
-            <textarea id="prompt" value={prompt.prompt} onChange={onInputChange} rows={10}/>
-            <button>Send</button>
-            <label htmlFor="answer">Answer :</label>
-            <textarea id="answer" value={answer.answer} readOnly={true} rows={10}/>
-        </form>
+        <>
+            <h3>Simple Chat</h3>
+            <form onSubmit={onSubmitForm} className={"SimpleChatForm"}>
+                <label htmlFor="prompt">Prompt :</label>
+                <textarea id="prompt" value={prompt.prompt} onChange={onInputChange} rows={10}/>
+                <button>Send</button>
+                <label htmlFor="answer">Answer :</label>
+                <textarea id="answer" value={answer.answer} readOnly={true} rows={10}/>
+            </form>
+        </>
     )
 }
