@@ -10,6 +10,7 @@ import BreadCrumbs from "../../components/BreadCrumbs.tsx";
 import {Scenario, ScenarioDialogOptions} from "../../models/ScenarioTypes.tsx";
 import {BackendAPI} from "../../global_functions/BackendAPI.tsx";
 import styled from "styled-components";
+import {SimpleCard} from "../../components/StandardStyledComponents.tsx";
 
 const AddButton = styled.button`
   padding: 1em;
@@ -78,7 +79,16 @@ export default function ScenariosPage(props:Readonly<Props> ) {
             <BreadCrumbs/>
             {
                 user.isAdmin &&
-                <label><input type="checkbox" checked={showFromAllUsers} onChange={onShowAllChange}/> of all users</label>
+                <SimpleCard>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={showFromAllUsers}
+                            onChange={onShowAllChange}
+                        />
+                        {" of all users"}
+                    </label>
+                </SimpleCard>
             }
             <div className="FlexRow">
                 <AddButton onClick={()=>addDialog.showDialog()}>Add</AddButton>
