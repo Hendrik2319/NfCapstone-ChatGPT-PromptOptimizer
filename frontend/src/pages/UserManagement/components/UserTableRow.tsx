@@ -2,6 +2,15 @@ import {Role, UserTableRowProps} from "../../../models/UserManagementTypes.tsx";
 import {SVGsInVars} from "../../../assets/SVGsInVars.tsx";
 import {ChangeEvent, useEffect, useState} from "react";
 import {trimLongText} from "../../../global_functions/Tools.tsx";
+import {ButtonSVG} from "../../../components/StandardStyledComponents.tsx";
+import styled from "styled-components";
+
+const EditButton = styled.span`
+  display: inline;
+  background: none;
+  border: none;
+  color: var(--text-color);
+`;
 
 type Props = {
     props?: UserTableRowProps
@@ -54,13 +63,10 @@ export default function UserTableRow( props_:Readonly<Props> ) {
 
     function onChangeRole( event: ChangeEvent<HTMLSelectElement> ) {
         setEditRoleActive(false);
-        let selectedRole: Role = "USER";
-        switch (event.target.value) {
-            case "ADMIN"          : selectedRole = "ADMIN"          ; break;
-            case "USER"           : break;
-            case "UNKNOWN_ACCOUNT": selectedRole = "UNKNOWN_ACCOUNT"; break;
-        }
-        saveUser({...user, role: selectedRole});
+        saveUser({
+            ...user,
+            role: event.target.value as Role
+        });
     }
 
     function onDenialReasonCheckboxChange( event: ChangeEvent<HTMLInputElement> ) {
@@ -68,6 +74,14 @@ export default function UserTableRow( props_:Readonly<Props> ) {
             showEditReasonDialog({user});
         else
             saveUser({...user, denialReason: ""});
+    }
+
+    function getRoleLabel(role: Role) {
+        switch (role) {
+            case "ADMIN": return "Admin";
+            case "USER": return "User";
+            case "UNKNOWN_ACCOUNT": return "New Account";
+        }
     }
 
     return (
@@ -81,37 +95,35 @@ export default function UserTableRow( props_:Readonly<Props> ) {
             <td className={"NoWrap"}>
                 {
                     !editRoleActive &&
-                    <>
-                        {user.role}
-                        <button className={"EditBtn"} onClick={onSetEditRoleActive}>
-                            { SVGsInVars.Edit }
-                        </button>
-                    </>
+                    <EditButton onClick={onSetEditRoleActive}>
+                        {getRoleLabel(user.role)+" "}
+                        <ButtonSVG>{SVGsInVars.Edit}</ButtonSVG>
+                    </EditButton>
                 }
                 {
                     editRoleActive &&
                     <select value={user.role} onChange={onChangeRole}>
-                        <option value={"ADMIN"}>Admin</option>
-                        <option value={"USER"}>User</option>
-                        <option value={"UNKNOWN_ACCOUNT"}>Unknown Account</option>
+                        <option value={"ADMIN"          }>{getRoleLabel("ADMIN"          )}</option>
+                        <option value={"USER"           }>{getRoleLabel("USER"           )}</option>
+                        <option value={"UNKNOWN_ACCOUNT"}>{getRoleLabel("UNKNOWN_ACCOUNT")}</option>
                     </select>
                 }
             </td>
 
             <td className={"DenialReason"}>
                 <input type={"checkbox"} checked={!(!user.denialReason)} onChange={onDenialReasonCheckboxChange}/>
-                { trimLongText( user.denialReason, 35 ) }
                 {
                     user.denialReason &&
-                    <button className={"EditBtn"} onClick={() => showEditReasonDialog({ user })}>
-                        { SVGsInVars.Edit }
-                    </button>
+                    <EditButton onClick={() => showEditReasonDialog({ user })}>
+                        { trimLongText( user.denialReason, 35 )+" " }
+                        <ButtonSVG>{ SVGsInVars.Edit }</ButtonSVG>
+                    </EditButton>
                 }
             </td>
 
             <td>{user.login         }</td>
             <td>{user.location      }</td>
-            <td><a href={user.url}>{user.url}</a> </td>
+            <td><a href={user.url} target={"_blank"}>{user.url}</a> </td>
             <td>{user.id            }</td>
             <td>{user.registrationId}</td>
             <td>{user.originalId    }</td>

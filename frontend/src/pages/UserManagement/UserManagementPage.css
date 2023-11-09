@@ -5,9 +5,6 @@
 .UserTable tr {
     height: 2em;
 }
-.UserTable tbody tr:hover {
-    background: var(--button-background-color-hover);
-}
 
 .UserTable td {
     padding: 0.2em 0.5em;
@@ -22,10 +19,6 @@
     display: inline-block;
     color: var(--text-color);
     text-decoration: none;
-}
-
-.UserTable a:hover {
-    background: var(--button-background-color);
 }
 
 .UserTable td.Name {
