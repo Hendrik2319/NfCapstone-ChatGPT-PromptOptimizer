@@ -11,6 +11,7 @@ const TextArea = styled.textarea`
   border: 2px solid var(--border-color, #707070);
   border-radius: 3px;
   font-family: monospace;
+  font-size: 1.1em;
   padding: 0.2em;
   margin: 0;
 `;
@@ -22,6 +23,7 @@ const View = styled.div`
   border: 1px solid var(--border-color, #707070);
   border-radius: 3px;
   font-family: monospace;
+  font-size: 1.1em;
   padding: 0.2em;
   margin: 0;
 `;
