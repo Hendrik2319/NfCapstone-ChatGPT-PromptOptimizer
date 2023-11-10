@@ -96,7 +96,7 @@ public class ChatGptService {
 		log.info("##### execRequest(): got Mono: %s".formatted(mono));
 
 		ResponseEntity<ChatGptResponse> responseEntity = mono
-				.block(Duration.of(3, ChronoUnit.MINUTES));
+				.block(Duration.of(60, ChronoUnit.SECONDS));
 		log.info("##### execRequest(): got responseEntity -> END");
 
 		if (responseEntity == null) return null;
