@@ -37,7 +37,7 @@ public class ChatGptService {
 
 	public Answer askChatGPT(@NonNull Prompt prompt) {
 		if (webClient == null) // API access is disabled
-			return new Answer("Access to OpenAI API is currently disabled.%nYour prompt was:%n\"%s\"".formatted(prompt.prompt()));
+			return new Answer("Access to OpenAI API is currently disabled.\nYour prompt was:\n\"%s\"".formatted(prompt.prompt()));
 
 		ChatGptRequest request = new ChatGptRequest(
 				"gpt-3.5-turbo",

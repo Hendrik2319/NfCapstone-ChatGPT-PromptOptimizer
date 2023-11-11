@@ -45,7 +45,7 @@ class ChatGptServiceTest {
 		Answer actual = chatGptService.askChatGPT(new Prompt("TestPrompt"));
 
 		// Then
-		Answer expected = new Answer("Access to OpenAI API is currently disabled.%nYour prompt was:%n\"%s\"".formatted("TestPrompt"));
+		Answer expected = new Answer("Access to OpenAI API is currently disabled.\nYour prompt was:\n\"%s\"".formatted("TestPrompt"));
 		assertEquals(expected, actual);
 	}
 
