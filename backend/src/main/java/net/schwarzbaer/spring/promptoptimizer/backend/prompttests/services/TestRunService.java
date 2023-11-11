@@ -55,25 +55,27 @@ public class TestRunService {
 	}
 
 	public void performTestRun(@NonNull NewTestRun newTestRun) throws UserIsNotAllowedException {
-		if (newTestRun.scenarioId()==null)
-			throw new IllegalArgumentException("A NewTestRun must have an scenario ID.");
+		String scenarioId = newTestRun.scenarioId();
+		String prompt = newTestRun.prompt();
+		List<String> variables = newTestRun.variables();
+		List<Map<String, List<String>>> testcases = newTestRun.testcases();
+		if (scenarioId==null) throw new IllegalArgumentException("A NewTestRun must have a (non null) scenario ID.");
+		if (prompt    ==null) throw new IllegalArgumentException("A NewTestRun must have a (non null) prompt.");
+		if (variables ==null) throw new IllegalArgumentException("A NewTestRun must have a (non null) list of variables.");
+		if (testcases ==null) throw new IllegalArgumentException("A NewTestRun must have a (non null) list of testcases.");
 
-		Optional<Scenario> storedScenarioOpt = scenarioService.getScenarioById(newTestRun.scenarioId());
+		Optional<Scenario> storedScenarioOpt = scenarioService.getScenarioById(scenarioId);
 		if (storedScenarioOpt.isEmpty())
-			throw new NoSuchElementException("Can't perform a TestRun, no Scenario with ID \"%s\" found.".formatted(newTestRun.scenarioId()));
+			throw new NoSuchElementException("Can't perform a TestRun, no Scenario with ID \"%s\" found.".formatted(scenarioId));
 
 		ZonedDateTime now = timeService.getNow();
 
 		List<TestRun.TestAnswer> answers = new ArrayList<>();
-		PromptGenerator generator = new PromptGenerator(
-				newTestRun.prompt(),
-				newTestRun.variables(),
-				newTestRun.testcases()
-		);
-		RunningTestRunsList.ListEntry listEntry = runningTestRunsList.createNewEntry(newTestRun.scenarioId());
+		PromptGenerator generator = new PromptGenerator( prompt, variables, testcases );
+		RunningTestRunsList.ListEntry listEntry = runningTestRunsList.createNewEntry(scenarioId);
 		generator.foreachPrompt(
-				(prompt, indexOfTestCase, totalAmountOfPrompts, label) -> {
-					listEntry.setValues(answers.size(), totalAmountOfPrompts, prompt, label);
+				(prompt_, indexOfTestCase_, totalAmountOfPrompts_, label_) -> {
+					listEntry.setValues(answers.size(), totalAmountOfPrompts_, prompt_, label_);
 					log.info("+++++ performTestRun(): Next API request: [%d/%d] \"%s\"".formatted(
 							listEntry.getPromptIndex(),
 							listEntry.getTotalAmountOfPrompts(),
@@ -81,14 +83,14 @@ public class TestRunService {
 					));
 					Answer answer = null;
 					try {
-						answer = chatGptService.askChatGPT(new Prompt(prompt));
+						answer = chatGptService.askChatGPT(new Prompt(prompt_));
 					} catch (Exception e) {
 						log.error("+++++ %s while requesting ChatGPT API. [ Message: %s ]".formatted(e.getClass().getSimpleName(), e.getMessage()));
 					}
 					if (answer!=null) {
 						answers.add(new TestRun.TestAnswer(
-								indexOfTestCase,
-								label,
+								indexOfTestCase_,
+								label_,
 								answer.answer(),
 								answer.promptTokens(),
 								answer.completionTokens(),
@@ -98,15 +100,15 @@ public class TestRunService {
 					}
 				}
 		);
-		runningTestRunsList.removeEntry(newTestRun.scenarioId(), listEntry);
+		runningTestRunsList.removeEntry(scenarioId, listEntry);
 
 		Double averageTokensPerRequest = computeAverageTokensPerRequest(answers);
 
 		testRunRepository.save(new TestRun(
-				null, newTestRun.scenarioId(), now,
-				newTestRun.prompt(),
-				newTestRun.variables(),
-				newTestRun.testcases(),
+				null, scenarioId, now,
+				prompt,
+				variables,
+				testcases,
 				answers,
 				averageTokensPerRequest
 		));

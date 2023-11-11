@@ -12,6 +12,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -200,7 +201,7 @@ class ScenarioServiceTest {
 	}
 
 	private void whenUpdateScenario_getsWrongArguments_throwsException(
-			String pathId, String scenId, String scenAuthor
+			@NonNull String pathId, String scenId, String scenAuthor
 	) {
 		// Given
 		// When

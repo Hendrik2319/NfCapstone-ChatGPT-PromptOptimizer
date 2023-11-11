@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.services.ChatGptService;
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models.Answer;
 import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.models.Prompt;
+
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +19,7 @@ public class SimpleChatGptController {
 	private final ChatGptService chatGptService;
 
 	@PostMapping // allowed: admin & user
-	public Answer aksChatGPT(@RequestBody Prompt prompt){
+	public Answer aksChatGPT(@NonNull @RequestBody Prompt prompt){
 		return chatGptService.askChatGPT(prompt);
 	}
 

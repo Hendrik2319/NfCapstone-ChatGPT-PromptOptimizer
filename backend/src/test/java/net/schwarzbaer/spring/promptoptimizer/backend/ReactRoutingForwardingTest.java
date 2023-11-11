@@ -1,6 +1,5 @@
 package net.schwarzbaer.spring.promptoptimizer.backend;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
 import org.junit.jupiter.api.Test;
@@ -30,9 +29,7 @@ class ReactRoutingForwardingTest {
 
 	@Autowired
 	private MockMvc mockMvc;
-	@Autowired
-	private ScenarioRepository scenarioRepository;
-
+	
 	@DynamicPropertySource
 	static void setUrlDynamically(DynamicPropertyRegistry reg) {
 		reg.add("app.openai-api-key", ()->"dummy_api_key");

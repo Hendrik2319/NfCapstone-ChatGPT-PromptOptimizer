@@ -3,7 +3,6 @@ package net.schwarzbaer.spring.promptoptimizer.backend;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.PathResourceResolver;
@@ -16,7 +15,7 @@ public class ReactRoutingForwarding implements WebMvcConfigurer {
 
 	static class ReactRoutingPathResourceResolver extends PathResourceResolver {
 		@Override
-		protected Resource getResource(@NonNull String resourcePath, @NonNull Resource location) throws IOException {
+		protected Resource getResource(String resourcePath, Resource location) throws IOException {
 			var requestedResource = location.createRelative(resourcePath);
 
 			// Is this a request to a real file?

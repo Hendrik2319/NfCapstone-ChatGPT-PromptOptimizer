@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -37,16 +38,18 @@ public class ChatGptService {
 
 	public Answer askChatGPT(@NonNull Prompt prompt) {
 		if (webClient == null) // API access is disabled
-			return new Answer("Access to OpenAI API is currently disabled.%nYour prompt was:%n\"%s\"".formatted(prompt.prompt()));
+			return new Answer( Objects.requireNonNull(
+				"Access to OpenAI API is currently disabled.\nYour prompt was:\n\"%s\"".formatted(prompt.prompt())
+			) );
 
 		ChatGptRequest request = new ChatGptRequest(
 				"gpt-3.5-turbo",
-				List.of(
+				Objects.requireNonNull( List.of(
 						new ChatGptRequest.Message(
 								"user",
-								prompt.prompt()
+								Objects.requireNonNull( prompt.prompt() )
 						)
-				)
+				) )
 		);
 
 		log.info("##### Request: %s".formatted(request));

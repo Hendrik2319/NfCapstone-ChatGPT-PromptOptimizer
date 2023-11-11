@@ -8,9 +8,9 @@ import java.util.*;
 @RequiredArgsConstructor
 class PromptGenerator {
 
-	private final String prompt;
-	private final List<String> variables;
-	private final List<Map<String, List<String>>> testcases;
+	private final @NonNull String prompt;
+	private final @NonNull List<String> variables;
+	private final @NonNull List<Map<String, List<String>>> testcases;
 
 	interface PromptAction {
 		void process(@NonNull String prompt, int indexOfTestCase, int totalAmountOfPrompts, @NonNull String label);
@@ -76,6 +76,7 @@ class PromptGenerator {
 		});
 	}
 
+	@NonNull
 	private String buildLabel(int testcaseIndex, Map<String, String> values, List<String> usedVarsList) {
 		StringBuilder sb = new StringBuilder();
 
@@ -84,16 +85,17 @@ class PromptGenerator {
 			sb.append(" %s:\"%s\"".formatted(varName, values.get(varName)));
 		sb.append(" }");
 
-		return sb.toString();
+		return Objects.requireNonNull( sb.toString() );
 	}
 
+	@NonNull
 	private String buildPrompt(Map<String, String> values) {
 		String promptStr = prompt;
 
 		for (Map.Entry<String, String> entry : values.entrySet())
 			promptStr = promptStr.replace("{%s}".formatted(entry.getKey()), entry.getValue());
 
-		return promptStr;
+		return Objects.requireNonNull( promptStr );
 	}
 
 	private interface LoopAction {

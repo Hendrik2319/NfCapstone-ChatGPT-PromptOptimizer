@@ -1,7 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class StoredUserInfoService {
 

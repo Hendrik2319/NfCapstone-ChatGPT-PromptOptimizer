@@ -6,6 +6,7 @@ import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenari
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.ScenarioService;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,27 +31,27 @@ public class ScenarioController {
 	}
 
 	@GetMapping("{id}") // allowed: user (author) & admin
-	public ResponseEntity<Scenario> getScenarioById(@PathVariable String id)
+	public ResponseEntity<Scenario> getScenarioById(@NonNull @PathVariable String id)
 			throws UserIsNotAllowedException
 	{
 		return ResponseEntity.of(scenarioService.getScenarioById(id));
 	}
 
 	@PostMapping // allowed: user & admin   --> author
-	public ResponseEntity<Scenario> addScenarios(@RequestBody NewScenario newScenario)
+	public ResponseEntity<Scenario> addScenarios(@NonNull @RequestBody NewScenario newScenario)
 	{
 		return ResponseEntity.of(scenarioService.addScenarios(newScenario));
 	}
 
 	@PutMapping("{id}") // allowed: user (author) & admin
-	public ResponseEntity<Scenario> updateScenario(@PathVariable String id, @RequestBody Scenario scenario)
+	public ResponseEntity<Scenario> updateScenario(@NonNull @PathVariable String id, @NonNull @RequestBody Scenario scenario)
 			throws UserIsNotAllowedException
 	{
 		return ResponseEntity.of(scenarioService.updateScenario(id, scenario));
 	}
 
 	@DeleteMapping("{id}") // allowed: user (author) & admin
-	public void deleteScenario(@PathVariable String id)
+	public void deleteScenario(@NonNull @PathVariable String id)
 			throws UserIsNotAllowedException
 	{
 		scenarioService.deleteScenario(id);

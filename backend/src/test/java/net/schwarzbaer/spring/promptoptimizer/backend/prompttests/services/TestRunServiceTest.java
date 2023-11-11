@@ -21,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -211,13 +212,27 @@ class TestRunServiceTest {
 //               performTestRun
 // ####################################################################################
 
-	@Test
-	void whenPerformTestRun_isCalledWithoutScenarioId_throwsException() {
+	@Test void whenPerformTestRun_isCalledWithoutScenarioId_throwsException() {
+		whenPerformTestRun_isCalledWithWrongNewTestRun_throwsException(null, "TestPrompt", List.of(), List.of());
+	}
+	@Test void whenPerformTestRun_isCalledWithoutPrompt_throwsException() {
+		whenPerformTestRun_isCalledWithWrongNewTestRun_throwsException("scenarioId", null, List.of(), List.of());
+	}
+	@Test void whenPerformTestRun_isCalledWithoutVariables_throwsException() {
+		whenPerformTestRun_isCalledWithWrongNewTestRun_throwsException("scenarioId", "TestPrompt", null, List.of());
+	}
+	@Test void whenPerformTestRun_isCalledWithoutTestcases_throwsException() {
+		whenPerformTestRun_isCalledWithWrongNewTestRun_throwsException("scenarioId", "TestPrompt", List.of(), null);
+	}
+
+	private void whenPerformTestRun_isCalledWithWrongNewTestRun_throwsException(
+		String scenarioId, String prompt, List<String> variables, List<Map<String, List<String>>> testcases
+	) {
 		// Given
 
 		// When
 		Executable call = () -> testRunService.performTestRun(new NewTestRun(
-				null, "TestPrompt", List.of(), List.of()
+				scenarioId, prompt, variables, testcases
 		));
 
 		// Then
@@ -304,7 +319,7 @@ class TestRunServiceTest {
 		verify(runningTestRunsListEntry).setValues(4,8, "TestPrompt/value1.3/value2.2","TestCase 1 { var1:\"value1.3\" var2:\"value2.2\" }");
 		verify(runningTestRunsListEntry).setValues(5,8, "TestPrompt/value1.4/value2.3","TestCase 2 { var1:\"value1.4\" var2:\"value2.3\" }");
 		verify(runningTestRunsListEntry).setValues(6,8, "TestPrompt/value1.4/value2.4","TestCase 2 { var1:\"value1.4\" var2:\"value2.4\" }");
-		verify(runningTestRunsList).removeEntry("scenarioId1", runningTestRunsListEntry);
+		verify(runningTestRunsList).removeEntry("scenarioId1", Objects.requireNonNull( runningTestRunsListEntry ) );
 
 		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.1/value2.1"));
 		verify(chatGptService).askChatGPT(new Prompt("TestPrompt/value1.1/value2.2"));
@@ -349,7 +364,7 @@ class TestRunServiceTest {
 		// Given
 
 		// When
-		Double actual = testRunService.computeAverageTokensPerRequest(List.of());
+		Double actual = testRunService.computeAverageTokensPerRequest( Objects.requireNonNull( List.of() ) );
 
 		// Then
 		assertNull(actual);
@@ -360,7 +375,7 @@ class TestRunServiceTest {
 		// Given
 
 		// When
-		Double actual = testRunService.computeAverageTokensPerRequest(List.of(
+		Double actual = testRunService.computeAverageTokensPerRequest( Objects.requireNonNull( List.of(
 				new TestRun.TestAnswer(0, "label1","answer1",null,null,null), // --
 				new TestRun.TestAnswer(0, "label1","answer1",null,   1,null), // 1
 				new TestRun.TestAnswer(0, "label1","answer1",   2,null,null), // 2
@@ -369,7 +384,7 @@ class TestRunServiceTest {
 				new TestRun.TestAnswer(0, "label1","answer1",null,   6,   6), // 6
 				new TestRun.TestAnswer(0, "label1","answer1",   7,null,   7), // 7
 				new TestRun.TestAnswer(0, "label1","answer1",   8,   9,  17)  // 17
-		));
+		)));
 
 		// Then
 		double expected = (1 + 2 + 7 + 5 + 6 + 7 + 17) / 7.0;

@@ -282,7 +282,7 @@ class TestRunIntegrationTest {
 		);
 	}
 
-	private void whenAddTestRun_isCalled_returnsStatus400BadRequest(String scenarioIdInPath, String testRunId, String scenarioIdInTestRun) throws Exception {
+	private void whenAddTestRun_isCalled_returnsStatus400BadRequest(@NonNull String scenarioIdInPath, String testRunId, @NonNull String scenarioIdInTestRun) throws Exception {
 		// Given
 
 		// When

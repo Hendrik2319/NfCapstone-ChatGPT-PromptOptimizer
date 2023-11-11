@@ -1,7 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import org.springframework.lang.NonNull;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class UserService {
 

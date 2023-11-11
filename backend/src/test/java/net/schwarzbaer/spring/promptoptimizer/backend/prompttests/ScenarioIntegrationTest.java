@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -354,7 +355,7 @@ class ScenarioIntegrationTest {
 		);
 	}
 	private void whenUpdateScenario_isCalled_returnsStatus403Forbidden(
-			Role role, String userDbId, String authorOfStored, String authorOfGiven
+			Role role, String userDbId, @NonNull String authorOfStored, @NonNull String authorOfGiven
 	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("id1", authorOfStored, "labelOld", 1));
@@ -376,13 +377,15 @@ class ScenarioIntegrationTest {
 
 	@Test @DirtiesContext
 	void whenUpdateScenario_isCalledByAdmin_returnsUpdatedValue() throws Exception {
-		whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue("author2", Role.ADMIN, "authorAdmin");
+		whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue(Role.ADMIN, "authorAdmin", "author2");
 	}
 	@Test @DirtiesContext
 	void whenUpdateScenario_isCalledByUser_returnsUpdatedValue() throws Exception {
-		whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue("author1", Role.USER, "author1");
+		whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue(Role.USER, "author1", "author1");
 	}
-	private void whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue(String storedAuthorId, Role role, String userDbId) throws Exception {
+	private void whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue(
+		Role role, String userDbId, @NonNull String storedAuthorId
+	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("id1", storedAuthorId, "labelOld", 1));
 
@@ -421,7 +424,7 @@ class ScenarioIntegrationTest {
 		whenDeleteScenario_isCalledByAllowedUser(Role.USER, "author1", "author1");
 	}
 	private void whenDeleteScenario_isCalledByAllowedUser(
-			Role role, String userDbId, String storedAuthorID
+			Role role, String userDbId, @NonNull String storedAuthorID
 	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
@@ -483,7 +486,7 @@ class ScenarioIntegrationTest {
 	}
 
 	private void whenDeleteScenario_isCalled_returnsStatus403Forbidden(
-			Role role, String userDbId, String storedAuthorID
+			Role role, String userDbId, @NonNull String storedAuthorID
 	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
@@ -511,7 +514,7 @@ class ScenarioIntegrationTest {
 	}
 
 	private void whenGetScenarioById_isCalledByAllowedUser(
-			Role role, String userDbId, String storedAuthorID
+			Role role, String userDbId, @NonNull String storedAuthorID
 	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
@@ -572,7 +575,7 @@ class ScenarioIntegrationTest {
 	}
 
 	private void whenGetScenarioById_isCalled_returnsStatus403Forbidden(
-			Role role, String userDbId, String storedAuthorID
+			Role role, String userDbId, @NonNull String storedAuthorID
 	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));

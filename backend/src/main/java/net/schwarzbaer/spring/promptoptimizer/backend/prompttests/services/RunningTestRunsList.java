@@ -1,6 +1,8 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
 import lombok.Getter;
+
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -14,19 +16,20 @@ public class RunningTestRunsList {
 		return runningTestRuns;
 	}
 
-	public synchronized ListEntry createNewEntry(String scenarioId) {
+	@NonNull
+	public synchronized ListEntry createNewEntry(@NonNull String scenarioId) {
 		List<ListEntry> entries = runningTestRuns.computeIfAbsent(scenarioId, key->new ArrayList<>());
 		ListEntry listEntry = new ListEntry(this);
 		entries.add(listEntry);
 		return listEntry;
 	}
 
-	public synchronized List<ListEntryDTO> getEntries(String scenarioId) {
+	public synchronized List<ListEntryDTO> getEntries(@NonNull String scenarioId) {
 		List<ListEntry> entries = runningTestRuns.get(scenarioId);
 		return entries==null ? List.of() : entries.stream().map(ListEntry::getDTO).toList();
 	}
 
-	public synchronized void removeEntry(String scenarioId, ListEntry listEntry) {
+	public synchronized void removeEntry(@NonNull String scenarioId, @NonNull ListEntry listEntry) {
 		List<ListEntry> entries = runningTestRuns.get(scenarioId);
 		if (entries!=null) {
 			entries.remove(listEntry);
@@ -38,16 +41,16 @@ public class RunningTestRunsList {
 	@Getter
 	public static class ListEntry {
 
-		private final RunningTestRunsList container;
+		private final @NonNull RunningTestRunsList container;
 		private int promptIndex;
 		private int totalAmountOfPrompts;
 		private String prompt;
 		private String label;
 
-		private ListEntry(RunningTestRunsList container) {
+		private ListEntry(@NonNull RunningTestRunsList container) {
 			this(container,-1, -1, null, null);
 		}
-		ListEntry(RunningTestRunsList container, int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
+		ListEntry(@NonNull RunningTestRunsList container, int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
 			this.container = container;
 			this.promptIndex = promptIndex;
 			this.totalAmountOfPrompts = totalAmountOfPrompts;
@@ -55,7 +58,7 @@ public class RunningTestRunsList {
 			this.label = label;
 		}
 
-		public void setValues(int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
+		public void setValues(int promptIndex, int totalAmountOfPrompts, @NonNull String prompt, @NonNull String label) {
 			synchronized (container) {
 				this.promptIndex = promptIndex;
 				this.totalAmountOfPrompts = totalAmountOfPrompts;
