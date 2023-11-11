@@ -9,7 +9,7 @@ public record ChatGptRequest(
         @NonNull List<Message> messages
 ) {
 	public record Message(
-            @NonNull String role,
-            @NonNull String content
-    ) {}
+			@NonNull String role,
+			@NonNull String content
+	) {}
 }

@@ -2,9 +2,11 @@ package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +21,8 @@ class RunningTestRunsListTest {
 		runningTestRuns = runningTestRunsList.getDataForUnitTest();
 	}
 
-	private RunningTestRunsList.ListEntry addEntry(String scenarioId, int promptIndex, int totalAmountOfPrompts, String prompt, String label) {
+	@NonNull
+	private RunningTestRunsList.ListEntry addEntry(@NonNull String scenarioId, int promptIndex, int totalAmountOfPrompts, @NonNull String prompt, @NonNull String label) {
 		RunningTestRunsList.ListEntry entry = runningTestRunsList.createNewEntry(scenarioId);
 		entry.setValues(promptIndex, totalAmountOfPrompts, prompt, label);
 		return entry;
@@ -148,7 +151,7 @@ class RunningTestRunsListTest {
 		addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
 		addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
 		RunningTestRunsList.ListEntry unknownEntry =
-				new RunningTestRunsList.ListEntry(runningTestRunsList, 2, 5, "prompt1a", "label1a");
+				new RunningTestRunsList.ListEntry( Objects.requireNonNull( runningTestRunsList ), 2, 5, "prompt1a", "label1a");
 
 		// When
 		runningTestRunsList.removeEntry("scenarioId1", unknownEntry);

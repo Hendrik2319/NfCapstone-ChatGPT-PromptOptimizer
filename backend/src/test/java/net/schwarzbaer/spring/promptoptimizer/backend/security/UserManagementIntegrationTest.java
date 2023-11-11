@@ -47,7 +47,6 @@ class UserManagementIntegrationTest {
 		reg.add("app.openai-api-url", ()->"dummy_url");
 	}
 
-	@NonNull
 	private static String buildCurrentUserResponse(
 			boolean isAuthenticated, boolean isUser, boolean isAdmin,
 			@NonNull String id, @Nullable String login
@@ -88,7 +87,7 @@ class UserManagementIntegrationTest {
 	void whenGetCurrentUser_isCalledWithMockUser() throws Exception { // to test the test
 		whenGetCurrentUser_isCalledWithUnauthenticatedUser("TestUser");
 	}
-	private void whenGetCurrentUser_isCalledWithUnauthenticatedUser(String id) throws Exception {
+	private void whenGetCurrentUser_isCalledWithUnauthenticatedUser(@NonNull String id) throws Exception {
 		// Given
 
 		// When
@@ -286,7 +285,7 @@ class UserManagementIntegrationTest {
 	void whenGetAllStoredUsers_isCalledByUnknownAccount_returns403Forbidden() throws Exception {
 		whenGetAllStoredUsers_isCalledByNotAllowedUser_returns403Forbidden(Role.UNKNOWN_ACCOUNT, "userIdB");
 	}
-	private void whenGetAllStoredUsers_isCalledByNotAllowedUser_returns403Forbidden(Role role, String userId) throws Exception {
+	private void whenGetAllStoredUsers_isCalledByNotAllowedUser_returns403Forbidden(Role role, @NonNull String userId) throws Exception {
 		// Given
 		performRequest_return403Forbidden(MockMvcRequestBuilders
 				.get("/api/users")
@@ -431,7 +430,7 @@ class UserManagementIntegrationTest {
 	void whenDeleteStoredUser_isCalledByUnknownAccount_returns403Forbidden() throws Exception {
 		whenDeleteStoredUser_isCalledByNotAllowedUser_returns403Forbidden(Role.UNKNOWN_ACCOUNT, "userIdB");
 	}
-	private void whenDeleteStoredUser_isCalledByNotAllowedUser_returns403Forbidden(Role role, String userId) throws Exception {
+	private void whenDeleteStoredUser_isCalledByNotAllowedUser_returns403Forbidden(Role role, @NonNull String userId) throws Exception {
 		performRequest_return403Forbidden( MockMvcRequestBuilders
 				.delete("/api/users/%s".formatted("registrationIduserId2"))
 				.with(SecurityTestTools.buildUser(role, userId, "registrationId" + userId, "login"))
@@ -465,7 +464,7 @@ class UserManagementIntegrationTest {
 	void whenGetDenialReasonForCurrentUser_isCalledWithUnknownUserId_returnsEmptyString() throws Exception { // --> no reason --> "Please wait, until ..."
 		whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role.UNKNOWN_ACCOUNT, "userId4", "");
 	}
-	private void whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role role, String originalId, String expectedReason) throws Exception {
+	private void whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role role, @NonNull String originalId, @NonNull String expectedReason) throws Exception {
 		// Given
 		fillStoredUserInfoRepository();
 

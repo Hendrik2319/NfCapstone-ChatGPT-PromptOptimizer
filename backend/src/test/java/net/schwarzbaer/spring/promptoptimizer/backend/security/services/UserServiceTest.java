@@ -114,8 +114,8 @@ class UserServiceTest {
 	}
 	private void whenGetCurrentUser_isCalled(
 			Role loggedUserRole,
-			String loggedUserID,
-			String loggedUserLogin,
+			@NonNull String loggedUserID,
+			@NonNull String loggedUserLogin,
 			boolean isUser, boolean isAdmin
 	) {
 		// Given

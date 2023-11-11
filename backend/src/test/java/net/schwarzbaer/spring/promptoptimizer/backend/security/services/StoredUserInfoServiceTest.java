@@ -348,7 +348,7 @@ class StoredUserInfoServiceTest {
 				"RegistrationIduserId1"
 		);
 	}
-	private void whenUpdateStoredUser_isCalledWithWrongIDs_throwsException(String idInPath, String idInUserInfo) {
+	private void whenUpdateStoredUser_isCalledWithWrongIDs_throwsException(@NonNull String idInPath, String idInUserInfo) {
 		// Given
 
 		// When

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,8 +22,8 @@ class PromptGeneratorTest {
 		// Given
 		promptGenerator = new PromptGenerator(
 				"Text Text Text",
-				List.of("var1","var2"),
-				List.of(
+				Objects.requireNonNull( List.of("var1","var2") ),
+				Objects.requireNonNull( List.of(
 						Map.of(
 								"var1", List.of("value1.1", "value1.2", "value1.3"),
 								"var2", List.of("value2.1", "value2.2")
@@ -31,7 +32,7 @@ class PromptGeneratorTest {
 								"var1", List.of("value1.4"),
 								"var2", List.of("value2.3", "value2.4")
 						)
-				)
+				) )
 		);
 
 		// When
@@ -52,8 +53,8 @@ class PromptGeneratorTest {
 		// Given
 		promptGenerator = new PromptGenerator(
 				"{var1}##{var2}",
-				List.of("var1","var2"),
-				List.of(
+				Objects.requireNonNull( List.of("var1","var2") ),
+				Objects.requireNonNull( List.of(
 						Map.of(
 								"var1", List.of("value1.1", "value1.2", "value1.3"),
 								"var2", List.of("value2.1", "value2.2")
@@ -62,7 +63,7 @@ class PromptGeneratorTest {
 								"var1", List.of("value1.4"),
 								"var2", List.of("value2.3", "value2.4")
 						)
-				)
+				) )
 		);
 
 		// When
@@ -91,8 +92,8 @@ class PromptGeneratorTest {
 		// Given
 		promptGenerator = new PromptGenerator(
 				"{var2}~~{var1}~~ {var1} {var2}~~",
-				List.of("var1","var2"),
-				List.of(
+				Objects.requireNonNull( List.of("var1","var2") ),
+				Objects.requireNonNull( List.of(
 						Map.of(
 								"var1", List.of("value1.1", "value1.2", "value1.3"),
 								"var2", List.of("value2.1", "value2.2")
@@ -101,7 +102,7 @@ class PromptGeneratorTest {
 								"var1", List.of("value1.4"),
 								"var2", List.of("value2.3", "value2.4")
 						)
-				)
+				) )
 		);
 
 		// When
@@ -133,8 +134,8 @@ class PromptGeneratorTest {
 		testcase3.put("var2", List.of("value2.5"));
 		promptGenerator = new PromptGenerator(
 				"{var1}##{var2}",
-				List.of("var1","var2"),
-				List.of(
+				Objects.requireNonNull( List.of("var1","var2") ),
+				Objects.requireNonNull( List.of(
 						Map.of(
 								"var1", List.of("value1.1", "value1.2", "value1.3"),
 								"var2", List.of("value2.1", "value2.2")
@@ -144,7 +145,7 @@ class PromptGeneratorTest {
 								"var2", List.of("value2.3", "value2.4")
 						),
 						testcase3
-				)
+				) )
 		);
 
 		// When

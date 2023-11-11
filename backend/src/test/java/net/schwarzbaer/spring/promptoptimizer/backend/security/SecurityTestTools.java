@@ -15,17 +15,14 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 public class SecurityTestTools {
 
-	@NonNull
 	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(@Nullable Role role) {
 		return buildUser(role, "TestID", null, "TestLogin");
 	}
 
-	@NonNull
 	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(@Nullable Role role, @NonNull String id, @NonNull String login) {
 		return buildUser(role, id, null, login);
 	}
 
-	@NonNull
 	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(@Nullable Role role, @NonNull String id, @Nullable String userDbId, @NonNull String login) {
 		return oidcLogin()
 				.authorities(new SimpleGrantedAuthority(role == null ? "DummyAuthority" : role.getLong()))

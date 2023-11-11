@@ -4,13 +4,11 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
 import okhttp3.mockwebserver.MockResponse;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 public class ChatGptTestTools {
 
-	@NonNull
 	public static MockHttpServletRequestBuilder buildAskRequest(String prompt, Role role) {
 		return MockMvcRequestBuilders
 				.post("/api/ask")
@@ -25,7 +23,6 @@ public class ChatGptTestTools {
 						""".formatted(prompt));
 	}
 
-	@NonNull
 	public static MockHttpServletRequestBuilder buildAskRequest(String prompt) {
 		return MockMvcRequestBuilders
 				.post("/api/ask")
@@ -38,7 +35,6 @@ public class ChatGptTestTools {
 						""".formatted(prompt));
 	}
 
-	@NonNull
 	public static MockResponse buildApiResponse(String answer, int prompt_tokens, int completion_tokens, int total_tokens) {
 		return new MockResponse()
 				.setHeader("Content-Type", "application/json")

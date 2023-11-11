@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -34,8 +35,9 @@ public class ScenarioService {
 
 	public Optional<Scenario> addScenarios(@NonNull NewScenario newScenario) {
 		UserInfo currentUser = userService.getCurrentUser();
-		if (currentUser.userDbId()==null) return Optional.empty();
-		return Optional.of(scenarioRepository.save(new Scenario( currentUser.userDbId(), newScenario )));
+		String userDbId = currentUser.userDbId();
+		if (userDbId==null) return Optional.empty();
+		return Optional.of(scenarioRepository.save(new Scenario( userDbId, newScenario )));
 	}
 
 	public void deleteScenario(@NonNull String id) throws UserIsNotAllowedException {
@@ -43,7 +45,7 @@ public class ScenarioService {
 		if (storedScenarioOpt.isEmpty()) throw new NoSuchElementException("Can't delete, No Scenario with ID \"%s\" found.".formatted(id));
 		Scenario storedScenario = storedScenarioOpt.get();
 
-		checkAuthorIDs("delete", storedScenario.authorID());
+		checkAuthorIDs("delete", Objects.requireNonNull( storedScenario.authorID() ) );
 
 		scenarioRepository.deleteById(id);
 	}
@@ -57,7 +59,7 @@ public class ScenarioService {
 		if (storedScenarioOpt.isEmpty()) return Optional.empty();
 		Scenario storedScenario = storedScenarioOpt.get();
 
-		checkAuthorIDs("update", storedScenario.authorID(), scenario.authorID());
+		checkAuthorIDs("update", Objects.requireNonNull( storedScenario.authorID() ), scenario.authorID());
 
 		return Optional.of(scenarioRepository.save(scenario));
 	}
@@ -67,7 +69,7 @@ public class ScenarioService {
 		if (storedScenarioOpt.isEmpty()) return Optional.empty();
 		Scenario storedScenario = storedScenarioOpt.get();
 
-		checkAuthorIDs("get", storedScenario.authorID());
+		checkAuthorIDs("get", Objects.requireNonNull( storedScenario.authorID() ));
 
 		return Optional.of(storedScenario);
 	}

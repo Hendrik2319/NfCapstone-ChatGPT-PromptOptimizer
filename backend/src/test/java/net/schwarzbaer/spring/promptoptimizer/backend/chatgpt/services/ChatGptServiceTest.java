@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -45,7 +46,7 @@ class ChatGptServiceTest {
 		Answer actual = chatGptService.askChatGPT(new Prompt("TestPrompt"));
 
 		// Then
-		Answer expected = new Answer("Access to OpenAI API is currently disabled.\nYour prompt was:\n\"%s\"".formatted("TestPrompt"));
+		Answer expected = new Answer( Objects.requireNonNull( "Access to OpenAI API is currently disabled.\nYour prompt was:\n\"%s\"".formatted("TestPrompt") ) );
 		assertEquals(expected, actual);
 	}
 
