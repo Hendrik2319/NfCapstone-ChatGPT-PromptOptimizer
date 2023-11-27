@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface TestRunRepository extends MongoRepository<TestRun, String> {
 	List<TestRun> findAllByScenarioId(@NonNull String scenarioId);
+	void deleteAllByScenarioId(@NonNull String scenarioId);
 }
