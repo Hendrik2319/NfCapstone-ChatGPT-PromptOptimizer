@@ -1,7 +1,9 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests;
 
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,10 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,6 +44,8 @@ class ScenarioIntegrationTest {
 	private MockMvc mockMvc;
 	@Autowired
 	private ScenarioRepository scenarioRepository;
+	@Autowired
+	private TestRunRepository testRunRepository;
 
 	@DynamicPropertySource
 	static void setUrlDynamically(DynamicPropertyRegistry reg) {
@@ -51,6 +59,18 @@ class ScenarioIntegrationTest {
 		scenarioRepository.save(new Scenario("id2", "author2", "label2", 1));
 		scenarioRepository.save(new Scenario("id3", "author2", "label3", 1));
 		scenarioRepository.save(new Scenario("id4", "author2", "label4", 1));
+	}
+
+	@NonNull
+	private static TestRun createTestRun(String testRunId, String scenarioId) {
+		return new TestRun(
+				testRunId, scenarioId,
+				ZonedDateTime.of(2023, 10, 29, 14, 30, 0, 0, ZoneId.systemDefault()),
+				"prompt", List.of("var1", "var2"),
+				List.of(Map.of("var1", List.of("value1"), "var2", List.of("value2"))),
+				List.of(new TestRun.TestAnswer(1, "label", "answer",12,23,35)),
+				35.0
+		);
 	}
 
 // ####################################################################################
@@ -428,6 +448,11 @@ class ScenarioIntegrationTest {
 	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
+		testRunRepository.save(createTestRun("testRun1", "id1"));
+		testRunRepository.save(createTestRun("testRun2", "id1"));
+		testRunRepository.save(createTestRun("testRun3", "id1"));
+		testRunRepository.save(createTestRun("testRun4", "id1"));
+		testRunRepository.save(createTestRun("testRun5", "id2"));
 
 		// When
 		mockMvc
@@ -442,6 +467,10 @@ class ScenarioIntegrationTest {
 		Optional<Scenario> actual = scenarioRepository.findById("id1");
 		assertNotNull(actual);
 		assertTrue(actual.isEmpty());
+
+		List<TestRun> actualRemainingTestRuns = testRunRepository.findAll();
+		List<TestRun> expectedRemainingTestRuns = List.of( createTestRun("testRun5", "id2") );
+		assertEquals(expectedRemainingTestRuns, actualRemainingTestRuns);
 	}
 
 	@Test @DirtiesContext

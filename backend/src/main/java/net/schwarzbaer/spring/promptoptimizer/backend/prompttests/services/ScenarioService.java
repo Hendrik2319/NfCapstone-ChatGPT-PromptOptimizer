@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewScenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserService;
@@ -21,6 +22,7 @@ import java.util.Optional;
 public class ScenarioService {
 
 	private final ScenarioRepository scenarioRepository;
+	private final TestRunRepository testRunRepository;
 	private final UserService userService;
 
 	public List<Scenario> getAllScenarios() {
@@ -48,6 +50,7 @@ public class ScenarioService {
 		checkAuthorIDs("delete", Objects.requireNonNull( storedScenario.authorID() ) );
 
 		scenarioRepository.deleteById(id);
+		testRunRepository.deleteAllByScenarioId(id);
 	}
 
 	public Optional<Scenario> updateScenario(@NonNull String id, @NonNull Scenario scenario) throws UserIsNotAllowedException {

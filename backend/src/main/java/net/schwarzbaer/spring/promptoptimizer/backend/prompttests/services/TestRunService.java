@@ -37,6 +37,16 @@ public class TestRunService {
 		return testRunRepository.findAllByScenarioId(scenarioId);
 	}
 
+	public void deleteTestRunsOfScenario(@NonNull String scenarioId)
+			throws UserIsNotAllowedException
+	{
+		Optional<Scenario> storedScenarioOpt = scenarioService.getScenarioById(scenarioId);
+		if (storedScenarioOpt.isEmpty()) return;
+		// if it's not empty user is allowed to have scenario access
+
+		testRunRepository.deleteAllByScenarioId(scenarioId);
+	}
+
 	public TestRun addTestRun(@NonNull String scenarioId, @NonNull TestRun testRun) throws UserIsNotAllowedException {
 		if (testRun.id()!=null)
 			throw new IllegalArgumentException("A new TestRun must not have an ID if it is to be added to the database.");

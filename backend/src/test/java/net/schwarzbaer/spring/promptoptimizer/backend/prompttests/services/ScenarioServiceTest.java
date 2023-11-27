@@ -3,6 +3,7 @@ package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.NewScenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
 import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserIsNotAllowedException;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserService;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.when;
 class ScenarioServiceTest {
 
 	@Mock private ScenarioRepository scenarioRepository;
+	@Mock private TestRunRepository testRunRepository;
 	@Mock private UserService userService;
 	@InjectMocks private ScenarioService scenarioService;
 
@@ -324,11 +326,12 @@ class ScenarioServiceTest {
 		verify(userService).getCurrentUser();
 		verify(scenarioRepository).findById("id1");
 		verify(scenarioRepository).deleteById("id1");
+		verify(testRunRepository).deleteAllByScenarioId("id1");
 		assertTrue(true); // no exception was thrown
 	}
 
 	@Test
-	void whenDeleteScenario_isCalledWithUnknownId_throwException() {
+	void whenDeleteScenario_isCalledWithUnknownId_throwsException() {
 		// Given
 		when(scenarioRepository.findById("id1")).thenReturn( Optional.empty() );
 
@@ -341,28 +344,28 @@ class ScenarioServiceTest {
 	}
 
 	@Test
-	void whenDeleteScenario_isCalledByUnauthorized_andExceptionIsThrown() {
+	void whenDeleteScenario_isCalledByUnauthorized_throwsException() {
 		whenDeleteScenario_isCalled_andExceptionIsThrown(
 				"Author1", "Author1", "anonymousUser",
 				false, false
 		);
 	}
 	@Test
-	void whenDeleteScenario_isCalledByUnknownAccount_andExceptionIsThrown() {
+	void whenDeleteScenario_isCalledByUnknownAccount_throwsException() {
 		whenDeleteScenario_isCalled_andExceptionIsThrown(
 				"Author1", "Author1", "User1",
 				true, false
 		);
 	}
 	@Test
-	void whenDeleteScenario_isCalledByUserWithNoUserDbId_andExceptionIsThrown() {
+	void whenDeleteScenario_isCalledByUserWithNoUserDbId_throwsException() {
 		whenDeleteScenario_isCalled_andExceptionIsThrown(
 				"Author1", null, "User1",
 				true, true
 		);
 	}
 	@Test
-	void whenDeleteScenario_isCalledByUserWithOtherUserDbId_andExceptionIsThrown() {
+	void whenDeleteScenario_isCalledByUserWithOtherUserDbId_throwsException() {
 		whenDeleteScenario_isCalled_andExceptionIsThrown(
 				"Author2", "Author1", "User1",
 				true, true

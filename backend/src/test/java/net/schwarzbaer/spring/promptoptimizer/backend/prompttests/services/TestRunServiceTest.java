@@ -100,6 +100,7 @@ class TestRunServiceTest {
 		List<TestRun> actual = testRunService.getTestRunsOfScenario("scenarioId1");
 
 		// Then
+		verify(scenarioService).getScenarioById("scenarioId1");
 		List<Object> expected = List.of();
 		assertEquals(expected, actual);
 	}
@@ -118,8 +119,53 @@ class TestRunServiceTest {
 		List<TestRun> actual = testRunService.getTestRunsOfScenario("scenarioId1");
 
 		// Then
+		verify(scenarioService).getScenarioById("scenarioId1");
 		List<Object> expected = List.of(createTestRun("id1", "scenarioId1"));
 		assertEquals(expected, actual);
+	}
+
+// ####################################################################################
+//               deleteTestRunsOfScenario
+// ####################################################################################
+
+	@Test
+	void whenDeleteTestRunsOfScenario_isCalledWithUnknownId() throws UserIsNotAllowedException {
+		// Given
+		when(scenarioService.getScenarioById("scenarioId1")).thenReturn(Optional.empty());
+
+		// When
+		testRunService.deleteTestRunsOfScenario("scenarioId1");
+
+		// Then
+		verify(scenarioService).getScenarioById("scenarioId1");
+	}
+
+	@Test
+	void whenDeleteTestRunsOfScenario_isCalledByNotAllowedUser_throwsException() throws UserIsNotAllowedException {
+		// Given
+		when(scenarioService.getScenarioById("scenarioId1")).thenThrow(UserIsNotAllowedException.class);
+
+		// When
+		Executable call = () -> testRunService.deleteTestRunsOfScenario("scenarioId1");
+
+		// Then
+		assertThrows(UserIsNotAllowedException.class, call);
+		verify(scenarioService).getScenarioById("scenarioId1");
+	}
+
+	@Test
+	void whenDeleteTestRunsOfScenario_isCalledByAllowedUser() throws UserIsNotAllowedException {
+		// Given
+		when(scenarioService.getScenarioById("scenarioId1")).thenReturn(
+			Optional.of(new Scenario("scenarioId1", "author1", "label1", 1))
+		);
+
+		// When
+		testRunService.deleteTestRunsOfScenario("scenarioId1");
+
+		// Then
+		verify(scenarioService).getScenarioById("scenarioId1");
+		verify(testRunRepository).deleteAllByScenarioId("scenarioId1");
 	}
 
 // ####################################################################################
