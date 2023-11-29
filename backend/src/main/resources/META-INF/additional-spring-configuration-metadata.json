@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "app.openai-api-url",
+    "type": "java.lang.String",
+    "description": "URL of OpenAI API"
+  },
+  {
+    "name": "app.openai-api-org",
+    "type": "java.lang.String",
+    "description": "Organization Key for OpenAI API"
+  },
+  {
+    "name": "app.openai-api-key",
+    "type": "java.lang.String",
+    "description": "API Key for OpenAI API"
+  },
+  {
+    "name": "app.security.initial-admin",
+    "type": "java.lang.String",
+    "description": "Id of first admin, when user database is empty"
+  }
+]}
