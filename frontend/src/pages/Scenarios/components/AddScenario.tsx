@@ -6,7 +6,7 @@ const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
   
-  & > div {
+  .right {
     text-align: right;
   }
   & > * {
@@ -55,9 +55,9 @@ export default function AddScenario( props:Readonly<Props> ) {
 
     return (
         <StyledForm onSubmit={onSubmit}>
-            <label>Enter a Scenario Label:</label>
+            <div>Enter a Scenario Label:</div>
             <InputField value={label} onChange={onChange}/>
-            <div>
+            <div className="right">
                 <button>Add</button>
                 <button type="button" onClick={closeDialog}>Cancel</button>
             </div>
