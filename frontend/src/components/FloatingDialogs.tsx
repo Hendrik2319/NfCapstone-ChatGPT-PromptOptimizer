@@ -74,10 +74,10 @@ function Dialog( props: Readonly<Props> ): ReactNode {
     }
 
     return (
-        <button className={"FloatingDialogBackground" + (visible ? " visible" : "")} onClick={onBackgroundClick}>
+        <div className={"FloatingDialogBackground" + (visible ? "" : " hidden")} onClick={onBackgroundClick}>
             <div className="FloatingDialog" onClick={onDialogClick}>
                 {props.getContent()}
             </div>
-        </button>
+        </div>
     );
 }
