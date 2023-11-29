@@ -17,6 +17,15 @@ const StyledForm = styled.form`
   & > *:last-child  { margin-bottom: 0; }
 `;
 
+const InputField = styled.input`
+  background: var(--textarea-background-color);
+  border: 1px solid var(--border-color, #707070);
+  border-radius: 3px;
+  color: var(--text-color);
+  font-size: 1em;
+  padding: 0.2em 0.5em;
+`;
+
 type Props = {
     saveChanges: (scenario: Scenario) => void
     closeDialog: ()=>void
@@ -55,7 +64,7 @@ export default function EditScenario( props: Readonly<Props> ) {
     return (
         <StyledForm onSubmit={onSubmit}>
             <label>Enter a Scenario Label :</label>
-            <input value={label} onChange={onChange}/>
+            <InputField value={label} onChange={onChange}/>
             <div>
                 <button>Set</button>
                 <button type="button" onClick={closeDialog}>Cancel</button>
