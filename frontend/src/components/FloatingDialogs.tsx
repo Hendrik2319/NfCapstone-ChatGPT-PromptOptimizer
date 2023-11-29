@@ -64,7 +64,7 @@ function Dialog( props: Readonly<Props> ): ReactNode {
 
     props.setShowDialogFunction(setVisible);
 
-    function onBackgroundClick(event: ReactMouseEvent<HTMLDivElement, MouseEvent>): void {
+    function onBackgroundClick(): void {
         if (props.cancelWithBackgroundClick)
             props.closeDialog();
     }
@@ -74,10 +74,10 @@ function Dialog( props: Readonly<Props> ): ReactNode {
     }
 
     return (
-        <div className={"FloatingDialogBackground" + (visible ? " visible" : "")} onClick={onBackgroundClick} role="button">
-            <div className="FloatingDialog" onClick={onDialogClick} role="dialog">
+        <button className={"FloatingDialogBackground" + (visible ? " visible" : "")} onClick={onBackgroundClick}>
+            <div className="FloatingDialog" onClick={onDialogClick}>
                 {props.getContent()}
             </div>
-        </div>
+        </button>
     );
 }
