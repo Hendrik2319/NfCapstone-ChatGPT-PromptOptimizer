@@ -1,5 +1,5 @@
 import './FloatingDialogs.css'
-import {ReactNode, useState} from "react";
+import {ReactNode, useState, MouseEvent as ReactMouseEvent} from "react";
 import {SHOW_RENDERING_HINTS} from "../models/BaseTypes.tsx";
 
 export type DialogControl<DialogOptions> = {
@@ -40,6 +40,7 @@ export function createDialog<DialogOptions>( id:string, writeContent: ( dialogCo
         writeHTML  : () =>
             <Dialog
                 getContent={() => writeContent({ closeDialog, setInitFunction })}
+                closeDialog={closeDialog}
                 setShowDialogFunction={setShowDialogFunction}
             />,
     }
@@ -48,17 +49,26 @@ export function createDialog<DialogOptions>( id:string, writeContent: ( dialogCo
 
 type Props = {
     getContent: () => ReactNode,
+    closeDialog: () => void,
     setShowDialogFunction: ( showDialogFunction: ( showDialog: boolean ) => void ) => void,
 }
 
-function Dialog( props: Readonly<Props> ) {
+function Dialog( props: Readonly<Props> ): ReactNode {
     const [visible, setVisible] = useState<boolean>(false);
 
     props.setShowDialogFunction(setVisible);
 
+    function onBackgroundClick(event: ReactMouseEvent<HTMLDivElement, MouseEvent>): void {
+        props.closeDialog();
+    }
+
+    function onDialogClick(event: ReactMouseEvent<HTMLDivElement, MouseEvent>): void {
+        event.stopPropagation();
+    }
+
     return (
-        <div className={"FloatingDialogBackground" + (visible ? " visible" : "")}>
-            <div className="FloatingDialog">
+        <div className={"FloatingDialogBackground" + (visible ? " visible" : "")} onClick={onBackgroundClick}>
+            <div className="FloatingDialog" onClick={onDialogClick}>
                 {props.getContent()}
             </div>
         </div>
