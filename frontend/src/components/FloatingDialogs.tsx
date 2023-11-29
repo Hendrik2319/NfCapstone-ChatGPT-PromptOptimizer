@@ -7,7 +7,11 @@ export type DialogControl<DialogOptions> = {
     setInitFunction: ( initFunction: (options:DialogOptions)=> void ) => void
 }
 
-export function createDialog<DialogOptions>( id:string, writeContent: ( dialogControl: DialogControl<DialogOptions> ) => ReactNode ) {
+export function createDialog<DialogOptions>(
+    id:string,
+    writeContent: ( dialogControl: DialogControl<DialogOptions> ) => ReactNode,
+    disableCancelWithBackgroundClick?: boolean
+) {
 
     let initFunction: undefined | ((options:DialogOptions)=> void) = undefined;
     let showDialogFunction: undefined | ((showDialog: boolean) => void) = undefined;
@@ -42,6 +46,7 @@ export function createDialog<DialogOptions>( id:string, writeContent: ( dialogCo
                 getContent={() => writeContent({ closeDialog, setInitFunction })}
                 closeDialog={closeDialog}
                 setShowDialogFunction={setShowDialogFunction}
+                cancelWithBackgroundClick={!disableCancelWithBackgroundClick}
             />,
     }
 }
@@ -51,6 +56,7 @@ type Props = {
     getContent: () => ReactNode,
     closeDialog: () => void,
     setShowDialogFunction: ( showDialogFunction: ( showDialog: boolean ) => void ) => void,
+    cancelWithBackgroundClick: boolean,
 }
 
 function Dialog( props: Readonly<Props> ): ReactNode {
@@ -59,7 +65,8 @@ function Dialog( props: Readonly<Props> ): ReactNode {
     props.setShowDialogFunction(setVisible);
 
     function onBackgroundClick(event: ReactMouseEvent<HTMLDivElement, MouseEvent>): void {
-        props.closeDialog();
+        if (props.cancelWithBackgroundClick)
+            props.closeDialog();
     }
 
     function onDialogClick(event: ReactMouseEvent<HTMLDivElement, MouseEvent>): void {
