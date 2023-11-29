@@ -7,9 +7,9 @@ const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
   
-  & > div {
-    text-align: right;
-  }
+  .right { text-align: right; }
+  .left  { text-align: left; }
+  
   & > * {
     margin: 0.5em 0;
   }
@@ -47,14 +47,14 @@ export default function EditDenialReasonDialog( props: Readonly<Props> ) {
 
     return (
         <StyledForm onSubmit={onSubmit}>
-            <label>Enter a reason for denial of the user:</label>
+            <div className="left">Enter a reason for denial of the user:</div>
             <textarea
                 value={reason}
                 onChange={onChange}
                 rows={10}
                 cols={40}
             />
-            <div>
+            <div className="right">
                 <button>Set</button>
                 <button type="button" onClick={props.closeDialog}>Cancel</button>
             </div>

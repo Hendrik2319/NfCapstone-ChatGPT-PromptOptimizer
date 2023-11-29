@@ -6,9 +6,9 @@ const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
   
-  .right {
-    text-align: right;
-  }
+  .right { text-align: right; }
+  .left  { text-align: left; }
+
   & > * {
     margin: 0.5em 0;
   }
@@ -55,7 +55,7 @@ export default function AddScenario( props:Readonly<Props> ) {
 
     return (
         <StyledForm onSubmit={onSubmit}>
-            <div>Enter a Scenario Label:</div>
+            <div className="left">Enter a Scenario Label:</div>
             <InputField value={label} onChange={onChange}/>
             <div className="right">
                 <button>Add</button>
