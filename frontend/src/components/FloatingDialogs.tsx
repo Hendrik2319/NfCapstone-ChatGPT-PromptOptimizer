@@ -74,8 +74,8 @@ function Dialog( props: Readonly<Props> ): ReactNode {
     }
 
     return (
-        <div className={"FloatingDialogBackground" + (visible ? " visible" : "")} onClick={onBackgroundClick}>
-            <div className="FloatingDialog" onClick={onDialogClick}>
+        <div className={"FloatingDialogBackground" + (visible ? " visible" : "")} onClick={onBackgroundClick} role="button">
+            <div className="FloatingDialog" onClick={onDialogClick} role="dialog">
                 {props.getContent()}
             </div>
         </div>
