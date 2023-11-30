@@ -49,6 +49,10 @@
   * client id from OAuth2 app in GitHub
 * `OAUTH_GITHUB_CLIENT_SECRET`
   * client secret from OAuth2 app in GitHub
+* `OAUTH_GOOGLE_CLIENT_ID`
+  * client id from OAuth2 app in Google
+* `OAUTH_GOOGLE_CLIENT_SECRET`
+  * client secret from OAuth2 app in Google
 * `INITIAL_ADMIN`
   * user id of first admin: `github{ ID of GitHub Account }`
   * to have an admin if user database is initially empty
