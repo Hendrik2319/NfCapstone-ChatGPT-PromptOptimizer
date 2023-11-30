@@ -1,8 +1,5 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
-import lombok.RequiredArgsConstructor;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,24 +7,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.UserAttributes;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
-	public static final String ATTR_USER_DB_ID      = "UserDbId";
-	public static final String ATTR_REGISTRATION_ID = "RegistrationId";
-
-	static final String ATTR_ORIGINAL_ID = "id";
-	static final String ATTR_LOGIN       = "login";
-	static final String ATTR_NAME        = "name";
-	static final String ATTR_LOCATION    = "location";
-	static final String ATTR_URL         = "html_url";
-	static final String ATTR_AVATAR_URL  = "avatar_url";
-
-	//	@SuppressWarnings("java:S106")
-	//	private static final PrintStream DEBUG_OUT = System.out;
 
 // ####################################################################################
 //               Called by and allowed for all users (authorized or not)
@@ -36,46 +23,21 @@ public class UserService {
 	public @NonNull UserInfo getCurrentUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Object principal = authentication!=null ? authentication.getPrincipal() : null;
-//		if (principal!=null) DEBUG_OUT.println("Principal: "+principal.getClass()+" -> "+principal);
 
 		if (principal instanceof OAuth2AuthenticatedPrincipal user) {
-			/* 
-			DEBUG_OUT.println("User Attributes:");
-			user.getAttributes().forEach((key, value) ->
-					DEBUG_OUT.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
-			);
- 			*/
-
-			String registrationId = Objects.toString( user.getAttribute(ATTR_REGISTRATION_ID), null );
-
-			if (registrationId!=null)
-				switch (registrationId) {
-					case "github": 
-						return new UserInfo(
-								true,
-								hasRole(user, Role.USER),
-								hasRole(user, Role.ADMIN),
-								Objects.toString( user.getAttribute(ATTR_ORIGINAL_ID), null ),
-								Objects.toString( user.getAttribute(ATTR_USER_DB_ID ), null ),
-								Objects.toString( user.getAttribute(ATTR_LOGIN      ), null ),
-								Objects.toString( user.getAttribute(ATTR_NAME       ), null ),
-								Objects.toString( user.getAttribute(ATTR_LOCATION   ), null ),
-								Objects.toString( user.getAttribute(ATTR_URL        ), null ),
-								Objects.toString( user.getAttribute(ATTR_AVATAR_URL ), null )
-						);
-				}
+			String registrationId = UserAttributes.getAttribute( user, UserAttributes.ATTR_REGISTRATION_ID, null );
 
 			return new UserInfo(
 					true,
 					hasRole(user, Role.USER),
 					hasRole(user, Role.ADMIN),
-					null,
-					Objects.toString( user.getAttribute(ATTR_USER_DB_ID ), null ),
-					null,
-					null,
-					null,
-					null,
-					null
+					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.ORIGINAL_ID, null ),
+					UserAttributes.getAttribute( user, UserAttributes.ATTR_USER_DB_ID, null ),
+					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.LOGIN      , null ),
+					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.NAME       , null ),
+					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.LOCATION   , null ),
+					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.URL        , null ),
+					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.AVATAR_URL , null )
 			);
 		}
 

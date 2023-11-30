@@ -1,9 +1,12 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.services.StoredUserInfoService;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserService;
+import static org.springframework.security.config.Customizer.withDefaults;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -24,9 +27,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
-import java.util.*;
-
-import static org.springframework.security.config.Customizer.withDefaults;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.StoredUserInfoService;
 
 @Configuration
 @EnableWebSecurity
@@ -100,8 +103,8 @@ public class SecurityConfig {
 				System.out.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
 		);
 
-		newAttributes.put(UserService.ATTR_USER_DB_ID, userDbId);
-		newAttributes.put(UserService.ATTR_REGISTRATION_ID, registrationId);
+		newAttributes.put(UserAttributes.ATTR_USER_DB_ID, userDbId);
+		newAttributes.put(UserAttributes.ATTR_REGISTRATION_ID, registrationId);
 		Role role = null;
 
 		final Optional<StoredUserInfo> storedUserInfoOpt = storedUserInfoService.getUserById(userDbId);
@@ -121,7 +124,7 @@ public class SecurityConfig {
 			storedUserInfoService.addUser(userDbId, registrationId, role, newAttributes);
 
 		newAuthorities.add(new SimpleGrantedAuthority(role.getLong()));
-		return new DefaultOAuth2User(newAuthorities, newAttributes, UserService.ATTR_USER_DB_ID);
+		return new DefaultOAuth2User(newAuthorities, newAttributes, UserAttributes.ATTR_USER_DB_ID);
 	}
 
 }

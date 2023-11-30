@@ -1,6 +1,7 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
 import lombok.RequiredArgsConstructor;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.UserAttributes;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
@@ -27,65 +28,35 @@ public class StoredUserInfoService {
 	}
 
 	public void addUser(@NonNull String userDbId, String registrationId, @NonNull Role role, @NonNull Map<String, Object> newAttributes) {
-		StoredUserInfo storedUserInfo = null;
-
-		if (registrationId!=null)
-			switch (registrationId) {
-				case "github":
-					storedUserInfo = new StoredUserInfo(
-							userDbId,
-							role,
-							registrationId,
-							Objects.toString(newAttributes.get(UserService.ATTR_ORIGINAL_ID), null),
-							Objects.toString(newAttributes.get(UserService.ATTR_LOGIN      ), null),
-							Objects.toString(newAttributes.get(UserService.ATTR_NAME       ), null),
-							Objects.toString(newAttributes.get(UserService.ATTR_LOCATION   ), null),
-							Objects.toString(newAttributes.get(UserService.ATTR_URL        ), null),
-							Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), null),
-							null
-					);
-					break;
-			}
-
-		if (storedUserInfo==null)
-			storedUserInfo = new StoredUserInfo(
-					userDbId,
-					role,
-					registrationId,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null
-			);
-		
-		storedUserInfoRepository.save(storedUserInfo);
+		storedUserInfoRepository.save(new StoredUserInfo(
+				userDbId,
+				role,
+				registrationId,
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.ORIGINAL_ID, null ),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.LOGIN      , null ),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.NAME       , null ),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.LOCATION   , null ),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.URL        , null ),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.AVATAR_URL , null ),
+				null
+		));
 	}
 
-	public void updateUserIfNeeded(StoredUserInfo storedUserInfo, String registrationId, Map<String, Object> newAttributes) {
-		StoredUserInfo updatedUserInfo = null;
-
-		if (registrationId!=null)
-			switch (registrationId) {
-				case "github":
-					updatedUserInfo = new StoredUserInfo(
-							storedUserInfo.id(),
-							storedUserInfo.role(),
-							storedUserInfo.registrationId(),
-							Objects.toString(newAttributes.get(UserService.ATTR_ORIGINAL_ID), storedUserInfo.originalId()),
-							Objects.toString(newAttributes.get(UserService.ATTR_LOGIN      ), storedUserInfo.login     ()),
-							Objects.toString(newAttributes.get(UserService.ATTR_NAME       ), storedUserInfo.name      ()),
-							Objects.toString(newAttributes.get(UserService.ATTR_LOCATION   ), storedUserInfo.location  ()),
-							Objects.toString(newAttributes.get(UserService.ATTR_URL        ), storedUserInfo.url       ()),
-							Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), storedUserInfo.avatar_url()),
-							storedUserInfo.denialReason()
-					);
-					break;
-			}
+	public void updateUserIfNeeded(@NonNull StoredUserInfo storedUserInfo, String registrationId, @NonNull Map<String, Object> newAttributes) {
+		StoredUserInfo updatedUserInfo = new StoredUserInfo(
+				storedUserInfo.id(),
+				storedUserInfo.role(),
+				storedUserInfo.registrationId(),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.ORIGINAL_ID, storedUserInfo.originalId()),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.LOGIN      , storedUserInfo.login     ()),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.NAME       , storedUserInfo.name      ()),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.LOCATION   , storedUserInfo.location  ()),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.URL        , storedUserInfo.url       ()),
+				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.AVATAR_URL , storedUserInfo.avatar_url()),
+				storedUserInfo.denialReason()
+		);
 		
-		if (updatedUserInfo!=null && !updatedUserInfo.equals(storedUserInfo))
+		if (registrationId!=null && !updatedUserInfo.equals(storedUserInfo))
 			storedUserInfoRepository.save(updatedUserInfo);
 	}
 
