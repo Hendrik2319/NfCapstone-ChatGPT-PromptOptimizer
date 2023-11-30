@@ -27,6 +27,7 @@ class StoredUserInfoServiceTest {
 
 	@Mock private StoredUserInfoRepository storedUserInfoRepository;
 	@Mock private UserService userService;
+	@Mock private UserAttributesService userAttributesService;
 	@InjectMocks private StoredUserInfoService storedUserInfoService;
 
 	@BeforeEach
@@ -87,16 +88,16 @@ class StoredUserInfoServiceTest {
 	@Test
 	void whenAddUser_isCalled() {
 		// Given
+		Map<String, Object> attrs = Objects.requireNonNull( Map.of() );
+		String registrationId = "RegistrationID";
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.ORIGINAL_ID, null)).thenReturn("userID1"   );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.LOGIN      , null)).thenReturn("login1"    );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.NAME       , null)).thenReturn("name1"     );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.LOCATION   , null)).thenReturn("location1" );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.URL        , null)).thenReturn("url1"      );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.AVATAR_URL , null)).thenReturn("avatarUrl1");
+
 		// When
-		Map<String, Object> attrs = Objects.requireNonNull( Map.of(
-				"UserDbId"  , "RegistrationIDuserID1",
-				"id"        , "userID1"  ,
-				"login"     , "login1"   ,
-				"name"      , "name1"    ,
-				"location"  , "location1",
-				"html_url"  , "url1"     ,
-				"avatar_url", "avatarUrl1"
-		) );
 		storedUserInfoService.addUser("RegistrationIDuserID1", "RegistrationID", Role.UNKNOWN_ACCOUNT, attrs);
 
 		// Then
@@ -114,16 +115,16 @@ class StoredUserInfoServiceTest {
 	@Test
 	void whenUpdateUserIfNeeded_isCalledWithNewData() {
 		// Given
+		Map<String, Object> attrs = Objects.requireNonNull( Map.of() );
+		String registrationId = "RegistrationID";
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.ORIGINAL_ID, "userID1"   )).thenReturn("userID1"   );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.LOGIN      , "login2"    )).thenReturn("login1"    );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.NAME       , "name2"     )).thenReturn("name1"     );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.LOCATION   , "location2" )).thenReturn("location1" );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.URL        , "url2"      )).thenReturn("url1"      );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.AVATAR_URL , "avatarUrl2")).thenReturn("avatarUrl1");
+
 		// When
-		Map<String, Object> attrs = Map.of(
-				"UserDbId"  , "RegistrationIDuserID1",
-				"id"        , "userID1"  ,
-				"login"     , "login1"   ,
-				"name"      , "name1"    ,
-				"location"  , "location1",
-				"html_url"  , "url1"     ,
-				"avatar_url", "avatarUrl1"
-		);
 		StoredUserInfo storedUserInfo = new StoredUserInfo(
 				"RegistrationIDuserID1", Role.UNKNOWN_ACCOUNT, "RegistrationID",
 				"userID1", "login2",
@@ -139,22 +140,16 @@ class StoredUserInfoServiceTest {
 		));
 	}
 
-	@Test void whenUpdateUserIfNeeded_isCalledWithNoData() {
-		whenUpdateUserIfNeeded_isCalled_andNothingIsWrittenToRepo(Map.of());
-	}
-	@Test void whenUpdateUserIfNeeded_isCalledWithSameData() {
-		whenUpdateUserIfNeeded_isCalled_andNothingIsWrittenToRepo(Map.of(
-				"UserDbId"  , "RegistrationIDuserID1",
-				"id"        , "userID1"  ,
-				"login"     , "login1"   ,
-				"name"      , "name1"    ,
-				"location"  , "location1",
-				"html_url"  , "url1"     ,
-				"avatar_url", "avatarUrl1"
-		));
-	}
-	private void whenUpdateUserIfNeeded_isCalled_andNothingIsWrittenToRepo(Map<String, Object> attrs) {
+	@Test void whenUpdateUserIfNeeded_isCalledWithNoDataOrSameData() {
 		// Given
+		Map<String, Object> attrs = Objects.requireNonNull( Map.of() );
+		String registrationId = "RegistrationID";
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.ORIGINAL_ID, "userID1"   )).thenReturn("userID1"   );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.LOGIN      , "login1"    )).thenReturn("login1"    );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.NAME       , "name1"     )).thenReturn("name1"     );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.LOCATION   , "location1" )).thenReturn("location1" );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.URL        , "url1"      )).thenReturn("url1"      );
+		when(userAttributesService.getAttribute(attrs, registrationId, UserAttributesService.Field.AVATAR_URL , "avatarUrl1")).thenReturn("avatarUrl1");
 
 		// When
 		StoredUserInfo storedUserInfo = new StoredUserInfo(

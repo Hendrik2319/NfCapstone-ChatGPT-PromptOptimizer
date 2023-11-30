@@ -63,7 +63,7 @@ public class StoredUserInfoService {
 				storedUserInfo.denialReason()
 		);
 		
-		if (registrationId!=null && !updatedUserInfo.equals(storedUserInfo))
+		if (!updatedUserInfo.equals(storedUserInfo))
 			storedUserInfoRepository.save(updatedUserInfo);
 	}
 
