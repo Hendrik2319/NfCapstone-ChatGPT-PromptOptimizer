@@ -1,7 +1,6 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
 import lombok.RequiredArgsConstructor;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.UserAttributes;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
@@ -18,6 +17,7 @@ public class StoredUserInfoService {
 
 	private final StoredUserInfoRepository storedUserInfoRepository;
 	private final UserService userService;
+	private final UserAttributesService userAttributesService;
 
 // ####################################################################################
 //               Called by SecurityConfig
@@ -36,12 +36,12 @@ public class StoredUserInfoService {
 				userDbId,
 				role,
 				registrationId,
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.ORIGINAL_ID, null ),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.LOGIN      , null ),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.NAME       , null ),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.LOCATION   , null ),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.URL        , null ),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.AVATAR_URL , null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.ORIGINAL_ID, null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.LOGIN      , null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.NAME       , null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.LOCATION   , null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.URL        , null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.AVATAR_URL , null ),
 				null
 		));
 	}
@@ -54,12 +54,12 @@ public class StoredUserInfoService {
 				storedUserInfo.id(),
 				storedUserInfo.role(),
 				storedUserInfo.registrationId(),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.ORIGINAL_ID, storedUserInfo.originalId()),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.LOGIN      , storedUserInfo.login     ()),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.NAME       , storedUserInfo.name      ()),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.LOCATION   , storedUserInfo.location  ()),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.URL        , storedUserInfo.url       ()),
-				UserAttributes.getAttribute( newAttributes, registrationId, UserAttributes.Field.AVATAR_URL , storedUserInfo.avatar_url()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.ORIGINAL_ID, storedUserInfo.originalId()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.LOGIN      , storedUserInfo.login     ()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.NAME       , storedUserInfo.name      ()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.LOCATION   , storedUserInfo.location  ()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.URL        , storedUserInfo.url       ()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.AVATAR_URL , storedUserInfo.avatar_url()),
 				storedUserInfo.denialReason()
 		);
 		

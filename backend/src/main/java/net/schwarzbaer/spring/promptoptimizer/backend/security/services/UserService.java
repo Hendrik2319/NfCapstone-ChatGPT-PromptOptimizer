@@ -8,13 +8,14 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.UserAttributes;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+	private final UserAttributesService userAttributesService;
 
 // ####################################################################################
 //               Called by and allowed for all users (authorized or not)
@@ -25,19 +26,19 @@ public class UserService {
 		Object principal = authentication!=null ? authentication.getPrincipal() : null;
 
 		if (principal instanceof OAuth2AuthenticatedPrincipal user) {
-			String registrationId = UserAttributes.getAttribute( user, UserAttributes.ATTR_REGISTRATION_ID, null );
+			String registrationId = userAttributesService.getAttribute( user, UserAttributesService.ATTR_REGISTRATION_ID, null );
 
 			return new UserInfo(
 					true,
 					hasRole(user, Role.USER),
 					hasRole(user, Role.ADMIN),
-					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.ORIGINAL_ID, null ),
-					UserAttributes.getAttribute( user, UserAttributes.ATTR_USER_DB_ID, null ),
-					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.LOGIN      , null ),
-					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.NAME       , null ),
-					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.LOCATION   , null ),
-					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.URL        , null ),
-					UserAttributes.getAttribute( user, registrationId, UserAttributes.Field.AVATAR_URL , null )
+					userAttributesService.getAttribute( user, registrationId, UserAttributesService.Field.ORIGINAL_ID, null ),
+					userAttributesService.getAttribute( user, UserAttributesService.ATTR_USER_DB_ID, null ),
+					userAttributesService.getAttribute( user, registrationId, UserAttributesService.Field.LOGIN      , null ),
+					userAttributesService.getAttribute( user, registrationId, UserAttributesService.Field.NAME       , null ),
+					userAttributesService.getAttribute( user, registrationId, UserAttributesService.Field.LOCATION   , null ),
+					userAttributesService.getAttribute( user, registrationId, UserAttributesService.Field.URL        , null ),
+					userAttributesService.getAttribute( user, registrationId, UserAttributesService.Field.AVATAR_URL , null )
 			);
 		}
 

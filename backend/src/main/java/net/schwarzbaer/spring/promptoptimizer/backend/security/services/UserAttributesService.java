@@ -1,4 +1,4 @@
-package net.schwarzbaer.spring.promptoptimizer.backend.security;
+package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -7,8 +7,13 @@ import java.util.Objects;
 
 import org.springframework.lang.NonNull;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
+import org.springframework.stereotype.Service;
 
-public class UserAttributes {
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class UserAttributesService {
 
 	public static final String ATTR_USER_DB_ID      = "UserDbId";
 	public static final String ATTR_REGISTRATION_ID = "RegistrationId";
@@ -51,24 +56,24 @@ public class UserAttributes {
 	}
 
 
-	public static String getAttribute( @NonNull OAuth2AuthenticatedPrincipal user, @NonNull String field, String nullDefault )
+	public String getAttribute( @NonNull OAuth2AuthenticatedPrincipal user, @NonNull String field, String nullDefault )
 	{
 		return Objects.toString( user.getAttribute(field), nullDefault );
 	}
 
-	public static String getAttribute( @NonNull Map<String, Object> userAttributes, @NonNull String field, String nullDefault )
+	public String getAttribute( @NonNull Map<String, Object> userAttributes, @NonNull String field, String nullDefault )
 	{
 		return Objects.toString( userAttributes.get(field), nullDefault );
 	}
 
-    public static String getAttribute( @NonNull OAuth2AuthenticatedPrincipal user, String registrationId, Field field, String nullDefault )
+    public String getAttribute( @NonNull OAuth2AuthenticatedPrincipal user, String registrationId, Field field, String nullDefault )
 	{
-        return getAttribute( user, registrationId, field, nullDefault, UserAttributes::getAttribute );
+        return getAttribute( user, registrationId, field, nullDefault, this::getAttribute );
     }
 
-    public static String getAttribute( @NonNull Map<String, Object> userAttributes, String registrationId, Field field, String nullDefault )
+    public String getAttribute( @NonNull Map<String, Object> userAttributes, String registrationId, Field field, String nullDefault )
 	{
-        return getAttribute( userAttributes, registrationId, field, nullDefault, UserAttributes::getAttribute );
+        return getAttribute( userAttributes, registrationId, field, nullDefault, this::getAttribute );
     }
 
 	
@@ -76,7 +81,7 @@ public class UserAttributes {
 		String getAttribute( @NonNull Source source, @NonNull String field, String nullDefault);
 	}
 
-    private static <Source> String getAttribute( @NonNull Source source, String registrationId, Field field, String nullDefault, GetAttributeFunction<Source> getAttribute )
+    private <Source> String getAttribute( @NonNull Source source, String registrationId, Field field, String nullDefault, GetAttributeFunction<Source> getAttribute )
 	{
 		Map<Field, String> attrNames = config.get(registrationId);
 		if (attrNames==null) return nullDefault;

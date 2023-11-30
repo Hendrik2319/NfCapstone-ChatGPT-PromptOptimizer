@@ -30,6 +30,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.services.StoredUserInfoService;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService;
 
 @Configuration
 @EnableWebSecurity
@@ -103,8 +104,8 @@ public class SecurityConfig {
 				System.out.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
 		);
 
-		newAttributes.put(UserAttributes.ATTR_USER_DB_ID, userDbId);
-		newAttributes.put(UserAttributes.ATTR_REGISTRATION_ID, registrationId);
+		newAttributes.put(UserAttributesService.ATTR_USER_DB_ID, userDbId);
+		newAttributes.put(UserAttributesService.ATTR_REGISTRATION_ID, registrationId);
 		Role role = null;
 
 		final Optional<StoredUserInfo> storedUserInfoOpt = storedUserInfoService.getUserById(userDbId);
@@ -124,7 +125,7 @@ public class SecurityConfig {
 			storedUserInfoService.addUser(userDbId, registrationId, role, newAttributes);
 
 		newAuthorities.add(new SimpleGrantedAuthority(role.getLong()));
-		return new DefaultOAuth2User(newAuthorities, newAttributes, UserAttributes.ATTR_USER_DB_ID);
+		return new DefaultOAuth2User(newAuthorities, newAttributes, UserAttributesService.ATTR_USER_DB_ID);
 	}
 
 }
