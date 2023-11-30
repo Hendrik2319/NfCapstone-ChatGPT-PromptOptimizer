@@ -1,7 +1,8 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
@@ -11,24 +12,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
-import java.util.stream.Stream;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService;
 
 public class SecurityTestTools {
-	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(
-		Role role
-	) {
-		throw new UnsupportedOperationException();
-	}
-
-	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(
-		Role role,
-		String id,
-		String login
-	) {
-		throw new UnsupportedOperationException();
-	}
 
 	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(
 		Role role,
