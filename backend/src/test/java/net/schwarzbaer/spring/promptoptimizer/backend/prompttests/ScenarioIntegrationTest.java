@@ -1,11 +1,17 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
@@ -21,17 +27,16 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService.Registration;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -54,11 +59,19 @@ class ScenarioIntegrationTest {
 		reg.add("app.openai-api-url", ()->"dummy_url");
 	}
 
-	private void fillScenarioRepository() {
-		scenarioRepository.save(new Scenario("id1", "author1", "label1", 1));
-		scenarioRepository.save(new Scenario("id2", "author2", "label2", 1));
-		scenarioRepository.save(new Scenario("id3", "author2", "label3", 1));
-		scenarioRepository.save(new Scenario("id4", "author2", "label4", 1));
+	private void fillScenarioRepository () {
+		fillScenarioRepository(null);
+	}
+	private void fillScenarioRepository(Registration reg2) {
+		fillScenarioRepository("user1", null, "user2", reg2);
+	}
+	private void fillScenarioRepository(String user1, Registration reg1, String user2, Registration reg2) {
+		String regId1 = reg1==null ? "registrationId1" : reg1.id;
+		String regId2 = reg2==null ? "registrationId2" : reg2.id;
+		scenarioRepository.save(new Scenario("id1", regId1 + user1, "label1", 1));
+		scenarioRepository.save(new Scenario("id2", regId2 + user2, "label2", 1));
+		scenarioRepository.save(new Scenario("id3", regId2 + user2, "label3", 1));
+		scenarioRepository.save(new Scenario("id4", regId2 + user2, "label4", 1));
 	}
 
 	@NonNull
@@ -73,6 +86,38 @@ class ScenarioIntegrationTest {
 		);
 	}
 
+	private void performRequest_andGetStatusWithEmptyResponse(
+			MockHttpServletRequestBuilder request,
+			HttpStatus httpStatus
+	) throws Exception {
+		// Given
+		fillScenarioRepository();
+
+		// When
+		mockMvc
+				.perform(request)
+
+				// Then
+				.andExpect(status().is(httpStatus.value()))
+				.andExpect(content().string(""));
+	}
+
+	private void saveExampleScenario_performRequest_andGetStatus(
+			String storedScenarioId, String storedAuthorID,
+			MockHttpServletRequestBuilder request,
+			HttpStatus status
+	) throws Exception {
+		// Given
+		scenarioRepository.save(new Scenario(storedScenarioId, storedAuthorID, "label1", 1));
+
+		// When
+		mockMvc
+				.perform(request)
+
+				// Then
+				.andExpect(status().is(status.value()));
+	}
+
 // ####################################################################################
 //               getAllScenariosOfUser
 // ####################################################################################
@@ -80,36 +125,22 @@ class ScenarioIntegrationTest {
 	@Test
 	@DirtiesContext
 	void whenGetAllScenariosOfUser_isCalledByUnauthorized_returnsStatus401Unauthorized() throws Exception {
-		// Given
-		fillScenarioRepository();
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.get("/api/scenario")
-				)
-
-				// Then
-				.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
-				.andExpect(content().string(""));
+		performRequest_andGetStatusWithEmptyResponse(
+			MockMvcRequestBuilders
+				.get("/api/scenario"),
+			HttpStatus.UNAUTHORIZED
+		);
 	}
 
 	@Test
 	@DirtiesContext
 	void whenGetAllScenariosOfUser_isCalledByUnknownAccount_returnsStatus403Forbidden() throws Exception {
-		// Given
-		fillScenarioRepository();
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.get("/api/scenario")
-						.with(SecurityTestTools.buildUser(Role.UNKNOWN_ACCOUNT, "id", "author2", "login"))
-				)
-
-				// Then
-				.andExpect(status().is(HttpStatus.FORBIDDEN.value()))
-				.andExpect(content().string(""));
+		performRequest_andGetStatusWithEmptyResponse(
+			MockMvcRequestBuilders
+				.get("/api/scenario")
+				.with(SecurityTestTools.buildUser(Role.UNKNOWN_ACCOUNT, "user2", Registration.GITHUB, "login")),
+			HttpStatus.FORBIDDEN
+		);
 	}
 
 	@ParameterizedTest
@@ -117,24 +148,24 @@ class ScenarioIntegrationTest {
 	@ArgumentsSource(SecurityTestTools.UserAndAdminRoles.class)
 	void whenGetAllScenariosOfUser_isCalledByAllowedUser_returnsList(Role role) throws Exception {
 		// Given
-		fillScenarioRepository();
+		fillScenarioRepository(Registration.GITHUB);
 
 		// When
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.get("/api/scenario")
-						.with(SecurityTestTools.buildUser(role, "id", "author2", "login"))
+						.with(SecurityTestTools.buildUser(role, "user2", Registration.GITHUB, "login"))
 				)
 
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
 						[
-							{ "id": "id2", "authorID": "author2", "label": "label2", "maxWantedWordCount": 1 },
-							{ "id": "id3", "authorID": "author2", "label": "label3", "maxWantedWordCount": 1 },
-							{ "id": "id4", "authorID": "author2", "label": "label4", "maxWantedWordCount": 1 }
+							{ "id": "id2", "authorID": "%1$s", "label": "label2", "maxWantedWordCount": 1 },
+							{ "id": "id3", "authorID": "%1$s", "label": "label3", "maxWantedWordCount": 1 },
+							{ "id": "id4", "authorID": "%1$s", "label": "label4", "maxWantedWordCount": 1 }
 						]
-				"""));
+				""".formatted( Registration.GITHUB.id + "user2" )));
 	}
 
 // ####################################################################################
@@ -144,60 +175,50 @@ class ScenarioIntegrationTest {
 	@Test
 	@DirtiesContext
 	void whenGetAllScenarios_isCalledByUnauthorized_returnsStatus401Unauthorized() throws Exception {
-		// Given
-		fillScenarioRepository();
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders.get("/api/scenario/all"))
-
-				// Then
-				.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
-				.andExpect(content().string(""));
+		performRequest_andGetStatusWithEmptyResponse(
+			MockMvcRequestBuilders
+				.get("/api/scenario/all"),
+			HttpStatus.UNAUTHORIZED
+		);
 	}
 
 	@ParameterizedTest
 	@DirtiesContext
 	@ArgumentsSource(SecurityTestTools.NotAdminRoles.class)
 	void whenGetAllScenarios_isCalledByNotAllowedRole_returnsStatus403Forbidden(Role role) throws Exception {
-		// Given
-		fillScenarioRepository();
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.get("/api/scenario/all")
-						.with(SecurityTestTools.buildUser(role, "id", "dbId", "login"))
-				)
-
-				// Then
-				.andExpect(status().is(HttpStatus.FORBIDDEN.value()))
-				.andExpect(content().string(""));
+		performRequest_andGetStatusWithEmptyResponse(
+			MockMvcRequestBuilders
+				.get("/api/scenario/all")
+				.with(SecurityTestTools.buildUser(role, "user2", Registration.GOOGLE, "login")),
+			HttpStatus.FORBIDDEN
+		);
 	}
 
 	@Test
 	@DirtiesContext
 	void whenGetAllScenarios_isCalledByAdmin_returnsList() throws Exception {
 		// Given
-		fillScenarioRepository();
+		Registration reg1 = Registration.GITHUB;
+		Registration reg2 = Registration.GOOGLE;
+		fillScenarioRepository("user1", reg1, "user2", reg2);
 
 		// When
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.get("/api/scenario/all")
-						.with(SecurityTestTools.buildUser(Role.ADMIN, "id", "dbId", "login"))
+						.with(SecurityTestTools.buildUser(Role.ADMIN, "user2", reg2, "login"))
 				)
 
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
 						[
-							{ "id": "id1", "authorID": "author1", "label": "label1", "maxWantedWordCount":  1 },
-							{ "id": "id2", "authorID": "author2", "label": "label2", "maxWantedWordCount":  1 },
-							{ "id": "id3", "authorID": "author2", "label": "label3", "maxWantedWordCount":  1 },
-							{ "id": "id4", "authorID": "author2", "label": "label4", "maxWantedWordCount":  1 }
+							{ "id": "id1", "authorID": "%1$s", "label": "label1", "maxWantedWordCount":  1 },
+							{ "id": "id2", "authorID": "%2$s", "label": "label2", "maxWantedWordCount":  1 },
+							{ "id": "id3", "authorID": "%2$s", "label": "label3", "maxWantedWordCount":  1 },
+							{ "id": "id4", "authorID": "%2$s", "label": "label4", "maxWantedWordCount":  1 }
 						]
-				"""));
+				""".formatted(reg1.id + "user1", reg2.id + "user2")));
 	}
 
 // ####################################################################################
@@ -207,42 +228,30 @@ class ScenarioIntegrationTest {
 	@Test
 	@DirtiesContext
 	void whenAddScenarios_isCalledByUnauthorized_returnsStatus401Unauthorized() throws Exception {
-		// Given
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.post("/api/scenario")
-						.contentType(MediaType.APPLICATION_JSON)
-						.content("""
-								{ "label": "labelXY" }
-						""")
-				)
-
-				// Then
-				.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
-				.andExpect(content().string(""));
+		performRequest_andGetStatusWithEmptyResponse(
+			MockMvcRequestBuilders
+				.post("/api/scenario")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{ "label": "labelXY" }
+				"""),
+			HttpStatus.UNAUTHORIZED
+		);
 	}
 
 	@Test
 	@DirtiesContext
 	void whenAddScenarios_isCalledByUnknownAccount_returnsStatus403Forbidden() throws Exception {
-		// Given
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.post("/api/scenario")
-						.with(SecurityTestTools.buildUser(Role.UNKNOWN_ACCOUNT, "id", "userXY", "login"))
-						.contentType(MediaType.APPLICATION_JSON)
-						.content("""
-								{ "label": "labelXY" }
-						""")
-				)
-
-				// Then
-				.andExpect(status().is(HttpStatus.FORBIDDEN.value()))
-				.andExpect(content().string(""));
+		performRequest_andGetStatusWithEmptyResponse(
+			MockMvcRequestBuilders
+				.post("/api/scenario")
+				.with(SecurityTestTools.buildUser(Role.UNKNOWN_ACCOUNT, "userId", Registration.GOOGLE, "login"))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{ "label": "labelXY" }
+				"""),
+			HttpStatus.FORBIDDEN
+		);
 	}
 
 	@ParameterizedTest
@@ -255,7 +264,7 @@ class ScenarioIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.post("/api/scenario")
-						.with(SecurityTestTools.buildUser(role, "id", "userXY", "login"))
+						.with(SecurityTestTools.buildUser(role, "userId", Registration.GITHUB, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{ "label": "labelXY" }
@@ -265,8 +274,8 @@ class ScenarioIntegrationTest {
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
-						{ "authorID": "userXY", "label": "labelXY" }
-				"""));
+						{ "authorID": "%s", "label": "labelXY" }
+				""".formatted(Registration.GITHUB.id + "userId")));
 	}
 
 // ####################################################################################
@@ -276,115 +285,114 @@ class ScenarioIntegrationTest {
 	@Test @DirtiesContext
 	void whenUpdateScenario_getsPathIdDifferentToScenarioID_returnsStatus400BadRequest() throws Exception {
 		whenUpdateScenario_getsWrongArguments_returnsStatus400BadRequest(
-				"id2","{ \"id\": \"id1\", \"authorID\": \"author1\", \"label\": \"labelNew\" }"
+			"id2",
+			"{ \"id\": \"id1\", \"authorID\": \"%s\", \"label\": \"labelNew\" }".formatted(Registration.GITHUB.id + "userId1"),
+			"userId1", Registration.GITHUB
 		);
 	}
-
 	@Test @DirtiesContext
 	void whenUpdateScenario_getsScenarioWithNoId_returnsStatus400BadRequest() throws Exception {
 		whenUpdateScenario_getsWrongArguments_returnsStatus400BadRequest(
-				"id1","{ \"authorID\": \"author1\", \"label\": \"labelNew\" }"
+			"id1",
+			"{ \"authorID\": \"%s\", \"label\": \"labelNew\" }".formatted(Registration.GITHUB.id + "userId1"),
+			"userId1", Registration.GITHUB
 		);
 	}
-
 	@Test @DirtiesContext
 	void whenUpdateScenario_getsScenarioWithNoAuthorId_returnsStatus400BadRequest() throws Exception {
 		whenUpdateScenario_getsWrongArguments_returnsStatus400BadRequest(
-				"id1","{ \"id\": \"id1\", \"label\": \"labelNew\" }"
+			"id1",
+			"{ \"id\": \"id1\", \"label\": \"labelNew\" }",
+			"userId1", Registration.GITHUB
 		);
 	}
-
 	private void whenUpdateScenario_getsWrongArguments_returnsStatus400BadRequest(
-			String pathId, String requestBody
+			String pathId, String requestBody, @NonNull String userId, @NonNull Registration registration
 	) throws Exception {
 		// Given
+		fillScenarioRepository();
 
 		// When
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.put("/api/scenario/%s".formatted(pathId))
-						.with(SecurityTestTools.buildUser(Role.USER, "userId1", "author1", "login"))
+						.with(SecurityTestTools.buildUser(Role.USER, userId, registration, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(requestBody)
 				)
 
 				// Then
-				.andExpect(status().is(HttpStatus.BAD_REQUEST.value()));
+				.andExpect(status().isBadRequest());
 	}
 
 	@Test
 	@DirtiesContext
 	void whenUpdateScenario_getsScenarioWithUnknownId_returnsStatus404NotFound() throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id2", "author1", "label1", 1));
+		String userId = "userId1";
+		Registration reg = Registration.GOOGLE;
+		String authorID = reg.id + userId;
+
+		scenarioRepository.save(new Scenario("id2", authorID, "label1", 1));
 
 		// When
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.put("/api/scenario/%s".formatted("id1"))
-						.with(SecurityTestTools.buildUser(Role.USER, "userId1", "author1", "login"))
+						.with(SecurityTestTools.buildUser(Role.USER, userId, reg, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
-						.content("{ \"id\": \"id1\", \"authorID\": \"author1\", \"label\": \"labelNew\" }")
+						.content("{ \"id\": \"id1\", \"authorID\": \"%s\", \"label\": \"labelNew\" }".formatted(authorID))
 				)
 
 				// Then
-				.andExpect(status().is(HttpStatus.NOT_FOUND.value()));
+				.andExpect(status().isNotFound());
 	}
 
 	@Test @DirtiesContext
 	void whenUpdateScenario_isCalledByUnauthorized_returnsStatus401Unauthorized() throws Exception {
-		// Given
-		scenarioRepository.save(new Scenario("id1", "author1", "labelOld", 1));
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.put("/api/scenario/%s".formatted("id1"))
-						.contentType(MediaType.APPLICATION_JSON)
-						.content("""
-								{ "id": "id1", "authorID": "%s", "label": "labelNew" }
-						""".formatted("author1"))
-				)
-
-				// Then
-				.andExpect(status().is(HttpStatus.UNAUTHORIZED.value()));
+		saveExampleScenario_performRequest_andGetStatus(
+			"id1", "author1",
+			MockMvcRequestBuilders
+				.put("/api/scenario/%s".formatted("id1"))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+						{ "id": "id1", "authorID": "%s", "label": "labelNew" }
+				""".formatted("author1")),
+			HttpStatus.UNAUTHORIZED
+		);
 	}
 
 	@Test @DirtiesContext
 	void whenUpdateScenario_isCalledByUnknownAccount_returnsStatus403Forbidden() throws Exception {
 		whenUpdateScenario_isCalled_returnsStatus403Forbidden(
-				Role.UNKNOWN_ACCOUNT, "author1", "author1", "author1"
+				Role.UNKNOWN_ACCOUNT, "userId1", "userId1", "userId1", Registration.GOOGLE
 		);
 	}
 	@Test @DirtiesContext
-	void whenUpdateScenario_isCalledByNonAdmin_withNoDbId_returnsStatus403Forbidden() throws Exception {
+	void whenUpdateScenario_isCalledByUser_withDbIdDifferentToGivenScenario_returnsStatus403Forbidden() throws Exception {
 		whenUpdateScenario_isCalled_returnsStatus403Forbidden(
-				Role.USER, null, "author1", "author1"
+				Role.USER, "userId1", "userId2", "userId1", Registration.GOOGLE
 		);
 	}
 	@Test @DirtiesContext
-	void whenUpdateScenario_isCalledByNonAdmin_withDbIdDifferentToGivenScenario_returnsStatus403Forbidden() throws Exception {
+	void whenUpdateScenario_isCalledByUser_withDbIdDifferentToStoredScenario_returnsStatus403Forbidden() throws Exception {
 		whenUpdateScenario_isCalled_returnsStatus403Forbidden(
-				Role.USER, "author1", "author1", "author2"
-		);
-	}
-	@Test @DirtiesContext
-	void whenUpdateScenario_isCalledByNonAdmin_withDbIdDifferentToStoredScenario_returnsStatus403Forbidden() throws Exception {
-		whenUpdateScenario_isCalled_returnsStatus403Forbidden(
-				Role.USER,"author1", "author2", "author1"
+				Role.USER, "userId2", "userId1", "userId1", Registration.GOOGLE
 		);
 	}
 	private void whenUpdateScenario_isCalled_returnsStatus403Forbidden(
-			Role role, String userDbId, @NonNull String authorOfStored, @NonNull String authorOfGiven
+			@NonNull Role role, @NonNull String userIdOfStored, @NonNull String userIdOfGiven, @NonNull String userId, @NonNull Registration registration
 	) throws Exception {
 		// Given
+		String authorOfStored = registration.id + userIdOfStored;
+		String authorOfGiven  = registration.id + userIdOfGiven;
 		scenarioRepository.save(new Scenario("id1", authorOfStored, "labelOld", 1));
 
 		// When
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.put("/api/scenario/%s".formatted("id1"))
-						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, userId, registration, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{ "id": "id1", "authorID": "%s", "label": "labelNew", "maxWantedWordCount": 1 }
@@ -392,44 +400,42 @@ class ScenarioIntegrationTest {
 				)
 
 				// Then
-				.andExpect(status().is(HttpStatus.FORBIDDEN.value()));
+				.andExpect(status().isForbidden());
 	}
 
-	@Test @DirtiesContext
-	void whenUpdateScenario_isCalledByAdmin_returnsUpdatedValue() throws Exception {
-		whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue(Role.ADMIN, "authorAdmin", "author2");
+	@Test @DirtiesContext void whenUpdateScenario_isCalledByAdmin_returnsUpdatedValue() throws Exception {
+		whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue(Role.ADMIN, Registration.GITHUB.id + "userId2", "userId1", Registration.GITHUB);
 	}
-	@Test @DirtiesContext
-	void whenUpdateScenario_isCalledByUser_returnsUpdatedValue() throws Exception {
-		whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue(Role.USER, "author1", "author1");
+	@Test @DirtiesContext void whenUpdateScenario_isCalledByUser_returnsUpdatedValue() throws Exception {
+		whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue(Role.USER, Registration.GITHUB.id + "userId1", "userId1", Registration.GITHUB);
 	}
 	private void whenUpdateScenario_isCalledByAllowedUser_returnsUpdatedValue(
-		Role role, String userDbId, @NonNull String storedAuthorId
+			@NonNull Role role, @NonNull String storedAuthorID, @NonNull String userId, @NonNull Registration registration
 	) throws Exception {
 		// Given
-		scenarioRepository.save(new Scenario("id1", storedAuthorId, "labelOld", 1));
+		scenarioRepository.save(new Scenario("id1", storedAuthorID, "labelOld", 1));
 
 		// When
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.put("/api/scenario/%s".formatted("id1"))
-						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, userId, registration, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""
 								{ "id": "id1", "authorID": "%s", "label": "labelNew", "maxWantedWordCount": 1 }
-						""".formatted(storedAuthorId))
+						""".formatted(storedAuthorID))
 				)
 
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().json("""
 						{ "id": "id1", "authorID": "%s", "label": "labelNew", "maxWantedWordCount": 1 }
-				""".formatted(storedAuthorId)));
+				""".formatted(storedAuthorID)));
 
 		Optional<Scenario> actual = scenarioRepository.findById("id1");
 		assertNotNull(actual);
 		assertTrue(actual.isPresent());
-		Scenario expected = new Scenario("id1", storedAuthorId, "labelNew", 1);
+		Scenario expected = new Scenario("id1", storedAuthorID, "labelNew", 1);
 		assertEquals(expected, actual.get());
 	}
 
@@ -438,13 +444,13 @@ class ScenarioIntegrationTest {
 // ####################################################################################
 
 	@Test @DirtiesContext void whenDeleteScenario_isCalledByAdmin() throws Exception {
-		whenDeleteScenario_isCalledByAllowedUser(Role.ADMIN, "authorAdmin", "author2");
+		whenDeleteScenario_isCalledByAllowedUser(Role.ADMIN, Registration.GITHUB.id + "userId2", "userId1", Registration.GITHUB);
 	}
 	@Test @DirtiesContext void whenDeleteScenario_isCalledByUser() throws Exception {
-		whenDeleteScenario_isCalledByAllowedUser(Role.USER, "author1", "author1");
+		whenDeleteScenario_isCalledByAllowedUser(Role.USER, Registration.GITHUB.id + "userId1", "userId1", Registration.GITHUB);
 	}
 	private void whenDeleteScenario_isCalledByAllowedUser(
-			Role role, String userDbId, @NonNull String storedAuthorID
+			@NonNull Role role, @NonNull String storedAuthorID, @NonNull String userId, @NonNull Registration registration
 	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
@@ -458,7 +464,7 @@ class ScenarioIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.delete("/api/scenario/id1")
-						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, userId, registration, "login"))
 				)
 
 				// Then
@@ -475,60 +481,45 @@ class ScenarioIntegrationTest {
 
 	@Test @DirtiesContext
 	void whenDeleteScenario_isCalledWithUnknownId_returnsStatus404Notfound() throws Exception {
-		// Given
-		scenarioRepository.save(new Scenario("id2", "author1", "label1", 1));
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.delete("/api/scenario/id1")
-						.with(SecurityTestTools.buildUser(Role.USER, "userId1", "author1", "login"))
-				)
-
-				// Then
-				.andExpect(status().isNotFound());
+		saveExampleScenario_performRequest_andGetStatus(
+			"id2", "author1",
+			MockMvcRequestBuilders
+				.delete("/api/scenario/id1")
+				.with(SecurityTestTools
+					.buildUser(Role.USER, "userId1", Registration.GOOGLE, "login")
+				),
+			HttpStatus.NOT_FOUND
+		);
 	}
 
 	@Test @DirtiesContext
 	void whenDeleteScenario_isCalledUnauthorized_returnStatus401Unauthorized() throws Exception {
-		// Given
-		scenarioRepository.save(new Scenario("id1", "author1", "label1", 1));
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.delete("/api/scenario/id1")
-				)
-
-				// Then
-				.andExpect(status().isUnauthorized());
+		saveExampleScenario_performRequest_andGetStatus(
+			"id1", "author1",
+			MockMvcRequestBuilders
+				.delete("/api/scenario/id1"),
+			HttpStatus.UNAUTHORIZED
+		);
 	}
 
 	@Test @DirtiesContext void whenDeleteScenario_isCalledByUnknownAccount_returnsStatus403Forbidden() throws Exception {
-		whenDeleteScenario_isCalled_returnsStatus403Forbidden(Role.UNKNOWN_ACCOUNT, "author1", "author1");
-	}
-	@Test @DirtiesContext void whenDeleteScenario_isCalledByUserWithNoDbIDs_returnsStatus403Forbidden() throws Exception {
-		whenDeleteScenario_isCalled_returnsStatus403Forbidden(Role.USER, null, "author2");
+		whenDeleteScenario_isCalled_returnsStatus403Forbidden(Role.UNKNOWN_ACCOUNT, Registration.GITHUB.id + "userId1", "userId1", Registration.GITHUB);
 	}
 	@Test @DirtiesContext void whenDeleteScenario_isCalledWithDifferentAuthorIDs_returnsStatus403Forbidden() throws Exception {
-		whenDeleteScenario_isCalled_returnsStatus403Forbidden(Role.USER, "author2", "author1");
+		whenDeleteScenario_isCalled_returnsStatus403Forbidden(Role.USER, Registration.GITHUB.id + "userId2", "userId1", Registration.GITHUB);
 	}
-
 	private void whenDeleteScenario_isCalled_returnsStatus403Forbidden(
-			Role role, String userDbId, @NonNull String storedAuthorID
+			Role role, @NonNull String storedAuthorID, @NonNull String userId, @NonNull Registration registration
 	) throws Exception {
-		// Given
-		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.delete("/api/scenario/id1")
-						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
-				)
-
-				// Then
-				.andExpect(status().isForbidden());
+		saveExampleScenario_performRequest_andGetStatus(
+			"id1", storedAuthorID,
+			MockMvcRequestBuilders
+				.get("/api/scenario/id1")
+				.with(SecurityTestTools
+					.buildUser(role, userId, registration, "login")
+				),
+			HttpStatus.FORBIDDEN
+		);
 	}
 
 // ####################################################################################
@@ -536,14 +527,14 @@ class ScenarioIntegrationTest {
 // ####################################################################################
 
 	@Test @DirtiesContext void whenGetScenarioById_isCalledByAdmin() throws Exception {
-		whenGetScenarioById_isCalledByAllowedUser(Role.ADMIN, "authorAdmin", "author2");
+		whenGetScenarioById_isCalledByAllowedUser(Role.ADMIN, Registration.GITHUB.id + "userId2", "userId1", Registration.GITHUB);
 	}
 	@Test @DirtiesContext void whenGetScenarioById_isCalledByUser() throws Exception {
-		whenGetScenarioById_isCalledByAllowedUser(Role.USER, "author1", "author1");
+		whenGetScenarioById_isCalledByAllowedUser(Role.USER, Registration.GITHUB.id + "userId1", "userId1", Registration.GITHUB);
 	}
 
 	private void whenGetScenarioById_isCalledByAllowedUser(
-			Role role, String userDbId, @NonNull String storedAuthorID
+			@NonNull Role role, @NonNull String storedAuthorID, @NonNull String userId, @NonNull Registration registration
 	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
@@ -552,7 +543,7 @@ class ScenarioIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.get("/api/scenario/id1")
-						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, userId, registration, "login"))
 				)
 
 				// Then
@@ -564,59 +555,44 @@ class ScenarioIntegrationTest {
 
 	@Test @DirtiesContext
 	void whenGetScenarioById_isCalledWithUnknownId_returnsStatus404NotFound() throws Exception {
-		// Given
-		scenarioRepository.save(new Scenario("id2", "author1", "label1", 1));
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.get("/api/scenario/id1")
-						.with(SecurityTestTools.buildUser(Role.USER, "userId1", "author1", "login"))
-				)
-
-				// Then
-				.andExpect(status().isNotFound());
+		saveExampleScenario_performRequest_andGetStatus(
+			"id2", "author1",
+			MockMvcRequestBuilders
+				.get("/api/scenario/id1")
+				.with(SecurityTestTools
+					.buildUser(Role.USER, "userId1", Registration.GOOGLE, "login")
+				),
+			HttpStatus.NOT_FOUND
+		);
 	}
 
 	@Test @DirtiesContext
 	void whenGetScenarioById_isCalledUnauthorized_returnsStatus401Unauthorized() throws Exception {
-		// Given
-		scenarioRepository.save(new Scenario("id1", "author1", "label1", 1));
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.get("/api/scenario/id1")
-				)
-
-				// Then
-				.andExpect(status().isUnauthorized());
+		saveExampleScenario_performRequest_andGetStatus(
+			"id1", "author1",
+			MockMvcRequestBuilders
+				.get("/api/scenario/id1"),
+			HttpStatus.UNAUTHORIZED
+		);
 	}
 
 	@Test @DirtiesContext void whenGetScenarioById_isCalledByUnknownAccount_returnsStatus403Forbidden() throws Exception {
-		whenGetScenarioById_isCalled_returnsStatus403Forbidden(Role.UNKNOWN_ACCOUNT, "author1", "author1");
-	}
-	@Test @DirtiesContext void whenGetScenarioById_isCalledByUserWithNoDbIDs_returnsStatus403Forbidden() throws Exception {
-		whenGetScenarioById_isCalled_returnsStatus403Forbidden(Role.USER, null, "author2");
+		whenGetScenarioById_isCalled_returnsStatus403Forbidden(Role.UNKNOWN_ACCOUNT, Registration.GITHUB.id + "userId1", "userId1", Registration.GITHUB);
 	}
 	@Test @DirtiesContext void whenGetScenarioById_isCalledWithDifferentAuthorIDs_returnsStatus403Forbidden() throws Exception {
-		whenGetScenarioById_isCalled_returnsStatus403Forbidden(Role.USER, "author2", "author1");
+		whenGetScenarioById_isCalled_returnsStatus403Forbidden(Role.USER, Registration.GITHUB.id + "userId2", "userId1", Registration.GITHUB);
 	}
-
 	private void whenGetScenarioById_isCalled_returnsStatus403Forbidden(
-			Role role, String userDbId, @NonNull String storedAuthorID
+			Role role, @NonNull String storedAuthorID, @NonNull String userId, @NonNull Registration registration
 	) throws Exception {
-		// Given
-		scenarioRepository.save(new Scenario("id1", storedAuthorID, "label1", 1));
-
-		// When
-		mockMvc
-				.perform(MockMvcRequestBuilders
-						.get("/api/scenario/id1")
-						.with(SecurityTestTools.buildUser(role, "userId1", userDbId, "login"))
-				)
-
-				// Then
-				.andExpect(status().isForbidden());
+		saveExampleScenario_performRequest_andGetStatus(
+			"id1", storedAuthorID,
+			MockMvcRequestBuilders
+				.get("/api/scenario/id1")
+				.with(SecurityTestTools
+					.buildUser(role, userId, registration, "login")
+				),
+			HttpStatus.FORBIDDEN
+		);
 	}
 }
