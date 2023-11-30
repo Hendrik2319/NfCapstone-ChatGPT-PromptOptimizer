@@ -28,6 +28,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.services.StoredUserInfoService;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService;
 
 class SecurityConfigTest {
 
@@ -35,6 +36,7 @@ class SecurityConfigTest {
 	@Mock private DefaultOAuth2UserService delegate;
 	@Mock private OAuth2UserRequest oAuth2UserRequest;
 	@Mock private StoredUserInfoService storedUserInfoService;
+	@Mock private UserAttributesService userAttributesService;
 
 	@BeforeEach
 	void setup() {
@@ -62,7 +64,7 @@ class SecurityConfigTest {
 		);
 
 		//When
-		DefaultOAuth2User actual = securityConfig.configureUserData(storedUserInfoService, delegate, oAuth2UserRequest);
+		DefaultOAuth2User actual = securityConfig.configureUserData(storedUserInfoService, userAttributesService, delegate, oAuth2UserRequest);
 
 		//Then
 		Map<String, Object> newAttributes = Map.of(
@@ -93,7 +95,7 @@ class SecurityConfigTest {
 		);
 
 		//When
-		DefaultOAuth2User actual = securityConfig.configureUserData(storedUserInfoService, delegate, oAuth2UserRequest);
+		DefaultOAuth2User actual = securityConfig.configureUserData(storedUserInfoService, userAttributesService, delegate, oAuth2UserRequest);
 
 		//Then
 		Map<String, Object> newAttributes = Map.of(

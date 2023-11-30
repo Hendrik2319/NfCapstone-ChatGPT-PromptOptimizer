@@ -17,8 +17,6 @@ public class UserAttributesService {
 
 	public static final String ATTR_USER_DB_ID      = "UserDbId";
 	public static final String ATTR_REGISTRATION_ID = "RegistrationId";
-	public static final String REGID_GITHUB = "github";
-	public static final String REGID_GOOGLE = "google";
 	
 	public enum Field {
 		ORIGINAL_ID,
@@ -29,6 +27,16 @@ public class UserAttributesService {
 		AVATAR_URL ,
 	}
 
+	public enum Registration {
+		GITHUB("github"),
+		GOOGLE("google"),
+		;
+		public final String id;
+		private Registration(String id) {
+			this.id = id;
+		}
+	}
+
 
 	private static final Map<String, Map<Field, String>> config = createConfig();
 
@@ -36,7 +44,7 @@ public class UserAttributesService {
 		HashMap<String, Map<Field, String>> newConfig = new HashMap<>();
 		EnumMap<Field, String> fields;
 
-		newConfig.put(REGID_GITHUB, fields = new EnumMap<>(Field.class));
+		newConfig.put(Registration.GITHUB.id, fields = new EnumMap<>(Field.class));
 		fields.put( Field.ORIGINAL_ID, "id"         );
 		fields.put( Field.LOGIN      , "login"      );
 		fields.put( Field.NAME       , "name"       );
@@ -44,8 +52,8 @@ public class UserAttributesService {
 		fields.put( Field.URL        , "html_url"   );
 		fields.put( Field.AVATAR_URL , "avatar_url" );
 
-		newConfig.put(REGID_GOOGLE, fields = new EnumMap<>(Field.class));
-		fields.put( Field.ORIGINAL_ID, "sub"        );
+		newConfig.put(Registration.GOOGLE.id, fields = new EnumMap<>(Field.class));
+		fields.put( Field.ORIGINAL_ID, "original_Id");
 		fields.put( Field.LOGIN      , "email"      );
 		fields.put( Field.NAME       , "name"       );
 		fields.put( Field.LOCATION   , "locale"     );
@@ -53,6 +61,13 @@ public class UserAttributesService {
 		fields.put( Field.AVATAR_URL , "picture"    );
 
 		return newConfig;
+	}
+
+
+	public void fixAttributesIfNeeded(Map<String, Object> attributes, String registrationId) {
+		if (Registration.GOOGLE.id.equals(registrationId)) {
+			attributes.put("original_Id", attributes.get("sub"));
+		}
 	}
 
 
