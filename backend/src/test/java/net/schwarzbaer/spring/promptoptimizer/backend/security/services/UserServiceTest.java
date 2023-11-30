@@ -1,7 +1,11 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security.services;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -15,16 +19,14 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.UserInfo;
 
 class UserServiceTest {
 
 	@Mock private SecurityContext securityContext;
 	@Mock private Authentication authentication;
+	@Mock private UserAttributesService userAttributesService;
 	@InjectMocks private UserService userService;
 
 	@BeforeEach
@@ -33,22 +35,32 @@ class UserServiceTest {
 	}
 
 	@NonNull
-	public static DefaultOAuth2User buildUser(@Nullable Role role, @NonNull String id, @NonNull String login) {
+	private static DefaultOAuth2User buildUser(@Nullable Role role, @NonNull String id, @NonNull String registrationId, @NonNull String login) {
 		return new DefaultOAuth2User(
 				role==null
 						? List.of()
 						: List.of( new SimpleGrantedAuthority( role.getLong() ) ),
 				Map.of(
-						"id", id,
+						"originalId", id,
+						UserAttributesService.ATTR_USER_DB_ID, registrationId + id,
+						UserAttributesService.ATTR_REGISTRATION_ID, registrationId,
 						"login", login
 				),
-				"id");
+				UserAttributesService.ATTR_USER_DB_ID);
 	}
 
-	private void initSecurityContext(@Nullable Role role, @NonNull String id, @NonNull String login) {
+	private void initSecurityContext(@Nullable Role role, @NonNull String id, @NonNull String registrationId, @NonNull String login) {
+		DefaultOAuth2User user = buildUser(role, id, registrationId, login);
+
 		when(securityContext.getAuthentication()).thenReturn(authentication);
-		when(authentication.getPrincipal()).thenReturn(buildUser(role, id, login));
+		when(authentication.getPrincipal()).thenReturn(user);
 		when(authentication.getName()).thenThrow(IllegalStateException.class);
+
+		when(userAttributesService.getAttribute(user, UserAttributesService.ATTR_REGISTRATION_ID, null)).thenReturn(registrationId);
+		when(userAttributesService.getAttribute(user, UserAttributesService.ATTR_USER_DB_ID     , null)).thenReturn(registrationId + id);
+		when(userAttributesService.getAttribute(user, registrationId, UserAttributesService.Field.ORIGINAL_ID, null)).thenReturn(id);
+		when(userAttributesService.getAttribute(user, registrationId, UserAttributesService.Field.LOGIN      , null)).thenReturn(login);
+
 		SecurityContextHolder.setContext(securityContext);
 	}
 
@@ -119,7 +131,7 @@ class UserServiceTest {
 			boolean isUser, boolean isAdmin
 	) {
 		// Given
-		initSecurityContext(loggedUserRole, loggedUserID, loggedUserLogin);
+		initSecurityContext(loggedUserRole, loggedUserID, "Registration1", loggedUserLogin);
 
 		// When
 		UserInfo actual = userService.getCurrentUser();
@@ -127,7 +139,7 @@ class UserServiceTest {
 		// Then
 		UserInfo expected = new UserInfo(
 				true, isUser, isAdmin,
-				loggedUserID, null, loggedUserLogin, null, null, null, null
+				loggedUserID, "Registration1"+loggedUserID, loggedUserLogin, null, null, null, null
 		);
 		assertEquals(expected, actual);
 	}
