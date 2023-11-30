@@ -1,7 +1,10 @@
 package net.schwarzbaer.spring.promptoptimizer.backend;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.FileNotFoundException;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,10 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.io.FileNotFoundException;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService.Registration;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,7 +60,7 @@ class ReactRoutingForwardingTest {
 			resultActions = mockMvc
 					.perform(MockMvcRequestBuilders
 							.get(url)
-							.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+							.with(SecurityTestTools.buildUser(Role.USER, "id", Registration.GITHUB, "login"))
 					);
 		} catch (FileNotFoundException e) {
 			assertTrue(true);
