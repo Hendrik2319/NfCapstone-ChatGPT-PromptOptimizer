@@ -5,14 +5,22 @@ import {MainCard} from "../../components/StandardStyledComponents.tsx";
 
 type Props = {
     user?: UserInfo
-    login: ()=>void
+    logins: {
+        github: ()=>void,
+        google: ()=>void,
+    }
     logout: ()=>void
 }
 
 export default function MainPage( props: Readonly<Props> ) {
 
     if (!props.user?.isAuthenticated)
-        return <MainCard>Please <button onClick={props.login}>Login</button></MainCard>
+        return <MainCard>
+            Please
+            <button onClick={props.logins.github}>Login with GitHub</button>
+            or
+            <button onClick={props.logins.google}>Login with Google</button>
+        </MainCard>
 
     if (!props.user.isUser && !props.user.isAdmin)
         return <WaitUntilBecomeUserPage logout={props.logout}/>

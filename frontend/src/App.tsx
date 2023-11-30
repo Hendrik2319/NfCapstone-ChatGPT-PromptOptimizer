@@ -37,9 +37,14 @@ export default function App() {
         document.body.classList.add(state);
     }
 
-    function login() {
+    function loginWithGitHub() {
         const host = window.location.host === 'localhost:5173' ? 'http://localhost:8080': window.location.origin;
         window.open(host + '/oauth2/authorization/github', '_self');
+    }
+
+    function loginWithGoogle() {
+        const host = window.location.host === 'localhost:5173' ? 'http://localhost:8080': window.location.origin;
+        window.open(host + '/oauth2/authorization/google', '_self');
     }
 
     function logout() {
@@ -62,7 +67,8 @@ export default function App() {
                 <ApiStateIndicator/>
                 <DarkModeSwitch onChange={setAppTheme}/>
                 <div className={"Spacer"}/>
-                {!user?.isAuthenticated && <button onClick={login}>Login</button>}
+                {!user?.isAuthenticated && <button onClick={loginWithGitHub}>Login (GitHub)</button>}
+                {!user?.isAuthenticated && <button onClick={loginWithGoogle}>Login (Google)</button>}
                 { user?.isAuthenticated && <button onClick={logout}>Logout</button>}
                 <div className={"Spacer"}/>
                 <button onClick={()=>navigate("/")}>Home</button>
@@ -92,7 +98,7 @@ export default function App() {
             </SidePanel>
             <h1>ChatGPT PromptOptimizer</h1>
             <Routes>
-                <Route path={"/"} element={<MainPage user={user} login={login} logout={logout}/>}/>
+                <Route path={"/"} element={<MainPage user={user} logins={{github: loginWithGitHub, google: loginWithGoogle}} logout={logout}/>}/>
                 <Route element={<RouteProtection backPath="/" condition={user?.isAuthenticated}/>}>
                     <Route path={"/user"} element={<UserProfilePage user={user!}/>}/>
                 </Route>
