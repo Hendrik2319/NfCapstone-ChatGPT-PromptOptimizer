@@ -88,7 +88,7 @@ export default function App() {
                             {
                                 user.login &&
                                 <>
-                                    {user.avatar_url && <img alt="user avatar image" src={user.avatar_url} className={"AvatarImage"}/>}
+                                    {user.avatar_url && <img alt="[Avatar]" title={"Avatar of user with ID "+user.id} src={user.avatar_url} className={"AvatarImage"}/>}
                                     {" "+user.login}
                                 </>
                             }
