@@ -27,7 +27,11 @@ public class StoredUserInfoService {
 		return storedUserInfoRepository.findById(userDbId);
 	}
 
-	public void addUser(@NonNull String userDbId, String registrationId, @NonNull Role role, @NonNull Map<String, Object> newAttributes) {
+	public void addUser(String userDbId, String registrationId, Role role, Map<String, Object> newAttributes) {
+		userDbId = Objects.requireNonNull(userDbId);
+		role = Objects.requireNonNull(role);
+		newAttributes = Objects.requireNonNull(newAttributes);
+
 		storedUserInfoRepository.save(new StoredUserInfo(
 				userDbId,
 				role,
@@ -42,7 +46,10 @@ public class StoredUserInfoService {
 		));
 	}
 
-	public void updateUserIfNeeded(@NonNull StoredUserInfo storedUserInfo, String registrationId, @NonNull Map<String, Object> newAttributes) {
+	public void updateUserIfNeeded(StoredUserInfo storedUserInfo, String registrationId, Map<String, Object> newAttributes) {
+		storedUserInfo = Objects.requireNonNull(storedUserInfo);
+		newAttributes = Objects.requireNonNull(newAttributes);
+
 		StoredUserInfo updatedUserInfo = new StoredUserInfo(
 				storedUserInfo.id(),
 				storedUserInfo.role(),
