@@ -16,6 +16,7 @@ import org.springframework.lang.NonNull;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,7 +88,7 @@ class StoredUserInfoServiceTest {
 	void whenAddUser_isCalled() {
 		// Given
 		// When
-		Map<String, Object> attrs = Map.of(
+		Map<String, Object> attrs = Objects.requireNonNull( Map.of(
 				"UserDbId"  , "RegistrationIDuserID1",
 				"id"        , "userID1"  ,
 				"login"     , "login1"   ,
@@ -95,8 +96,8 @@ class StoredUserInfoServiceTest {
 				"location"  , "location1",
 				"html_url"  , "url1"     ,
 				"avatar_url", "avatarUrl1"
-		);
-		storedUserInfoService.addUser(Role.UNKNOWN_ACCOUNT, "RegistrationID", attrs);
+		) );
+		storedUserInfoService.addUser("RegistrationIDuserID1", "RegistrationID", Role.UNKNOWN_ACCOUNT, attrs);
 
 		// Then
 		verify(storedUserInfoRepository).save(new StoredUserInfo(
@@ -128,7 +129,7 @@ class StoredUserInfoServiceTest {
 				"userID1", "login2",
 				"name2", "location2", "url2", "avatarUrl2", "reason1"
 		);
-		storedUserInfoService.updateUserIfNeeded(storedUserInfo, attrs);
+		storedUserInfoService.updateUserIfNeeded(storedUserInfo, "RegistrationID", attrs);
 
 		// Then
 		verify(storedUserInfoRepository).save(new StoredUserInfo(
@@ -161,7 +162,7 @@ class StoredUserInfoServiceTest {
 				"userID1", "login1",
 				"name1", "location1", "url1", "avatarUrl1", "reason1"
 		);
-		storedUserInfoService.updateUserIfNeeded(storedUserInfo, attrs);
+		storedUserInfoService.updateUserIfNeeded(storedUserInfo, "RegistrationID", attrs);
 
 		// Then
 		verify(storedUserInfoRepository, times(0)).save(any());

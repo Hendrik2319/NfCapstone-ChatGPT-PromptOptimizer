@@ -26,35 +26,66 @@ public class StoredUserInfoService {
 		return storedUserInfoRepository.findById(userDbId);
 	}
 
-	public void addUser(Role role, String registrationId, Map<String, Object> newAttributes) {
-		storedUserInfoRepository.save(new StoredUserInfo(
-				Objects.toString(newAttributes.get(UserService.ATTR_USER_DB_ID ), null),
-				role,
-				registrationId,
-				Objects.toString(newAttributes.get(UserService.ATTR_ORIGINAL_ID), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_LOGIN      ), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_NAME       ), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_LOCATION   ), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_URL        ), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), null),
-				null
-		));
+	public void addUser(@NonNull String userDbId, String registrationId, @NonNull Role role, @NonNull Map<String, Object> newAttributes) {
+		StoredUserInfo storedUserInfo = null;
+
+		if (registrationId!=null)
+			switch (registrationId) {
+				case "github":
+					storedUserInfo = new StoredUserInfo(
+							userDbId,
+							role,
+							registrationId,
+							Objects.toString(newAttributes.get(UserService.ATTR_ORIGINAL_ID), null),
+							Objects.toString(newAttributes.get(UserService.ATTR_LOGIN      ), null),
+							Objects.toString(newAttributes.get(UserService.ATTR_NAME       ), null),
+							Objects.toString(newAttributes.get(UserService.ATTR_LOCATION   ), null),
+							Objects.toString(newAttributes.get(UserService.ATTR_URL        ), null),
+							Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), null),
+							null
+					);
+					break;
+			}
+
+		if (storedUserInfo==null)
+			storedUserInfo = new StoredUserInfo(
+					userDbId,
+					role,
+					registrationId,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null
+			);
+		
+		storedUserInfoRepository.save(storedUserInfo);
 	}
 
-	public void updateUserIfNeeded(StoredUserInfo storedUserInfo, Map<String, Object> newAttributes) {
-		StoredUserInfo updatedUserInfo = new StoredUserInfo(
-				storedUserInfo.id(),
-				storedUserInfo.role(),
-				storedUserInfo.registrationId(),
-				Objects.toString(newAttributes.get(UserService.ATTR_ORIGINAL_ID), storedUserInfo.originalId()),
-				Objects.toString(newAttributes.get(UserService.ATTR_LOGIN      ), storedUserInfo.login     ()),
-				Objects.toString(newAttributes.get(UserService.ATTR_NAME       ), storedUserInfo.name      ()),
-				Objects.toString(newAttributes.get(UserService.ATTR_LOCATION   ), storedUserInfo.location  ()),
-				Objects.toString(newAttributes.get(UserService.ATTR_URL        ), storedUserInfo.url       ()),
-				Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), storedUserInfo.avatar_url()),
-				storedUserInfo.denialReason()
-		);
-		if (!updatedUserInfo.equals(storedUserInfo))
+	public void updateUserIfNeeded(StoredUserInfo storedUserInfo, String registrationId, Map<String, Object> newAttributes) {
+		StoredUserInfo updatedUserInfo = null;
+
+		if (registrationId!=null)
+			switch (registrationId) {
+				case "github":
+					updatedUserInfo = new StoredUserInfo(
+							storedUserInfo.id(),
+							storedUserInfo.role(),
+							storedUserInfo.registrationId(),
+							Objects.toString(newAttributes.get(UserService.ATTR_ORIGINAL_ID), storedUserInfo.originalId()),
+							Objects.toString(newAttributes.get(UserService.ATTR_LOGIN      ), storedUserInfo.login     ()),
+							Objects.toString(newAttributes.get(UserService.ATTR_NAME       ), storedUserInfo.name      ()),
+							Objects.toString(newAttributes.get(UserService.ATTR_LOCATION   ), storedUserInfo.location  ()),
+							Objects.toString(newAttributes.get(UserService.ATTR_URL        ), storedUserInfo.url       ()),
+							Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), storedUserInfo.avatar_url()),
+							storedUserInfo.denialReason()
+					);
+					break;
+			}
+		
+		if (updatedUserInfo!=null && !updatedUserInfo.equals(storedUserInfo))
 			storedUserInfoRepository.save(updatedUserInfo);
 	}
 

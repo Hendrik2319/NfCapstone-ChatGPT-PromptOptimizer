@@ -16,9 +16,9 @@ export default function MainPage( props: Readonly<Props> ) {
 
     if (!props.user?.isAuthenticated)
         return <MainCard>
-            Please
+            {"Please "}
             <button onClick={props.logins.github}>Login with GitHub</button>
-            or
+            {" or "}
             <button onClick={props.logins.google}>Login with Google</button>
         </MainCard>
 

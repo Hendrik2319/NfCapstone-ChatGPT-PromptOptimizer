@@ -16,8 +16,10 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserService {
 
+	public static final String ATTR_USER_DB_ID      = "UserDbId";
+	public static final String ATTR_REGISTRATION_ID = "RegistrationId";
+
 	static final String ATTR_ORIGINAL_ID = "id";
-	static final String ATTR_USER_DB_ID  = "UserDbId";
 	static final String ATTR_LOGIN       = "login";
 	static final String ATTR_NAME        = "name";
 	static final String ATTR_LOCATION    = "location";
@@ -37,22 +39,43 @@ public class UserService {
 //		if (principal!=null) DEBUG_OUT.println("Principal: "+principal.getClass()+" -> "+principal);
 
 		if (principal instanceof OAuth2AuthenticatedPrincipal user) {
-//			DEBUG_OUT.println("User Attributes:");
-//			user.getAttributes().forEach((key, value) ->
-//					DEBUG_OUT.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
-//			);
+			/* 
+			DEBUG_OUT.println("User Attributes:");
+			user.getAttributes().forEach((key, value) ->
+					DEBUG_OUT.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
+			);
+ 			*/
+
+			String registrationId = Objects.toString( user.getAttribute(ATTR_REGISTRATION_ID), null );
+
+			if (registrationId!=null)
+				switch (registrationId) {
+					case "github": 
+						return new UserInfo(
+								true,
+								hasRole(user, Role.USER),
+								hasRole(user, Role.ADMIN),
+								Objects.toString( user.getAttribute(ATTR_ORIGINAL_ID), null ),
+								Objects.toString( user.getAttribute(ATTR_USER_DB_ID ), null ),
+								Objects.toString( user.getAttribute(ATTR_LOGIN      ), null ),
+								Objects.toString( user.getAttribute(ATTR_NAME       ), null ),
+								Objects.toString( user.getAttribute(ATTR_LOCATION   ), null ),
+								Objects.toString( user.getAttribute(ATTR_URL        ), null ),
+								Objects.toString( user.getAttribute(ATTR_AVATAR_URL ), null )
+						);
+				}
 
 			return new UserInfo(
 					true,
 					hasRole(user, Role.USER),
 					hasRole(user, Role.ADMIN),
-					Objects.toString( user.getAttribute(ATTR_ORIGINAL_ID), null ),
+					null,
 					Objects.toString( user.getAttribute(ATTR_USER_DB_ID ), null ),
-					Objects.toString( user.getAttribute(ATTR_LOGIN      ), null ),
-					Objects.toString( user.getAttribute(ATTR_NAME       ), null ),
-					Objects.toString( user.getAttribute(ATTR_LOCATION   ), null ),
-					Objects.toString( user.getAttribute(ATTR_URL        ), null ),
-					Objects.toString( user.getAttribute(ATTR_AVATAR_URL ), null )
+					null,
+					null,
+					null,
+					null,
+					null
 			);
 		}
 

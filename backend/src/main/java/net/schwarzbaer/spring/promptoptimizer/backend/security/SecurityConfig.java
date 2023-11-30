@@ -3,6 +3,8 @@ package net.schwarzbaer.spring.promptoptimizer.backend.security;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.services.StoredUserInfoService;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserService;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -92,14 +94,21 @@ public class SecurityConfig {
 
 		String registrationId = request.getClientRegistration().getRegistrationId();
 		String userDbId = registrationId + user.getName();
-		newAttributes.put("UserDbId", userDbId);
+
+		System.out.println("User: ["+ registrationId +"] "+ user.getName());
+		newAttributes.forEach((key, value) ->
+				System.out.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
+		);
+
+		newAttributes.put(UserService.ATTR_USER_DB_ID, userDbId);
+		newAttributes.put(UserService.ATTR_REGISTRATION_ID, registrationId);
 		Role role = null;
 
 		final Optional<StoredUserInfo> storedUserInfoOpt = storedUserInfoService.getUserById(userDbId);
 		if (storedUserInfoOpt.isPresent()) {
 			final StoredUserInfo storedUserInfo = storedUserInfoOpt.get();
 			role = storedUserInfo.role();
-			storedUserInfoService.updateUserIfNeeded(storedUserInfo, newAttributes);
+			storedUserInfoService.updateUserIfNeeded(storedUserInfo, registrationId, newAttributes);
 		}
 
 		if (role==null && initialAdmin.equals(userDbId))
@@ -109,10 +118,10 @@ public class SecurityConfig {
 			role = Role.UNKNOWN_ACCOUNT;
 
 		if (storedUserInfoOpt.isEmpty())
-			storedUserInfoService.addUser(role, registrationId, newAttributes);
+			storedUserInfoService.addUser(userDbId, registrationId, role, newAttributes);
 
 		newAuthorities.add(new SimpleGrantedAuthority(role.getLong()));
-		return new DefaultOAuth2User(newAuthorities, newAttributes, "id");
+		return new DefaultOAuth2User(newAuthorities, newAttributes, UserService.ATTR_USER_DB_ID);
 	}
 
 }
