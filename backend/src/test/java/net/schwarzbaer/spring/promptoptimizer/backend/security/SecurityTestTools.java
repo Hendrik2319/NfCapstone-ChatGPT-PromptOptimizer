@@ -18,15 +18,6 @@ import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttr
 public class SecurityTestTools {
 
 	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(
-		Role role,
-		String id,
-		String userDbId, 
-		String login
-	) {
-		throw new UnsupportedOperationException();
-	}
-
-	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(
 		@Nullable Role role,
 		@NonNull UserAttributesService.Registration registration
 	) {
@@ -52,9 +43,13 @@ public class SecurityTestTools {
 							token.claim("email", login);
 							break;
 					}
-					token.claim(UserAttributesService.ATTR_USER_DB_ID, registration.id + id);
+					token.claim(UserAttributesService.ATTR_USER_DB_ID, getUserDbId(id, registration));
 					token.claim(UserAttributesService.ATTR_REGISTRATION_ID, registration.id);
 				});
+	}
+
+	public static @NonNull String getUserDbId(@NonNull String userId, @NonNull UserAttributesService.Registration registration) {
+		return registration.id + userId;
 	}
 
 	public static class UserAndAdminRoles implements ArgumentsProvider {
