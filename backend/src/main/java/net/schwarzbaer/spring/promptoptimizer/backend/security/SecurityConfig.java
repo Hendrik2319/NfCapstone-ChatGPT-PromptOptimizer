@@ -88,7 +88,8 @@ public class SecurityConfig {
 	@Bean
 	public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService(StoredUserInfoService storedUserInfoService, UserAttributesService userAttributesService) {
 		DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
-		return request -> configureUserData(storedUserInfoService, userAttributesService, delegate, request);
+		return request ->
+			configureUserData(storedUserInfoService, userAttributesService, delegate, request);
 	}
 
 	DefaultOAuth2User configureUserData(
@@ -104,10 +105,10 @@ public class SecurityConfig {
 		String registrationId = request.getClientRegistration().getRegistrationId();
 		String userDbId = registrationId + user.getName();
 
-		System.out.println("User: ["+ registrationId +"] "+ user.getName());
-		newAttributes.forEach((key, value) ->
-				System.out.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
-		);
+		// System.out.println("User: ["+ registrationId +"] "+ user.getName());
+		// newAttributes.forEach((key, value) ->
+		// 		System.out.println("   ["+key+"]: "+value+ (value==null ? "" : " { Class:"+value.getClass().getName()+" }"))
+		// );
 
 		newAttributes.put(UserAttributesService.ATTR_USER_DB_ID, userDbId);
 		newAttributes.put(UserAttributesService.ATTR_REGISTRATION_ID, registrationId);
