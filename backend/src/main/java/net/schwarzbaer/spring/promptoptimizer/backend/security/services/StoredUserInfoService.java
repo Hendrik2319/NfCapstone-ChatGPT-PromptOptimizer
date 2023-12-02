@@ -17,6 +17,7 @@ public class StoredUserInfoService {
 
 	private final StoredUserInfoRepository storedUserInfoRepository;
 	private final UserService userService;
+	private final UserAttributesService userAttributesService;
 
 // ####################################################################################
 //               Called by SecurityConfig
@@ -26,34 +27,42 @@ public class StoredUserInfoService {
 		return storedUserInfoRepository.findById(userDbId);
 	}
 
-	public void addUser(Role role, String registrationId, Map<String, Object> newAttributes) {
+	public void addUser(String userDbId, String registrationId, Role role, Map<String, Object> newAttributes) {
+		userDbId = Objects.requireNonNull(userDbId);
+		role = Objects.requireNonNull(role);
+		newAttributes = Objects.requireNonNull(newAttributes);
+
 		storedUserInfoRepository.save(new StoredUserInfo(
-				Objects.toString(newAttributes.get(UserService.ATTR_USER_DB_ID ), null),
+				userDbId,
 				role,
 				registrationId,
-				Objects.toString(newAttributes.get(UserService.ATTR_ORIGINAL_ID), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_LOGIN      ), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_NAME       ), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_LOCATION   ), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_URL        ), null),
-				Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), null),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.ORIGINAL_ID, null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.LOGIN      , null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.NAME       , null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.LOCATION   , null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.URL        , null ),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.AVATAR_URL , null ),
 				null
 		));
 	}
 
-	public void updateUserIfNeeded(StoredUserInfo storedUserInfo, Map<String, Object> newAttributes) {
+	public void updateUserIfNeeded(StoredUserInfo storedUserInfo, String registrationId, Map<String, Object> newAttributes) {
+		storedUserInfo = Objects.requireNonNull(storedUserInfo);
+		newAttributes = Objects.requireNonNull(newAttributes);
+
 		StoredUserInfo updatedUserInfo = new StoredUserInfo(
 				storedUserInfo.id(),
 				storedUserInfo.role(),
 				storedUserInfo.registrationId(),
-				Objects.toString(newAttributes.get(UserService.ATTR_ORIGINAL_ID), storedUserInfo.originalId()),
-				Objects.toString(newAttributes.get(UserService.ATTR_LOGIN      ), storedUserInfo.login     ()),
-				Objects.toString(newAttributes.get(UserService.ATTR_NAME       ), storedUserInfo.name      ()),
-				Objects.toString(newAttributes.get(UserService.ATTR_LOCATION   ), storedUserInfo.location  ()),
-				Objects.toString(newAttributes.get(UserService.ATTR_URL        ), storedUserInfo.url       ()),
-				Objects.toString(newAttributes.get(UserService.ATTR_AVATAR_URL ), storedUserInfo.avatar_url()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.ORIGINAL_ID, storedUserInfo.originalId()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.LOGIN      , storedUserInfo.login     ()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.NAME       , storedUserInfo.name      ()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.LOCATION   , storedUserInfo.location  ()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.URL        , storedUserInfo.url       ()),
+				userAttributesService.getAttribute( newAttributes, registrationId, UserAttributesService.Field.AVATAR_URL , storedUserInfo.avatar_url()),
 				storedUserInfo.denialReason()
 		);
+		
 		if (!updatedUserInfo.equals(storedUserInfo))
 			storedUserInfoRepository.save(updatedUserInfo);
 	}

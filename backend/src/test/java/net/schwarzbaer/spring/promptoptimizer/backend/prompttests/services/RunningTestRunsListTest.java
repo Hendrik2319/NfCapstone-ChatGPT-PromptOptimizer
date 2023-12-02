@@ -1,14 +1,18 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.lang.NonNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.lang.NonNull;
+
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.RunningTestRunsList.ListEntry;
 
 class RunningTestRunsListTest {
 
@@ -143,6 +147,27 @@ class RunningTestRunsListTest {
 		// Then
 		List<RunningTestRunsList.ListEntry> entries = runningTestRuns.get("scenarioId1");
 		assertNull(entries);
+	}
+
+	@Test
+	void whenRemoveEntry_isCalledWithUnknownScenarioId() {
+		// Given
+		ListEntry entry =
+			addEntry("scenarioId1", 2, 5, "prompt1a", "label1a");
+		addEntry("scenarioId1", 3, 4, "prompt1b", "label1b");
+
+		// When
+		runningTestRunsList.removeEntry("scenarioId2", entry);
+
+		// Then
+		List<RunningTestRunsList.ListEntry> entries = runningTestRuns.get("scenarioId1");
+		assertNotNull(entries);
+		assertEquals(2, entries.size());
+
+		RunningTestRunsList.ListEntry entry0 = entries.get(0);
+		RunningTestRunsList.ListEntry entry1 = entries.get(1);
+		assertEntryEquals(entry0,2, 5, "prompt1a", "label1a");
+		assertEntryEquals(entry1,3, 4, "prompt1b", "label1b");
 	}
 
 	@Test

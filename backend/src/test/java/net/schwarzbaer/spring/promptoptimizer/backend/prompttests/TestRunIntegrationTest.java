@@ -1,14 +1,15 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.prompttests;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptTestTools;
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
-import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.RunningTestRunsList;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
-import okhttp3.mockwebserver.MockWebServer;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -26,13 +27,16 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.io.IOException;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import net.schwarzbaer.spring.promptoptimizer.backend.chatgpt.ChatGptTestTools;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.Scenario;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.models.TestRun;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.ScenarioRepository;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.repositories.TestRunRepository;
+import net.schwarzbaer.spring.promptoptimizer.backend.prompttests.services.RunningTestRunsList;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService.Registration;
+import okhttp3.mockwebserver.MockWebServer;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -116,6 +120,10 @@ class TestRunIntegrationTest {
 		);
 	}
 
+	private static @NonNull String getId(@NonNull String userId, @NonNull Registration registration) {
+		return SecurityTestTools.getUserDbId(userId, registration);
+	}
+
 //	####################################################################################
 //				getTestRunsOfScenario
 //	#################################################################################### 
@@ -138,16 +146,17 @@ class TestRunIntegrationTest {
 
 	@Test @DirtiesContext void whenGetTestRunsOfScenario_isCalledByUnknownAccount_returnsStatus403Forbidden() throws Exception {
 		whenGetTestRunsOfScenario_isCalled_returnsStatus403Forbidden(
-				"author1", "author1", Role.UNKNOWN_ACCOUNT
+			getId("author1", Registration.GOOGLE), Role.UNKNOWN_ACCOUNT, "author1", Registration.GOOGLE
 		);
 	}
 	@Test @DirtiesContext void whenGetTestRunsOfScenario_isCalledDifferentAuthorIds_returnsStatus403Forbidden() throws Exception {
 		whenGetTestRunsOfScenario_isCalled_returnsStatus403Forbidden(
-				"author3", "author2", Role.USER
+			getId("author3", Registration.GOOGLE), Role.USER, "author2", Registration.GOOGLE
 		);
 	}
-
-	private void whenGetTestRunsOfScenario_isCalled_returnsStatus403Forbidden(String storedAuthorID, String currentUserDbId, Role role) throws Exception {
+	private void whenGetTestRunsOfScenario_isCalled_returnsStatus403Forbidden(
+			@NonNull String storedAuthorID, @NonNull Role role, @NonNull String userId, @NonNull Registration registration
+	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("scenarioId1", storedAuthorID, "label1", 1));
 
@@ -155,7 +164,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.get("/api/scenario/%s/testrun".formatted("scenarioId1"))
-						.with(SecurityTestTools.buildUser(role, "id", currentUserDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, userId, registration, "login"))
 				)
 
 				// Then
@@ -164,16 +173,17 @@ class TestRunIntegrationTest {
 
 	@Test @DirtiesContext void whenGetTestRunsOfScenario_isCalledByAdmin_returnsList() throws Exception {
 		whenGetTestRunsOfScenario_isCalledByAllowedUser_returnsList(
-				"authorOther", Role.ADMIN, "authorAdmin"
+			getId("authorOther", Registration.GITHUB), Role.ADMIN, "authorAdmin", Registration.GITHUB
 		);
 	}
 	@Test @DirtiesContext void whenGetTestRunsOfScenario_isCalledByUser_returnsList() throws Exception {
 		whenGetTestRunsOfScenario_isCalledByAllowedUser_returnsList(
-				"authorUser", Role.USER, "authorUser"
+			getId("authorUser", Registration.GITHUB), Role.USER, "authorUser", Registration.GITHUB
 		);
 	}
-
-	private void whenGetTestRunsOfScenario_isCalledByAllowedUser_returnsList(String scenarioAuthorId, Role role, String userDbId) throws Exception {
+	private void whenGetTestRunsOfScenario_isCalledByAllowedUser_returnsList(
+			@NonNull String scenarioAuthorId, @NonNull Role role, @NonNull String userId, @NonNull Registration registration
+	) throws Exception {
 		// Given
 		String scenarioId = "scenarioId1";
 		scenarioRepository.save(new Scenario(scenarioId, scenarioAuthorId, "label1", 1));
@@ -185,7 +195,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.get("/api/scenario/%s/testrun".formatted(scenarioId))
-						.with(SecurityTestTools.buildUser(role, "id", userDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, userId, registration, "login"))
 				)
 
 				// Then
@@ -205,17 +215,16 @@ class TestRunIntegrationTest {
 	@Test @DirtiesContext void whenGetTestRunsOfScenario_isCalledWithEmptyDB_returnsEmptyList() throws Exception {
 		whenGetTestRunsOfScenario_returnsEmptyList(null, "scenarioId1");
 	}
-
 	private void whenGetTestRunsOfScenario_returnsEmptyList(String storedScenarioId, String requestedScenarioId) throws Exception {
 		// Given
 		if (storedScenarioId!=null)
-			scenarioRepository.save(new Scenario(storedScenarioId, "author1", "label1", 1));
+			scenarioRepository.save(new Scenario(storedScenarioId, getId("author1", Registration.GITHUB), "label1", 1));
 
 		// When
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.get("/api/scenario/%s/testrun".formatted(requestedScenarioId))
-						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+						.with(SecurityTestTools.buildUser(Role.USER, "author1", Registration.GITHUB, "login"))
 				)
 
 				// Then
@@ -228,13 +237,18 @@ class TestRunIntegrationTest {
 //	####################################################################################
 
 	@Test @DirtiesContext void whenAddTestRun_isCalledByUser_returnsStoredTestRun() throws Exception {
-		whenAddTestRun_isCalledByAllowedUser_returnsStoredTestRun("authorUser", Role.USER, "authorUser");
+		whenAddTestRun_isCalledByAllowedUser_returnsStoredTestRun(
+			getId("authorUser", Registration.GOOGLE), Role.USER, "authorUser", Registration.GOOGLE
+		);
 	}
 	@Test @DirtiesContext void whenAddTestRun_isCalledByAdmin_returnsStoredTestRun() throws Exception {
-		whenAddTestRun_isCalledByAllowedUser_returnsStoredTestRun("authorOther", Role.ADMIN, "authorAdmin");
+		whenAddTestRun_isCalledByAllowedUser_returnsStoredTestRun(
+			getId("authorOther", Registration.GOOGLE), Role.ADMIN, "authorAdmin", Registration.GOOGLE
+		);
 	}
-
-	private void whenAddTestRun_isCalledByAllowedUser_returnsStoredTestRun(String storedAuthorID, Role role, String userDbId) throws Exception {
+	private void whenAddTestRun_isCalledByAllowedUser_returnsStoredTestRun(
+			@NonNull String storedAuthorID, @NonNull Role role, @NonNull String userId, @NonNull Registration registration
+	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("scenarioId1", storedAuthorID, "label1", 1));
 
@@ -242,7 +256,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.post("/api/scenario/scenarioId1/testrun")
-						.with(SecurityTestTools.buildUser(role, "id", userDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, userId, registration, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(createTestRunJSON(null, "scenarioId1", true))
 				)
@@ -255,14 +269,14 @@ class TestRunIntegrationTest {
 	}
 
 	@Test @DirtiesContext
-	void whenAddTestRun_isCalledWithUnknownScenarioId_returnsStoredTestRun() throws Exception {
+	void whenAddTestRun_isCalledWithUnknownScenarioId_returnsStatus404NotFound() throws Exception {
 		// Given
 
 		// When
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.post("/api/scenario/scenarioId1/testrun")
-						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+						.with(SecurityTestTools.buildUser(Role.USER, "author1", Registration.GOOGLE, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(createTestRunJSON(null, "scenarioId1", true))
 				)
@@ -281,7 +295,6 @@ class TestRunIntegrationTest {
 				"scenarioId3", null, "scenarioId2"
 		);
 	}
-
 	private void whenAddTestRun_isCalled_returnsStatus400BadRequest(@NonNull String scenarioIdInPath, String testRunId, @NonNull String scenarioIdInTestRun) throws Exception {
 		// Given
 
@@ -289,7 +302,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.post("/api/scenario/%s/testrun".formatted(scenarioIdInPath))
-						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+						.with(SecurityTestTools.buildUser(Role.USER, "author1", Registration.GITHUB, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(createTestRunJSON(testRunId, scenarioIdInTestRun, true))
 				)
@@ -315,16 +328,18 @@ class TestRunIntegrationTest {
 	}
 
 	@Test @DirtiesContext void whenAddTestRun_isCalledByUnknownAccount_returnsStatus403Forbidden() throws Exception {
-		whenAddTestRun_returnsStatus403Forbidden("author1", Role.UNKNOWN_ACCOUNT, "author1");
+		whenAddTestRun_returnsStatus403Forbidden(
+			getId("author1", Registration.GOOGLE), Role.UNKNOWN_ACCOUNT, "author1", Registration.GOOGLE
+		);
 	}
 	@Test @DirtiesContext void whenAddTestRun_isCalledWithDifferentAuthorIds_returnsStatus403Forbidden() throws Exception {
-		whenAddTestRun_returnsStatus403Forbidden("authorA", Role.USER, "authorB");
+		whenAddTestRun_returnsStatus403Forbidden(
+			getId("authorA", Registration.GOOGLE), Role.USER, "authorB", Registration.GOOGLE
+		);
 	}
-	@Test @DirtiesContext void whenAddTestRun_isCalledWithUserWithoutUserDbId_returnsStatus403Forbidden() throws Exception {
-		whenAddTestRun_returnsStatus403Forbidden("author1", Role.USER, null);
-	}
-
-	private void whenAddTestRun_returnsStatus403Forbidden(String storedAuthorID, Role role, String userDbId) throws Exception {
+	private void whenAddTestRun_returnsStatus403Forbidden(
+			@NonNull String storedAuthorID, @NonNull Role role, @NonNull String userId, @NonNull Registration registration
+	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("scenarioId1", storedAuthorID, "label1", 1));
 
@@ -332,7 +347,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.post("/api/scenario/%s/testrun".formatted("scenarioId1"))
-						.with(SecurityTestTools.buildUser(role, "id", userDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, userId, registration, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(createTestRunJSON(null, "scenarioId1", true))
 				)
@@ -353,7 +368,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.post("/api/testrun")
-						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+						.with(SecurityTestTools.buildUser(Role.USER, "author1", Registration.GITHUB, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(createNewTestRunJSON(null))
 				)
@@ -381,21 +396,17 @@ class TestRunIntegrationTest {
 
 	@Test @DirtiesContext void whenPerformTestRun_isCalledByUnknownAccount_returnsStatus403Forbidden() throws Exception {
 		whenPerformTestRun_isCalledByNotAllowedUser_returnsStatus403Forbidden(
-				"author1", Role.UNKNOWN_ACCOUNT, "author1"
+			getId("author1", Registration.GOOGLE), Role.UNKNOWN_ACCOUNT, "author1", Registration.GOOGLE
 		);
 	}
 	@Test @DirtiesContext void whenPerformTestRun_isCalledDifferentAuthorIds_returnsStatus403Forbidden() throws Exception {
 		whenPerformTestRun_isCalledByNotAllowedUser_returnsStatus403Forbidden(
-				"authorA", Role.USER, "authorB"
+			getId("authorA", Registration.GOOGLE), Role.USER, "authorB", Registration.GOOGLE
 		);
 	}
-	@Test @DirtiesContext void whenPerformTestRun_isCalledNoUserDbId_returnsStatus403Forbidden() throws Exception {
-		whenPerformTestRun_isCalledByNotAllowedUser_returnsStatus403Forbidden(
-				"authorA", Role.USER, null
-		);
-	}
-
-	private void whenPerformTestRun_isCalledByNotAllowedUser_returnsStatus403Forbidden(String scenarioAuthorID, Role role, String userDbId) throws Exception {
+	private void whenPerformTestRun_isCalledByNotAllowedUser_returnsStatus403Forbidden(
+			@NonNull String scenarioAuthorID, @NonNull Role role, @NonNull String userId, @NonNull Registration registration
+	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("scenarioId1", scenarioAuthorID, "label1", 1));
 
@@ -403,7 +414,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.post("/api/testrun")
-						.with(SecurityTestTools.buildUser(role, "id", userDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, userId, registration, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(createNewTestRunJSON("scenarioId1"))
 				)
@@ -421,7 +432,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.post("/api/testrun")
-						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+						.with(SecurityTestTools.buildUser(Role.USER, "author1", Registration.GITHUB, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(createNewTestRunJSON("scenarioIdOther"))
 				)
@@ -431,13 +442,18 @@ class TestRunIntegrationTest {
 	}
 
 	@Test @DirtiesContext void whenPerformTestRun_isCalledByUser() throws Exception {
-		whenPerformTestRun_isCalledByAllowedUser("author1", Role.USER, "author1");
+		whenPerformTestRun_isCalledByAllowedUser(
+			getId("author1", Registration.GOOGLE), Role.USER, "author1", Registration.GOOGLE
+		);
 	}
 	@Test @DirtiesContext void whenPerformTestRun_isCalledByAdmin() throws Exception {
-		whenPerformTestRun_isCalledByAllowedUser("authorOther", Role.ADMIN, "authorAdmin");
+		whenPerformTestRun_isCalledByAllowedUser(
+			getId("authorOther", Registration.GOOGLE), Role.ADMIN, "authorAdmin", Registration.GOOGLE
+		);
 	}
-
-	private void whenPerformTestRun_isCalledByAllowedUser(String scenarioAuthorID, Role role, String userDbId) throws Exception {
+	private void whenPerformTestRun_isCalledByAllowedUser(
+			@NonNull String scenarioAuthorID, @NonNull Role role, @NonNull String userId, @NonNull Registration registration
+	) throws Exception {
 		// Given
 		scenarioRepository.save(new Scenario("scenarioId1", scenarioAuthorID, "label1", 1));
 		mockWebServer.enqueue(
@@ -448,7 +464,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.post("/api/testrun")
-						.with(SecurityTestTools.buildUser(role, "id", userDbId, "login"))
+						.with(SecurityTestTools.buildUser(role, userId, registration, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(createNewTestRunJSON("scenarioId1", "TestPrompt"))
 				)
@@ -479,7 +495,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.get("/api/scenario/%s/testrunstate".formatted(scenarioId))
-						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+						.with(SecurityTestTools.buildUser(Role.USER, "author1", Registration.GITHUB, "login"))
 				)
 
 				// Then
@@ -497,7 +513,7 @@ class TestRunIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.get("/api/scenario/%s/testrunstate".formatted("scenarioId1"))
-						.with(SecurityTestTools.buildUser(Role.USER, "id", "author1", "login"))
+						.with(SecurityTestTools.buildUser(Role.USER, "author1", Registration.GOOGLE, "login"))
 				)
 
 				// Then

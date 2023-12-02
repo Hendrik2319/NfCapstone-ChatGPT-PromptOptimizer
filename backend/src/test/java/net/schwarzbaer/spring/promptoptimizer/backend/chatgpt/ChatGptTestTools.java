@@ -1,19 +1,22 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
-import okhttp3.mockwebserver.MockResponse;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService.Registration;
+import okhttp3.mockwebserver.MockResponse;
+
 public class ChatGptTestTools {
 
-	public static MockHttpServletRequestBuilder buildAskRequest(String prompt, Role role) {
+	public static MockHttpServletRequestBuilder buildAskRequest(String prompt, Role role, @NonNull Registration registration) {
 		return MockMvcRequestBuilders
 				.post("/api/ask")
 
-				.with(SecurityTestTools.buildUser(role))
+				.with(SecurityTestTools.buildUser(role, registration))
 
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("""

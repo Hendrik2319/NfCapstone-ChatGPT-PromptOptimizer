@@ -1,8 +1,10 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.chatgpt;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
-import okhttp3.mockwebserver.MockWebServer;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.io.IOException;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,10 +21,10 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.io.IOException;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.SecurityTestTools;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService.Registration;
+import okhttp3.mockwebserver.MockWebServer;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -73,7 +75,7 @@ class ChatGptIntegrationTest {
 
 		// When
 		mockMvc
-				.perform(ChatGptTestTools.buildAskRequest("TestPrompt", Role.UNKNOWN_ACCOUNT))
+				.perform(ChatGptTestTools.buildAskRequest("TestPrompt", Role.UNKNOWN_ACCOUNT, Registration.GOOGLE))
 
 				// Then
 				.andExpect(status().is(HttpStatus.FORBIDDEN.value()))
@@ -90,7 +92,7 @@ class ChatGptIntegrationTest {
 
 		// When
 		mockMvc
-				.perform(ChatGptTestTools.buildAskRequest("TestPrompt", role))
+				.perform(ChatGptTestTools.buildAskRequest("TestPrompt", role, Registration.GOOGLE))
 
 				// Then
 				.andExpect(status().isOk())

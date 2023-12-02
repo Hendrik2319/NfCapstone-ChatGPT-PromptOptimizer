@@ -1,6 +1,9 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
@@ -9,28 +12,44 @@ import org.springframework.lang.Nullable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
-import java.util.stream.Stream;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService;
 
 public class SecurityTestTools {
 
-	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(@Nullable Role role) {
-		return buildUser(role, "TestID", null, "TestLogin");
+	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(
+		@Nullable Role role,
+		@NonNull UserAttributesService.Registration registration
+	) {
+		return buildUser(role, "TestID", registration, "TestLogin");
 	}
 
-	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(@Nullable Role role, @NonNull String id, @NonNull String login) {
-		return buildUser(role, id, null, login);
-	}
-
-	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(@Nullable Role role, @NonNull String id, @Nullable String userDbId, @NonNull String login) {
+	public static SecurityMockMvcRequestPostProcessors.OidcLoginRequestPostProcessor buildUser(
+		@Nullable Role role,
+		@NonNull String id,
+		@NonNull UserAttributesService.Registration registration,
+		@NonNull String login
+	) {
 		return oidcLogin()
 				.authorities(new SimpleGrantedAuthority(role == null ? "DummyAuthority" : role.getLong()))
 				.userInfoToken(token -> {
-					token.claim("id", id);
-					token.claim("login", login);
-					if (userDbId!=null) token.claim("UserDbId", userDbId);
+					switch (registration) {
+						case GITHUB:
+							token.claim("id", id);
+							token.claim("login", login);
+							break;
+						case GOOGLE:
+							token.claim("original_Id", id);
+							token.claim("email", login);
+							break;
+					}
+					token.claim(UserAttributesService.ATTR_USER_DB_ID, getUserDbId(id, registration));
+					token.claim(UserAttributesService.ATTR_REGISTRATION_ID, registration.id);
 				});
+	}
+
+	public static @NonNull String getUserDbId(@NonNull String userId, @NonNull UserAttributesService.Registration registration) {
+		return registration.id + userId;
 	}
 
 	public static class UserAndAdminRoles implements ArgumentsProvider {

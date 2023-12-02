@@ -1,8 +1,15 @@
 package net.schwarzbaer.spring.promptoptimizer.backend.security;
 
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
-import net.schwarzbaer.spring.promptoptimizer.backend.security.repositories.StoredUserInfoRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,13 +27,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.junit.jupiter.api.Assertions.*;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.Role;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.models.StoredUserInfo;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.repositories.StoredUserInfoRepository;
+import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService.Registration;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,7 +53,7 @@ class UserManagementIntegrationTest {
 
 	private static String buildCurrentUserResponse(
 			boolean isAuthenticated, boolean isUser, boolean isAdmin,
-			@NonNull String id, @Nullable String login
+			@NonNull String id, @Nullable String userDbId, @Nullable String login
 	) {
 		return """
 					{
@@ -57,7 +61,7 @@ class UserManagementIntegrationTest {
 						"isUser"         : %s,
 						"isAdmin"        : %s,
 						"id"        : "%s",
-						"userDbId"  : null,
+						"userDbId"  : %s,
 						"login"     : %s,
 						"name"      : null,
 						"location"  : null,
@@ -70,7 +74,8 @@ class UserManagementIntegrationTest {
 						isUser,
 						isAdmin,
 						id,
-						login==null ? null : "\"%s\"".formatted( login )
+						userDbId==null ? null : "\"%s\"".formatted( userDbId ),
+						login   ==null ? null : "\"%s\"".formatted( login    )
 				);
 	}
 
@@ -100,39 +105,52 @@ class UserManagementIntegrationTest {
 				.andExpect(status().isOk())
 				.andExpect(content().json(buildCurrentUserResponse(
 						false, false, false,
-						id, null)
+						id, null, null)
 				))
 		;
 	}
 
 	@Test void whenGetCurrentUser_isCalledWithAuthenticatedUser() throws Exception {
-		whenGetCurrentUser_isCalledWithAuthenticatedUser(null, false, false);
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(null, false, false, Registration.GITHUB);
 	}
-	@Test void whenGetCurrentUser_isCalledWithUnknownAccount() throws Exception {
-		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.UNKNOWN_ACCOUNT, false, false);
+	@Test void whenGetCurrentUser_isCalledWithUnknownGithubAccount() throws Exception {
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.UNKNOWN_ACCOUNT, false, false, Registration.GITHUB);
 	}
-	@Test void whenGetCurrentUser_isCalledWithUSER() throws Exception {
-		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.USER, true, false);
+	@Test void whenGetCurrentUser_isCalledWithUnknownGoogleAccount() throws Exception {
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.UNKNOWN_ACCOUNT, false, false, Registration.GOOGLE);
 	}
-	@Test void whenGetCurrentUser_isCalledWithADMIN() throws Exception {
-		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.ADMIN, false, true);
+	@Test void whenGetCurrentUser_isCalledWithGithubUSER() throws Exception {
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.USER, true, false, Registration.GITHUB);
 	}
-	private void whenGetCurrentUser_isCalledWithAuthenticatedUser(Role role, boolean isUser, boolean isAdmin) throws Exception {
+	@Test void whenGetCurrentUser_isCalledWithGoogleUSER() throws Exception {
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.USER, true, false, Registration.GOOGLE);
+	}
+	@Test void whenGetCurrentUser_isCalledWithGithubADMIN() throws Exception {
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.ADMIN, false, true, Registration.GITHUB);
+	}
+	@Test void whenGetCurrentUser_isCalledWithGoogleADMIN() throws Exception {
+		whenGetCurrentUser_isCalledWithAuthenticatedUser(Role.ADMIN, false, true, Registration.GOOGLE);
+	}
+	private void whenGetCurrentUser_isCalledWithAuthenticatedUser(
+		@Nullable Role role,
+		boolean isUser, boolean isAdmin,
+		@NonNull Registration registration
+	) throws Exception {
 		// Given
 
 		// When
 		mockMvc
 				.perform( MockMvcRequestBuilders
 						.get("/api/users/me")
-						.with(SecurityTestTools.buildUser(role, "TestID", "TestLogin"))
+						.with(SecurityTestTools.buildUser(role, "TestID", registration, "TestLogin"))
 				)
 
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().json(buildCurrentUserResponse(
 						true, isUser, isAdmin,
-						"TestID", "TestLogin")
-				))
+						"TestID", registration.id + "TestID", "TestLogin"
+				)))
 		;
 	}
 
@@ -142,8 +160,14 @@ class UserManagementIntegrationTest {
 
 	@NonNull
 	private static StoredUserInfo createStoredUserInfo(Role role, String originalId, int index) {
+		return createStoredUserInfo(role, originalId, null, index);
+	}
+
+	@NonNull
+	private static StoredUserInfo createStoredUserInfo(Role role, String originalId, Registration registration, int index) {
+		String registrationId = registration==null ? "registrationId" : registration.id;
 		return new StoredUserInfo(
-				"registrationId" + originalId, role, "registrationId", originalId,
+				registrationId + originalId, role, registrationId, originalId,
 				"login" + index, "name" + index, "location" + index, "url" + index,
 				"avatarUrl" + index, "reason" + index
 		);
@@ -170,28 +194,39 @@ class UserManagementIntegrationTest {
 	}
 
 	private void fillStoredUserInfoRepository() {
-		storedUserInfoRepository.save(createStoredUserInfo(Role.ADMIN          , "userId1", 1));
-		storedUserInfoRepository.save(createStoredUserInfo(Role.USER           , "userId2", 2));
-		storedUserInfoRepository.save(createStoredUserInfo(Role.UNKNOWN_ACCOUNT, "userId3", 3));
+		fillStoredUserInfoRepository(null);
+	}
+	private void fillStoredUserInfoRepository(Registration registration) {
+		storedUserInfoRepository.save(createStoredUserInfo(Role.ADMIN          , "userId1", registration, 1));
+		storedUserInfoRepository.save(createStoredUserInfo(Role.USER           , "userId2", registration, 2));
+		storedUserInfoRepository.save(createStoredUserInfo(Role.UNKNOWN_ACCOUNT, "userId3", registration, 3));
 	}
 	private void assertStoredUserInfoRepositoryUnchanged() {
-		asserEntryEquals("registrationIduserId1", createStoredUserInfo(Role.ADMIN          , "userId1", 1));
-		asserEntryEquals("registrationIduserId2", createStoredUserInfo(Role.USER           , "userId2", 2));
-		asserEntryEquals("registrationIduserId3", createStoredUserInfo(Role.UNKNOWN_ACCOUNT, "userId3", 3));
+		assertStoredUserInfoRepositoryUnchanged(null);
+	}
+	private void assertStoredUserInfoRepositoryUnchanged(Registration registration) {
+		String registrationId = registration==null ? "registrationId" : registration.id;
+		asserEntryEquals(registrationId+"userId1", createStoredUserInfo(Role.ADMIN          , "userId1", registration, 1));
+		asserEntryEquals(registrationId+"userId2", createStoredUserInfo(Role.USER           , "userId2", registration, 2));
+		asserEntryEquals(registrationId+"userId3", createStoredUserInfo(Role.UNKNOWN_ACCOUNT, "userId3", registration, 3));
 	}
 	private void assertStoredUserInfoRepositoryHasOneChange(String originalId, StoredUserInfo expected) {
-		asserEntryEquals("registrationIduserId1", "userId1".equals(originalId) ? expected : createStoredUserInfo(Role.ADMIN          , "userId1", 1));
-		asserEntryEquals("registrationIduserId2", "userId2".equals(originalId) ? expected : createStoredUserInfo(Role.USER           , "userId2", 2));
-		asserEntryEquals("registrationIduserId3", "userId3".equals(originalId) ? expected : createStoredUserInfo(Role.UNKNOWN_ACCOUNT, "userId3", 3));
+		assertStoredUserInfoRepositoryHasOneChange(originalId, expected, null);
+	}
+	private void assertStoredUserInfoRepositoryHasOneChange(String originalId, StoredUserInfo expected, Registration registration) {
+		String registrationId = registration==null ? "registrationId" : registration.id;
+		asserEntryEquals(registrationId+"userId1", "userId1".equals(originalId) ? expected : createStoredUserInfo(Role.ADMIN          , "userId1", registration, 1));
+		asserEntryEquals(registrationId+"userId2", "userId2".equals(originalId) ? expected : createStoredUserInfo(Role.USER           , "userId2", registration, 2));
+		asserEntryEquals(registrationId+"userId3", "userId3".equals(originalId) ? expected : createStoredUserInfo(Role.UNKNOWN_ACCOUNT, "userId3", registration, 3));
 	}
 	private void asserEntryEquals(String id, StoredUserInfo expected) {
 		Optional<StoredUserInfo> actualOpt = storedUserInfoRepository.findById(id);
 		assertNotNull(actualOpt);
 		if (expected==null)
-			assertTrue(actualOpt.isEmpty());
+			assertTrue(actualOpt.isEmpty(), "Entry["+id+"] is empty");
 		else
 		{
-			assertTrue(actualOpt.isPresent());
+			assertTrue(actualOpt.isPresent(), "Entry["+id+"] is present");
 			assertEquals(expected, actualOpt.get());
 		}
 	}
@@ -263,7 +298,7 @@ class UserManagementIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.get("/api/users")
-						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "registrationIduserId1", "login"))
+						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", Registration.GOOGLE, "login"))
 				)
 
 				// Then
@@ -289,7 +324,7 @@ class UserManagementIntegrationTest {
 		// Given
 		performRequest_return403Forbidden(MockMvcRequestBuilders
 				.get("/api/users")
-				.with(SecurityTestTools.buildUser(role, userId, "registrationId" + userId, "login")));
+				.with(SecurityTestTools.buildUser(role, userId, Registration.GOOGLE, "login")));
 	}
 
 	@Test @DirtiesContext
@@ -312,7 +347,7 @@ class UserManagementIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.put("/api/users/%s".formatted("registrationIduserId2"))
-						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "registrationIduserId1", "login"))
+						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", Registration.GITHUB, "login"))
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(
 								buildResponse(createStoredUserInfo(Role.USER, "userId2", 7))
@@ -334,7 +369,7 @@ class UserManagementIntegrationTest {
 	void whenUpdateStoredUser_isCalledWithUnknownId_returns404NotFound() throws Exception {
 		MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
 				.put("/api/users/%s".formatted("registrationIduserId7"))
-				.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "registrationIduserId1", "login"))
+				.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", Registration.GOOGLE, "login"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(
 						buildResponse(createStoredUserInfo(Role.USER, "userId7", 7))
@@ -353,7 +388,7 @@ class UserManagementIntegrationTest {
 	private void whenUpdateStoredUser_isCalledByNotAllowedUser_returns403Forbidden(Role role) throws Exception {
 		performRequest_return403Forbidden( MockMvcRequestBuilders
 				.put("/api/users/%s".formatted("registrationIduserId2"))
-				.with(SecurityTestTools.buildUser(role, "userId1", "registrationIduserId1", "login"))
+				.with(SecurityTestTools.buildUser(role, "userId1", Registration.GOOGLE, "login"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(
 						buildResponse(createStoredUserInfo(Role.USER, "userId2", 7))
@@ -383,7 +418,7 @@ class UserManagementIntegrationTest {
 	private void whenUpdateStoredUser_isCalledWithWrongIDs_returns400BadRequest(String idInPath, String idInData) throws Exception {
 		performRequest_return400BadRequest( MockMvcRequestBuilders
 				.put("/api/users/%s".formatted("registrationId" + idInPath))
-				.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "registrationIduserId1", "login"))
+				.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", Registration.GOOGLE, "login"))
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(
 						buildResponse(createStoredUserInfo(Role.USER, idInData, 7))
@@ -404,7 +439,7 @@ class UserManagementIntegrationTest {
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.delete("/api/users/%s".formatted("registrationIduserId3"))
-						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "registrationIduserId1", "login"))
+						.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", Registration.GOOGLE, "login"))
 				)
 
 				// Then
@@ -418,7 +453,7 @@ class UserManagementIntegrationTest {
 	void whenDeleteStoredUser_isCalledWithUnknownId_returns404NotFound() throws Exception {
 		performRequest_return404NotFound( MockMvcRequestBuilders
 				.delete("/api/users/%s".formatted("registrationIduserId7"))
-				.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", "registrationIduserId1", "login"))
+				.with(SecurityTestTools.buildUser(Role.ADMIN, "userId1", Registration.GOOGLE, "login"))
 		);
 	}
 
@@ -433,7 +468,7 @@ class UserManagementIntegrationTest {
 	private void whenDeleteStoredUser_isCalledByNotAllowedUser_returns403Forbidden(Role role, @NonNull String userId) throws Exception {
 		performRequest_return403Forbidden( MockMvcRequestBuilders
 				.delete("/api/users/%s".formatted("registrationIduserId2"))
-				.with(SecurityTestTools.buildUser(role, userId, "registrationId" + userId, "login"))
+				.with(SecurityTestTools.buildUser(role, userId, Registration.GOOGLE, "login"))
 		);
 	}
 
@@ -450,36 +485,37 @@ class UserManagementIntegrationTest {
 
 	@Test @DirtiesContext
 	void whenGetDenialReasonForCurrentUser_isCalledByADMIN_returnsString() throws Exception {
-		whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role.ADMIN, "userId1", "reason1");
+		whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role.ADMIN, "userId1", "reason1", Registration.GOOGLE);
 	}
 	@Test @DirtiesContext
 	void whenGetDenialReasonForCurrentUser_isCalledUSER_returnsString() throws Exception {
-		whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role.USER, "userId2", "reason2");
+		whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role.USER, "userId2", "reason2", Registration.GITHUB);
 	}
 	@Test @DirtiesContext
 	void whenGetDenialReasonForCurrentUser_isCalledUnknownAccount_returnsString() throws Exception {
-		whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role.UNKNOWN_ACCOUNT, "userId3", "reason3");
+		whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role.UNKNOWN_ACCOUNT, "userId3", "reason3", Registration.GOOGLE);
 	}
 	@Test @DirtiesContext
 	void whenGetDenialReasonForCurrentUser_isCalledWithUnknownUserId_returnsEmptyString() throws Exception { // --> no reason --> "Please wait, until ..."
-		whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role.UNKNOWN_ACCOUNT, "userId4", "");
+		whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role.UNKNOWN_ACCOUNT, "userId4", "", Registration.GOOGLE);
 	}
-	private void whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role role, @NonNull String originalId, @NonNull String expectedReason) throws Exception {
+	private void whenGetDenialReasonForCurrentUser_isCalledNormal_returnsString(Role role, @NonNull String originalId, @NonNull String expectedReason, @NonNull Registration registration)
+			throws Exception {
 		// Given
-		fillStoredUserInfoRepository();
+		fillStoredUserInfoRepository(registration);
 
 		// When
 		mockMvc
 				.perform(MockMvcRequestBuilders
 						.get("/api/users/reason")
-						.with(SecurityTestTools.buildUser(role, originalId, "registrationId"+ originalId, "login"))
+						.with(SecurityTestTools.buildUser(role, originalId, registration, "login"))
 				)
 
 				// Then
 				.andExpect(status().isOk())
 				.andExpect(content().string(expectedReason));
 
-		assertStoredUserInfoRepositoryUnchanged();
+		assertStoredUserInfoRepositoryUnchanged(registration);
 	}
 
 	@Test @DirtiesContext

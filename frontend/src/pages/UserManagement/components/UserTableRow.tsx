@@ -87,7 +87,7 @@ export default function UserTableRow( props_:Readonly<Props> ) {
     return (
         <tr>
             <td className={"Name"}>
-                {user.avatar_url && <img className={"AvatarImage"} alt={"Avatar of user with ID "+user.id} src={user.avatar_url}/>}
+                {user.avatar_url && <img className={"AvatarImage"} alt={"[Avatar]"} title={"Avatar of user with ID "+user.id} src={user.avatar_url}/>}
                 {"   "}
                 {getReplacementIfNeeded(user.name, "------")}
             </td>
@@ -115,7 +115,8 @@ export default function UserTableRow( props_:Readonly<Props> ) {
                 {
                     user.denialReason &&
                     <EditButton onClick={() => showEditReasonDialog({ user })}>
-                        { trimLongText( user.denialReason, 35 )+" " }
+                        <span title={user.denialReason}>{ trimLongText( user.denialReason, 35 )}</span>
+                        {" "}
                         <ButtonSVG>{ SVGsInVars.Edit }</ButtonSVG>
                     </EditButton>
                 }
