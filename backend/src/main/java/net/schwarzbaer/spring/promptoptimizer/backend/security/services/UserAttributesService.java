@@ -44,21 +44,23 @@ public class UserAttributesService {
 		HashMap<String, Map<Field, String>> newConfig = new HashMap<>();
 		EnumMap<Field, String> fields;
 
-		newConfig.put(Registration.GITHUB.id, fields = new EnumMap<>(Field.class));
+		fields = new EnumMap<>(Field.class);
 		fields.put( Field.ORIGINAL_ID, "id"         );
 		fields.put( Field.LOGIN      , "login"      );
 		fields.put( Field.NAME       , "name"       );
 		fields.put( Field.LOCATION   , "location"   );
 		fields.put( Field.URL        , "html_url"   );
 		fields.put( Field.AVATAR_URL , "avatar_url" );
+		newConfig.put(Registration.GITHUB.id, fields);
 
-		newConfig.put(Registration.GOOGLE.id, fields = new EnumMap<>(Field.class));
+		fields = new EnumMap<>(Field.class);
 		fields.put( Field.ORIGINAL_ID, "original_Id");
 		fields.put( Field.LOGIN      , "email"      );
 		fields.put( Field.NAME       , "name"       );
 		fields.put( Field.LOCATION   , "locale"     );
 	//	fields.put( Field.URL        , "html_url"   );
 		fields.put( Field.AVATAR_URL , "picture"    );
+		newConfig.put(Registration.GOOGLE.id, fields);
 
 		return newConfig;
 	}
@@ -81,22 +83,22 @@ public class UserAttributesService {
 		return Objects.toString( userAttributes.get(field), nullDefault );
 	}
 
-    public String getAttribute( @NonNull OAuth2AuthenticatedPrincipal user, String registrationId, Field field, String nullDefault )
+	public String getAttribute( @NonNull OAuth2AuthenticatedPrincipal user, String registrationId, Field field, String nullDefault )
 	{
-        return getAttribute( user, registrationId, field, nullDefault, this::getAttribute );
-    }
-
-    public String getAttribute( @NonNull Map<String, Object> userAttributes, String registrationId, Field field, String nullDefault )
-	{
-        return getAttribute( userAttributes, registrationId, field, nullDefault, this::getAttribute );
-    }
-
-	
-	private interface GetAttributeFunction<Source> {
-		String getAttribute( @NonNull Source source, @NonNull String field, String nullDefault);
+		return getAttribute( user, registrationId, field, nullDefault, this::getAttribute );
 	}
 
-    private <Source> String getAttribute( @NonNull Source source, String registrationId, Field field, String nullDefault, GetAttributeFunction<Source> getAttribute )
+	public String getAttribute( @NonNull Map<String, Object> userAttributes, String registrationId, Field field, String nullDefault )
+	{
+		return getAttribute( userAttributes, registrationId, field, nullDefault, this::getAttribute );
+	}
+
+	
+	private interface GetAttributeFunction<S> {
+		String getAttribute( @NonNull S source, @NonNull String field, String nullDefault);
+	}
+
+	private <S> String getAttribute( @NonNull S source, String registrationId, Field field, String nullDefault, GetAttributeFunction<S> getAttribute )
 	{
 		Map<Field, String> attrNames = config.get(registrationId);
 		if (attrNames==null) return nullDefault;
@@ -104,6 +106,6 @@ public class UserAttributesService {
 		String attrName = attrNames.get(field);
 		if (attrName==null) return nullDefault;
 
-        return getAttribute.getAttribute( source, attrName, nullDefault );
-    }
+		return getAttribute.getAttribute( source, attrName, nullDefault );
+	}
 }

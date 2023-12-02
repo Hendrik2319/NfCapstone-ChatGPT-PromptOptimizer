@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService.Field;
 import net.schwarzbaer.spring.promptoptimizer.backend.security.services.UserAttributesService.Registration;
 
-public class UserAttributesServiceTest {
+class UserAttributesServiceTest {
     
 	private UserAttributesService userAttributesService;
 
